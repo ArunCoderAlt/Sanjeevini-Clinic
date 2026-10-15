@@ -1,0 +1,20 @@
+{
+  "name": "sanjeevini-siddha-modern",
+  "version": "1.0.0",
+  "description": "Sanjeevini Siddha & Ayurveda Medical Centre - Modern MERN Website",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "seed": "cd server && npm run seed",
+    "start": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["siddha", "ayurveda", "clinic", "mern", "healthcare"],
+  "author": "Sanjeevini Siddha & Ayurveda Medical Centre"
+}

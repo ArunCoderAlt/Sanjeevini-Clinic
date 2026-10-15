@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream text-dark font-body antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-sage;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/70 rounded-full hover:bg-primary;
+}
+
+/* Instagram Reels Slider */
+.instagram-reels-slider {
+  position: relative;
+  overflow: visible;
+}
+
+.instagram-reels-slider .swiper {
+  overflow: visible;
+}
+
+.instagram-reels-slider .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: rgba(27, 94, 59, 0.25);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.instagram-reels-slider .swiper-pagination-bullet-active {
+  background: #1B5E3B;
+  width: 24px;
+  border-radius: 4px;
+}
+
+.instagram-reels-slider .swiper-slide {
+  height: auto;
+}
