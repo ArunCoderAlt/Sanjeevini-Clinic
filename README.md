@@ -107,6 +107,63 @@ npm run build    # Builds client to client/dist/
 
 ---
 
+## Production Deployment Guide (Vercel & Render)
+
+This application is pre-configured for zero-error deployment with the **Frontend on Vercel** and **Backend on Render**.
+
+### 1. Deploy Backend to Render
+
+1. Log into [Render.com](https://render.com) and click **New +** -> **Web Service**.
+2. Connect your GitHub repository.
+3. Configure the service settings:
+   - **Name**: `sanjeevini-backend` (or your preferred name)
+   - **Region**: Nearest to your users (e.g. `Singapore` or `Oregon`)
+   - **Branch**: `main`
+   - **Root Directory**: `server`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Health Check Path**: `/health`
+4. Under **Environment Variables**, add:
+   ```env
+   NODE_ENV=production
+   PORT=5000
+   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   SUPABASE_KEY=your_supabase_anon_or_service_key
+   JWT_SECRET=your_super_secret_jwt_key_at_least_32_chars
+   JWT_EXPIRE=30d
+   ADMIN_EMAIL=admin@sanjeevinisiddha.in
+   ADMIN_PASSWORD=your_secure_admin_password
+   GROQ_API_KEY=gsk_your_groq_api_key
+   GROQ_MODEL=qwen/qwen3.8-27b
+   CLIENT_ORIGIN=https://your-frontend-app.vercel.app
+   ```
+   *(Note: The backend automatically permits all `*.vercel.app` subdomains via dynamic CORS).*
+5. Click **Deploy Web Service**.
+6. When deployment finishes, copy your Render backend URL (e.g., `https://sanjeevini-backend.onrender.com`).
+
+---
+
+### 2. Deploy Frontend to Vercel
+
+1. Log into [Vercel.com](https://vercel.com) and click **Add New...** -> **Project**.
+2. Import your GitHub repository.
+3. Configure project settings:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: Click *Edit* and select `client` (or leave as root; both have `vercel.json` pre-configured).
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist` (if Root Directory is `client`)
+4. Under **Environment Variables**, add:
+   ```env
+   VITE_API_URL=https://sanjeevini-backend.onrender.com
+   ```
+   *(Note: Our API resolver automatically formats this URL whether you include `/api` or not).*
+5. Click **Deploy**.
+6. Once deployed, visit your Vercel URL. All SPA routes (`/`, `/about`, `/admin`, `/doctors`, etc.) are routed through `vercel.json` without 404 errors on refresh.
+
+---
+
 ## AI Chatbot & Groq LLM Architecture
 
 The Sanjeevini AI Chatbot provides verified clinical answers grounded in uploaded clinic PDFs using Retrieval-Augmented Generation (RAG).

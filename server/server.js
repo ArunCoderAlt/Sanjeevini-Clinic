@@ -9,10 +9,10 @@ const env = require('./config/environment');
 // Connect to database
 connectDB();
 
-const PORT = env.port || 5000;
+const PORT = process.env.PORT || env.port || 5000;
 
-const server = app.listen(PORT, () => {
-  logger.info(`Server running in ${env.nodeEnv} mode on port ${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`Server running in ${env.nodeEnv} mode on port ${PORT} (0.0.0.0)`);
 });
 
 // Handle unhandled promise rejections

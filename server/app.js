@@ -24,6 +24,9 @@ const reelRoutes = require('./routes/reelRoutes');
 
 const app = express();
 
+// Trust reverse proxies (Render, Cloudflare, Vercel)
+app.set('trust proxy', 1);
+
 // Security middleware (allow cross-origin for static assets like uploaded images)
 app.use(
   helmet({
@@ -31,9 +34,40 @@ app.use(
   })
 );
 
-// CORS middleware
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',');
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+// CORS middleware - supports CLIENT_URL, CLIENT_ORIGIN, and auto-permits Vercel domains
+const clientOriginEnv = process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || '';
+const explicitOrigins = clientOriginEnv
+  ? clientOriginEnv.split(',').map((o) => o.trim().replace(/\/$/, ''))
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, uptime probes)
+      if (!origin) return callback(null, true);
+
+      // In development or if explicitly allowed all
+      if (process.env.NODE_ENV !== 'production' || clientOriginEnv === '*') {
+        return callback(null, true);
+      }
+
+      const normalized = origin.replace(/\/$/, '');
+
+      // Check explicit origins or any vercel.app preview/production deployment
+      if (
+        explicitOrigins.includes(normalized) ||
+        /\.vercel\.app$/.test(new URL(origin).hostname)
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Body parser
 app.use(express.json());
@@ -43,6 +77,24 @@ app.use(express.urlencoded({ extended: false }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Root & Health check endpoints (essential for Render health probes and zero-downtime deployment)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    name: 'Sanjeevini Siddha & Ayurveda Medical Centre API',
+    version: '1.0.0',
+    documentation: '/api/bot/status'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
 
 // Rate limiting
 app.use('/api', apiLimiter);
