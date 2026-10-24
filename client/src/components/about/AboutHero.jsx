@@ -3,7 +3,7 @@ import Container from '../common/Container';
 
 const AboutHero = () => {
   return (
-    <section className="bg-primary-700 bg-[#164E31] py-24 text-white">
+    <section className="bg-primary-700 py-24 text-white">
       <Container>
         <div className="max-w-3xl">
           <h1 className="text-4xl md:text-6xl font-serif mb-6">About Sanjeevini</h1>

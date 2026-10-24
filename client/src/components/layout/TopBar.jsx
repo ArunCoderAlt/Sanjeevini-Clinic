@@ -18,7 +18,7 @@ export default function TopBar() {
             onClick={(e) => handleWhatsAppClick(e, clinicInfo.whatsapp, DEFAULT_WHATSAPP_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center hover:text-green-400 transition-colors"
+            className="flex items-center hover:text-[#38BDF8] transition-colors"
           >
             <MessageCircle className="w-4 h-4 mr-1.5 text-[#25D366]" />
             WhatsApp

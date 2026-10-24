@@ -120,7 +120,7 @@ const ImageUploader = ({
           <div
             className={`border-2 border-dashed rounded-lg p-5 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
               dragActive
-                ? 'border-[#1B5E3B] bg-[#EAF4EE]'
+                ? 'border-[#1880B8] bg-[#EAF4EE]'
                 : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
             }`}
             onDragEnter={handleDrag}
@@ -131,7 +131,7 @@ const ImageUploader = ({
           >
             <Upload className="mx-auto h-10 w-10 text-gray-400 mb-2" />
             <p className="text-sm text-gray-600 mb-1">
-              <span className="font-semibold text-[#1B5E3B]">Click to upload</span> or drag and drop
+              <span className="font-semibold text-[#1880B8]">Click to upload</span> or drag and drop
             </p>
             <p className="text-xs text-gray-400">PNG, JPG, WebP, GIF, SVG (Up to 10MB)</p>
             <input
@@ -151,7 +151,7 @@ const ImageUploader = ({
                 value={urlInput}
                 onChange={(e) => handleUrlSubmit(e.target.value)}
                 placeholder="https://example.com/photo.jpg or /images/..."
-                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
           </div>

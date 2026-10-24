@@ -296,7 +296,7 @@ const HomeReelCard = ({ reel, isFirstItem, onOpenModal }) => {
                 />
               </div>
               <span className="text-white text-xs font-semibold drop-shadow">
-                @sami_thiagarajan
+                @sanjeevinisiddha
               </span>
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
@@ -431,7 +431,7 @@ const InstagramSection = () => {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#833ab4]/10 via-[#fd1d1d]/10 to-[#fcb045]/10 border border-[#833ab4]/20 mb-4 shadow-sm">
               <Instagram className="w-4 h-4 text-[#E1306C]" />
               <span className="text-xs font-bold tracking-wide uppercase bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] bg-clip-text text-transparent">
-                Follow @sami_thiagarajan
+                Follow @sanjeevinisiddha
               </span>
             </div>
 
@@ -517,7 +517,7 @@ const InstagramSection = () => {
             className="inline-flex items-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-full text-white bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 transition-all shadow-md font-medium text-xs sm:text-sm hover:scale-105 hover:shadow-xl cursor-pointer"
           >
             <Instagram className="w-4 h-4" />
-            <span>Follow @sami_thiagarajan for Daily Health Reels</span>
+            <span>Follow @sanjeevinisiddha for Daily Health Reels</span>
             <ExternalLink className="w-3.5 h-3.5 opacity-80" />
           </a>
         </div>

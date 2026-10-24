@@ -13,7 +13,24 @@ exports.getTreatments = asyncHandler(async (req, res) => {
 });
 
 exports.getTreatmentBySlug = asyncHandler(async (req, res) => {
-  const treatment = await Treatment.findOne({ slug: req.params.slug, isActive: true });
+  let treatment = await Treatment.findOne({ slug: req.params.slug, isActive: true });
+  if (!treatment) {
+    treatment = await Treatment.findOne({ slug: req.params.slug });
+  }
+  if (!treatment) {
+    try {
+      treatment = await Treatment.findById(req.params.slug);
+    } catch (_) {}
+  }
+  if (!treatment) {
+    const all = await Treatment.find({});
+    treatment = all.find(
+      (t) =>
+        t.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
+        t.id?.toString() === req.params.slug ||
+        t._id?.toString() === req.params.slug
+    );
+  }
   if (!treatment) return error(res, 'Treatment not found', 404);
   return success(res, treatment);
 });

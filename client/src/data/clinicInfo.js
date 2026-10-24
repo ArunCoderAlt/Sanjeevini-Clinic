@@ -10,6 +10,6 @@ export const clinicInfo = {
   socialLinks: {
     twitter: 'https://twitter.com/Sanjeevini_KKL',
     youtube: 'https://www.youtube.com/@SanjeeviniSiddha',
-    instagram: 'https://www.instagram.com/sami_thiagarajan?xtok=MTh5ZDZkN3o2am9idw=='
+    instagram: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4'
   }
 };

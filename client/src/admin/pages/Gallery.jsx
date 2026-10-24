@@ -168,7 +168,7 @@ const Gallery = () => {
       {/* Upload Area */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <Upload size={18} className="text-[#1B5E3B]" />
+          <Upload size={18} className="text-primary-600" />
           <span>Upload New Image</span>
         </h3>
 
@@ -201,7 +201,7 @@ const Gallery = () => {
                 value={uploadTitle}
                 onChange={(e) => setUploadTitle(e.target.value)}
                 placeholder="e.g. Traditional Therapy Room"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -212,7 +212,7 @@ const Gallery = () => {
               <select
                 value={uploadCategory}
                 onChange={(e) => setUploadCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B] capitalize"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8] capitalize"
               >
                 {categories.map((c) => (
                   <option key={c} value={c} className="capitalize">
@@ -230,7 +230,7 @@ const Gallery = () => {
                 type="number"
                 value={uploadOrder}
                 onChange={(e) => setUploadOrder(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
           </div>
@@ -239,7 +239,7 @@ const Gallery = () => {
             <button
               type="submit"
               disabled={isUploading || (!selectedFile && !imageUrlInput)}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
               <Plus size={18} />
               <span>{isUploading ? 'Uploading...' : 'Save to Gallery'}</span>
@@ -256,7 +256,7 @@ const Gallery = () => {
             onClick={() => setFilter(c)}
             className={`px-4 py-2 rounded-lg text-sm font-medium capitalize whitespace-nowrap cursor-pointer transition-colors ${
               filter === c
-                ? 'bg-[#1B5E3B] text-white shadow-xs'
+                ? 'bg-primary-600 text-white shadow-xs'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -292,7 +292,7 @@ const Gallery = () => {
                   <button
                     onClick={() => handleOpenEdit(img)}
                     aria-label="Edit image details"
-                    className="p-2 bg-white rounded-full text-gray-700 hover:text-[#1B5E3B] cursor-pointer transition-colors shadow-sm"
+                    className="p-2 bg-white rounded-full text-gray-700 hover:text-primary-600 cursor-pointer transition-colors shadow-sm"
                     title="Edit"
                   >
                     <Edit2 size={16} />
@@ -339,7 +339,7 @@ const Gallery = () => {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
             />
           </div>
 
@@ -350,7 +350,7 @@ const Gallery = () => {
             <select
               value={editCategory}
               onChange={(e) => setEditCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B] capitalize"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8] capitalize"
             >
               {categories.map((c) => (
                 <option key={c} value={c} className="capitalize">
@@ -368,7 +368,7 @@ const Gallery = () => {
               type="number"
               value={editOrder}
               onChange={(e) => setEditOrder(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
             />
           </div>
 
@@ -378,7 +378,7 @@ const Gallery = () => {
                 type="checkbox"
                 checked={editIsActive}
                 onChange={(e) => setEditIsActive(e.target.checked)}
-                className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
               />
               <span className="text-sm font-medium text-gray-700">Active (Visible in Gallery)</span>
             </label>
@@ -395,7 +395,7 @@ const Gallery = () => {
             <button
               type="submit"
               disabled={isUpdating}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer disabled:opacity-70"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer disabled:opacity-70"
             >
               {isUpdating ? 'Saving...' : 'Update Details'}
             </button>

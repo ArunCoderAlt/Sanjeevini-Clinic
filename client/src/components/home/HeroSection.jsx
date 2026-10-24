@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import Button from '../common/Button';
+import Container from '../common/Container';
 
 const HeroSection = () => {
   const textRef = useRef(null);
@@ -27,7 +28,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-20">
       {/* Full-background clinic image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -35,32 +36,35 @@ const HeroSection = () => {
         aria-hidden="true"
       />
 
-      {/* Warm semi-transparent overlay */}
+      {/* Neutral dark semi-transparent overlay with gentle left gradient for optimal text contrast (no blue tint on photo) */}
       <div
-        className="absolute inset-0"
-        style={{ backgroundColor: 'rgba(60, 45, 30, 0.55)' }}
+        className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25"
         aria-hidden="true"
       />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" ref={textRef}>
-        <span className="block text-[#C9A227] font-medium tracking-[0.25em] text-sm md:text-base mb-6 uppercase">TRADITIONAL WISDOM • MODERN CARE</span>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-[1.1] mb-6 drop-shadow-lg">
-          Natural Healing.<br />Personalized Care.
-        </h1>
-        <p className="text-[#F5F0DD] text-lg md:text-2xl mb-10 max-w-2xl mx-auto font-light drop-shadow-md">
-          Experience Siddha & Ayurveda care designed around your individual wellness journey.
-        </p>
+      <Container className="relative z-10 w-full py-12">
+        <div className="max-w-2xl text-left" ref={textRef}>
+          <span className="block text-[#E5A93C] font-medium tracking-[0.25em] text-xs md:text-sm mb-4 uppercase">
+            TRADITIONAL WISDOM • MODERN CARE
+          </span>
+          <h1 className="text-4xl md:text-6xl lg:text-[70px] font-serif text-white leading-[1.15] mb-5 drop-shadow-lg">
+            Natural Healing.<br />Personalized Care.
+          </h1>
+          <p className="text-white/90 text-base md:text-lg mb-8 max-w-xl font-light drop-shadow-md leading-relaxed">
+            Experience Siddha & Ayurveda care designed around your individual wellness journey.
+          </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button to="/contact#contact-form" variant="primary" className="w-full sm:w-auto text-lg py-3 px-8 shadow-lg">
-            Contact Us
-          </Button>
-          <Button to="/treatments" variant="outline" className="w-full sm:w-auto text-lg py-3 px-8 text-white border-white hover:bg-white/10 shadow-lg">
-            Explore Treatments
-          </Button>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4">
+            <Button to="/contact#contact-form" variant="primary" className="w-full sm:w-auto text-base py-2.5 px-7 shadow-lg">
+              Contact Us
+            </Button>
+            <Button to="/treatments" variant="outline" className="w-full sm:w-auto text-base py-2.5 px-7 text-white border-white hover:bg-white/10 shadow-lg">
+              Explore Treatments
+            </Button>
+          </div>
         </div>
-      </div>
+      </Container>
 
       <button 
         onClick={() => window.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' })}

@@ -18,7 +18,24 @@ exports.getServiceById = asyncHandler(async (req, res) => {
 });
 
 exports.getServiceBySlug = asyncHandler(async (req, res) => {
-  const service = await Service.findOne({ slug: req.params.slug, isActive: true });
+  let service = await Service.findOne({ slug: req.params.slug, isActive: true });
+  if (!service) {
+    service = await Service.findOne({ slug: req.params.slug });
+  }
+  if (!service) {
+    try {
+      service = await Service.findById(req.params.slug);
+    } catch (_) {}
+  }
+  if (!service) {
+    const all = await Service.find({});
+    service = all.find(
+      (s) =>
+        s.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
+        s.id?.toString() === req.params.slug ||
+        s._id?.toString() === req.params.slug
+    );
+  }
   if (!service) return error(res, 'Service not found', 404);
   return success(res, service);
 });

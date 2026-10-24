@@ -138,7 +138,7 @@ const Messages = () => {
                 <div>
                   <h4 className="text-base font-bold text-gray-900">{viewMessage.name}</h4>
                   <p className="text-sm text-gray-600">
-                    <a href={`mailto:${viewMessage.email}`} className="text-[#1B5E3B] hover:underline">
+                    <a href={`mailto:${viewMessage.email}`} className="text-primary-600 hover:underline">
                       {viewMessage.email}
                     </a>
                     {viewMessage.phone && ` • ${viewMessage.phone}`}
@@ -164,7 +164,7 @@ const Messages = () => {
             <div className="flex justify-between items-center pt-3 border-t border-gray-100">
               <a
                 href={`mailto:${viewMessage.email}?subject=Re: ${encodeURIComponent(viewMessage.subject || 'Inquiry')}`}
-                className="inline-flex items-center gap-1.5 bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 <Mail size={16} />
                 <span>Reply via Email</span>

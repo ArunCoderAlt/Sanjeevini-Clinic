@@ -80,7 +80,7 @@ exports.createReel = asyncHandler(async (req, res) => {
     likes: likes || '1.5K',
     views: views || '10.2K',
     desc: desc || description || 'Clinical insights and healing care at Sanjeevini Siddha.',
-    instagramUrl: instagramUrl || 'https://www.instagram.com/sami_thiagarajan?xtok=MTh5ZDZkN3o2am9idw==',
+    instagramUrl: instagramUrl || 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     isActive: isActive !== undefined ? Boolean(isActive) : true,
     order: Number(order) || 0,
     createdAt: new Date().toISOString(),

@@ -167,17 +167,17 @@ const Doctors = () => {
         </div>
       ),
     },
-    { key: 'name', label: 'Name', sortable: true },
+    { key: 'name', label: 'Doctor Name', sortable: true },
     { key: 'qualification', label: 'Qualification' },
     { key: 'specialization', label: 'Specialization' },
-    { key: 'experience', label: 'Experience (yrs)', sortable: true },
+    { key: 'experience', label: 'Experience', sortable: true },
     {
       key: 'isActive',
       label: 'Status',
       render: (val) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            val ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-red-100 text-red-800'
           }`}
         >
           {val ? 'Active' : 'Inactive'}
@@ -195,10 +195,10 @@ const Doctors = () => {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
+          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
         >
           <Plus size={18} />
-          <span>Add Doctor</span>
+          <span>Add Medical Team Doctor</span>
         </button>
       </div>
 
@@ -214,7 +214,7 @@ const Doctors = () => {
       <Modal
         isOpen={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
-        title={editingDoctor ? `Edit Doctor: ${editingDoctor.name}` : 'Add New Doctor'}
+        title={editingDoctor ? `Edit Medical Team Doctor: ${editingDoctor.name}` : 'Add Medical Team Doctor'}
         maxWidth="max-w-2xl"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -230,7 +230,7 @@ const Doctors = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Dr. Thiagarajan Saminadane"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -245,7 +245,7 @@ const Doctors = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. BSMS, MD(Siddha)"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -260,7 +260,7 @@ const Doctors = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Varmam & Chronic Disorders"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -276,7 +276,7 @@ const Doctors = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. 15"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -290,7 +290,7 @@ const Doctors = () => {
                 value={formData.consultationHours}
                 onChange={handleFormChange}
                 placeholder="e.g. Mon – Sat, 5:00 PM – 9:30 PM"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -304,13 +304,13 @@ const Doctors = () => {
                 value={formData.languages}
                 onChange={handleFormChange}
                 placeholder="Tamil, English"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <ImageUploader
-                label="Doctor Profile Photo"
+                label="Doctor Photo"
                 currentImage={formData.image}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
@@ -329,7 +329,7 @@ const Doctors = () => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Biography / Profile Summary
+                About Doctor / Biography
               </label>
               <textarea
                 name="bio"
@@ -337,7 +337,7 @@ const Doctors = () => {
                 value={formData.bio}
                 onChange={handleFormChange}
                 placeholder="Detailed background, research, clinical focus..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -351,7 +351,7 @@ const Doctors = () => {
                 value={formData.achievements}
                 onChange={handleFormChange}
                 placeholder="Gold medalist in Siddha Medicine&#10;Published 15+ peer-reviewed papers"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -364,7 +364,7 @@ const Doctors = () => {
                 name="order"
                 value={formData.order}
                 onChange={handleFormChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -375,7 +375,7 @@ const Doctors = () => {
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleFormChange}
-                  className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                  className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
                 />
                 <span className="text-sm font-medium text-gray-700">Active (Visible on Website)</span>
               </label>
@@ -394,7 +394,7 @@ const Doctors = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
             >
               {submitting ? 'Saving Doctor...' : editingDoctor ? 'Update Doctor' : 'Create Doctor'}
             </button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Users, Award, HeartPulse } from 'lucide-react';
 import Container from '../common/Container';
+import CountUp from '../common/CountUp';
 
 const stats = [
   { icon: Award, count: '15+', label: 'Years Experience' },
@@ -12,7 +13,7 @@ const stats = [
 
 const TrustStats = () => {
   return (
-    <section className="bg-[#1B5E3B] bg-primary-600 py-16 text-white shadow-inner relative z-10">
+    <section className="bg-primary-600 py-16 text-white shadow-inner relative z-10">
       <Container>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => {
@@ -29,7 +30,9 @@ const TrustStats = () => {
                 <div className="flex justify-center mb-4">
                   <Icon className="w-10 h-10 text-gold" />
                 </div>
-                <div className="text-4xl md:text-5xl font-serif font-bold mb-2 text-white drop-shadow-sm">{stat.count}</div>
+                <div className="text-4xl md:text-5xl font-serif font-bold mb-2 text-white drop-shadow-sm">
+                  <CountUp value={stat.count} delay={index * 0.15} duration={2} />
+                </div>
                 <div className="text-white/90 text-sm md:text-base uppercase tracking-wider font-medium">{stat.label}</div>
               </motion.div>
             );

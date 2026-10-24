@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.reels (
   likes TEXT DEFAULT '2.4K',
   views TEXT DEFAULT '18.9K',
   description TEXT DEFAULT '',
-  instagram_url TEXT DEFAULT 'https://www.instagram.com/sami_thiagarajan?xtok=MTh5ZDZkN3o2am9idw==',
+  instagram_url TEXT DEFAULT 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
   is_active BOOLEAN DEFAULT TRUE,
   order_index INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,

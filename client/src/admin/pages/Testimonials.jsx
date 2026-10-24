@@ -145,7 +145,7 @@ const Testimonials = () => {
         <button
           onClick={() => toggleStatus(row._id, 'isApproved')}
           className={`px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
-            val ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-gray-100 text-gray-600'
           }`}
         >
           {val ? 'Yes' : 'No'}
@@ -184,7 +184,7 @@ const Testimonials = () => {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
+          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
         >
           <Plus size={18} />
           <span>Add Testimonial</span>
@@ -217,7 +217,7 @@ const Testimonials = () => {
               onChange={handleFormChange}
               placeholder="e.g. Ramesh Kumar"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
             />
           </div>
 
@@ -230,7 +230,7 @@ const Testimonials = () => {
                 value={formData.location}
                 onChange={handleFormChange}
                 placeholder="e.g. Karaikal"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
             <div>
@@ -241,7 +241,7 @@ const Testimonials = () => {
                 value={formData.treatment}
                 onChange={handleFormChange}
                 placeholder="e.g. Varmam Therapy"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ const Testimonials = () => {
               name="rating"
               value={formData.rating}
               onChange={handleFormChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
             >
               <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
               <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
@@ -273,7 +273,7 @@ const Testimonials = () => {
               onChange={handleFormChange}
               placeholder="Patient's experience, health recovery feedback..."
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
             />
           </div>
 
@@ -284,7 +284,7 @@ const Testimonials = () => {
                 name="isApproved"
                 checked={formData.isApproved}
                 onChange={handleFormChange}
-                className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
               />
               <span className="text-sm font-medium text-gray-700">Approved</span>
             </label>
@@ -294,7 +294,7 @@ const Testimonials = () => {
                 name="isFeatured"
                 checked={formData.isFeatured}
                 onChange={handleFormChange}
-                className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
               />
               <span className="text-sm font-medium text-gray-700">Feature on Homepage</span>
             </label>
@@ -312,7 +312,7 @@ const Testimonials = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
             >
               {submitting ? 'Saving...' : 'Add Testimonial'}
             </button>

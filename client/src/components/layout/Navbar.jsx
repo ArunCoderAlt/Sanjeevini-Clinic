@@ -48,7 +48,7 @@ export default function Navbar() {
         <Container className="flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <img src="/images/logo.png" alt="Sanjeevini Siddha" className="h-9 w-auto object-contain" />
-            <span className="font-heading font-bold text-2xl text-primary hidden sm:inline">Sanjeevini</span>
+            <span className="font-heading font-bold text-2xl text-[#1880B8] hidden sm:inline">Sanjeevini</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -59,8 +59,8 @@ export default function Navbar() {
                   key={link.name}
                   to={link.path}
                   className={classNames(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    location.pathname === link.path ? "text-primary border-b-2 border-primary" : "text-gray-600"
+                    "text-sm font-medium transition-colors hover:text-[#1880B8]",
+                    location.pathname === link.path ? "text-[#1880B8] border-b-2 border-[#1880B8]" : "text-gray-600"
                   )}
                 >
                   {link.name}

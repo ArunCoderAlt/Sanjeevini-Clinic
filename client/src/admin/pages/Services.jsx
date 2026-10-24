@@ -158,10 +158,10 @@ const Services = () => {
         </div>
       ),
     },
-    { key: 'title', label: 'Title', sortable: true },
+    { key: 'title', label: 'Service Title', sortable: true },
     {
       key: 'shortDescription',
-      label: 'Description',
+      label: 'Short Summary',
       render: (val) => <span className="truncate block max-w-xs text-sm text-gray-600" title={val}>{val}</span>,
     },
     { key: 'order', label: 'Order', sortable: true },
@@ -171,7 +171,7 @@ const Services = () => {
       render: (val) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            val ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-red-100 text-red-800'
           }`}
         >
           {val ? 'Active' : 'Inactive'}
@@ -189,10 +189,10 @@ const Services = () => {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
+          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
         >
           <Plus size={18} />
-          <span>Add Service</span>
+          <span>Add Core Service</span>
         </button>
       </div>
 
@@ -208,7 +208,7 @@ const Services = () => {
       <Modal
         isOpen={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
-        title={editingService ? `Edit Service: ${editingService.title}` : 'Add New Service'}
+        title={editingService ? `Edit Core Service: ${editingService.title}` : 'Add New Core Service'}
         maxWidth="max-w-2xl"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -224,7 +224,7 @@ const Services = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Varmam Therapy"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -239,7 +239,7 @@ const Services = () => {
                 onChange={handleFormChange}
                 placeholder="Brief summary shown on services list cards..."
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -253,13 +253,13 @@ const Services = () => {
                 value={formData.fullDescription}
                 onChange={handleFormChange}
                 placeholder="In-depth details of what the service covers, healing theory, techniques used..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <ImageUploader
-                label="Service Banner Image"
+                label="Service Image"
                 currentImage={formData.image}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
@@ -286,13 +286,13 @@ const Services = () => {
                 value={formData.benefits}
                 onChange={handleFormChange}
                 placeholder="Relieves neuromuscular pain&#10;Stimulates vitality and energy points&#10;Non-invasive natural treatment"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Procedures / Step-by-Step (one per line)
+                Treatment Procedures (one per line)
               </label>
               <textarea
                 name="procedures"
@@ -300,7 +300,7 @@ const Services = () => {
                 value={formData.procedures}
                 onChange={handleFormChange}
                 placeholder="Initial diagnosis and nadi examination&#10;Targeted varmam point stimulation&#10;Post-therapy relaxation and herbal guidance"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -313,7 +313,7 @@ const Services = () => {
                 name="order"
                 value={formData.order}
                 onChange={handleFormChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -324,7 +324,7 @@ const Services = () => {
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleFormChange}
-                  className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                  className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
                 />
                 <span className="text-sm font-medium text-gray-700">Active (Visible on Website)</span>
               </label>
@@ -343,7 +343,7 @@ const Services = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
             >
               {submitting ? 'Saving Service...' : editingService ? 'Update Service' : 'Create Service'}
             </button>

@@ -26,7 +26,7 @@ export default function Footer() {
               <a href={clinicInfo.socialLinks.youtube} target="_blank" rel="noreferrer" aria-label="YouTube channel @SanjeeviniSiddha" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors text-red-500">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href={clinicInfo.socialLinks.instagram} target="_blank" rel="noreferrer" aria-label="Instagram @sami_thiagarajan" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-500 hover:text-white transition-all text-pink-400">
+              <a href={clinicInfo.socialLinks.instagram} target="_blank" rel="noreferrer" aria-label="Instagram @sanjeevinisiddha" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-500 hover:text-white transition-all text-pink-400">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>

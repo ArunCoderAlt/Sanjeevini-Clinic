@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
         <Container>
           <div className="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-sm">
             <h1 className="text-3xl font-serif text-primary-700 mb-8">Privacy Policy</h1>
-            <div className="prose prose-green max-w-none text-gray-700 space-y-6">
+            <div className="prose prose-blue max-w-none text-gray-700 space-y-6">
               <p>Last updated: {new Date().toLocaleDateString()}</p>
               
               <h2 className="text-xl font-semibold text-primary-700">1. Information We Collect</h2>

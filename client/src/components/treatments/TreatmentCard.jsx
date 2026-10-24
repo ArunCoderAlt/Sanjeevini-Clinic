@@ -8,7 +8,7 @@ const imageMap = {
 };
 
 const TreatmentCard = ({ treatment }) => {
-  const imgSrc = imageMap[treatment.category];
+  const imgSrc = treatment.image || imageMap[treatment.category];
 
   return (
     <motion.div

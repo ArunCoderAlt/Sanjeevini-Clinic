@@ -18,7 +18,24 @@ exports.getDoctorById = asyncHandler(async (req, res) => {
 });
 
 exports.getDoctorBySlug = asyncHandler(async (req, res) => {
-  const doctor = await Doctor.findOne({ slug: req.params.slug, isActive: true });
+  let doctor = await Doctor.findOne({ slug: req.params.slug, isActive: true });
+  if (!doctor) {
+    doctor = await Doctor.findOne({ slug: req.params.slug });
+  }
+  if (!doctor) {
+    try {
+      doctor = await Doctor.findById(req.params.slug);
+    } catch (_) {}
+  }
+  if (!doctor) {
+    const all = await Doctor.find({});
+    doctor = all.find(
+      (d) =>
+        d.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
+        d.id?.toString() === req.params.slug ||
+        d._id?.toString() === req.params.slug
+    );
+  }
   if (!doctor) return error(res, 'Doctor not found', 404);
   return success(res, doctor);
 });

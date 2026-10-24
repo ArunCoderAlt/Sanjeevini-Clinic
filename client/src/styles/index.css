@@ -47,13 +47,13 @@
 .instagram-reels-slider .swiper-pagination-bullet {
   width: 8px;
   height: 8px;
-  background: rgba(27, 94, 59, 0.25);
+  background: rgba(24, 128, 184, 0.25);
   opacity: 1;
   transition: all 0.3s ease;
 }
 
 .instagram-reels-slider .swiper-pagination-bullet-active {
-  background: #1B5E3B;
+  background: #1880B8;
   width: 24px;
   border-radius: 4px;
 }
@@ -61,3 +61,71 @@
 .instagram-reels-slider .swiper-slide {
   height: auto;
 }
+
+/* ==========================================================================
+   Sanjeevini Official Medical Blue & Navy Theme (Direct Overrides)
+   ========================================================================== */
+.bg-primary,
+.bg-primary-600 {
+  background-color: #1880B8 !important;
+}
+.bg-primary-50 {
+  background-color: #F0F7FD !important;
+}
+.bg-primary-100 {
+  background-color: #E0EFFB !important;
+}
+.bg-primary-700 {
+  background-color: #1A4B75 !important;
+}
+.bg-primary-800 {
+  background-color: #143B5C !important;
+}
+.bg-primary-900 {
+  background-color: #0E2940 !important;
+}
+.hover\:bg-primary:hover,
+.hover\:bg-primary-600:hover {
+  background-color: #146B9B !important;
+}
+.hover\:bg-primary-700:hover {
+  background-color: #113654 !important;
+}
+.text-primary,
+.text-primary-600 {
+  color: #1880B8 !important;
+}
+.text-primary-700 {
+  color: #1A4B75 !important;
+}
+.text-primary-800 {
+  color: #143B5C !important;
+}
+.border-primary,
+.border-primary-600 {
+  border-color: #1880B8 !important;
+}
+.border-primary-700 {
+  border-color: #1A4B75 !important;
+}
+.focus\:ring-primary:focus,
+.focus\:ring-primary-600:focus {
+  --tw-ring-color: #1880B8 !important;
+}
+.focus\:border-primary:focus,
+.focus\:border-primary-600:focus {
+  border-color: #1880B8 !important;
+}
+.bg-sage {
+  background-color: #EBF4FB !important;
+}
+.bg-cream {
+  background-color: #F8FAFD !important;
+}
+.bg-dark {
+  background-color: #0B1E32 !important;
+}
+.text-dark {
+  color: #0B1E32 !important;
+}
+

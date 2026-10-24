@@ -552,7 +552,7 @@ const ReelsAdmin = () => {
               type="url"
               value={instagramUrl}
               onChange={(e) => setInstagramUrl(e.target.value)}
-              placeholder="https://www.instagram.com/sami_thiagarajan"
+              placeholder="https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4"
               className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-600 text-sm"
             />
           </div>

@@ -46,11 +46,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-[#17221C] text-white flex flex-col transform transition-transform duration-300 ease-in-out
+        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-[#0B1E32] text-white flex flex-col transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h1 className="text-xl font-bold text-[#C9A227]">Sanjeevini Admin</h1>
+          <h1 className="text-xl font-bold text-[#38BDF8]">Sanjeevini Admin</h1>
           <button 
             className="md:hidden text-gray-300 hover:text-white"
             onClick={() => setIsOpen(false)}
@@ -69,7 +69,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   className={({ isActive }) => 
                     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200
                     ${isActive 
-                      ? 'bg-[#1B5E3B] text-white' 
+                      ? 'bg-primary-600 text-white shadow-sm' 
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`
                   }
                   onClick={() => setIsOpen(false)}

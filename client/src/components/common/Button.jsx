@@ -19,11 +19,11 @@ export default function Button({
   const baseStyles = "inline-flex items-center justify-center font-medium rounded-md transition-colors duration-300 gap-2 cursor-pointer";
   
   const variants = {
-    primary: "bg-primary text-white hover:bg-primary-light shadow-md",
-    secondary: "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white",
-    outline: "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white",
-    gold: "bg-gold text-white hover:bg-yellow-600 shadow-md",
-    white: "bg-white text-primary hover:bg-gray-50 shadow-sm"
+    primary: "bg-[#1880B8] text-white hover:bg-[#146B9B] shadow-md",
+    secondary: "bg-transparent border-2 border-[#1880B8] text-[#1880B8] hover:bg-[#1880B8] hover:text-white",
+    outline: "bg-transparent border-2 border-white/60 text-white hover:bg-white/10 shadow-sm",
+    gold: "bg-[#0284C7] text-white hover:bg-[#0275B1] shadow-md",
+    white: "bg-white text-[#1880B8] hover:bg-gray-50 shadow-sm"
   };
   
   const sizes = {

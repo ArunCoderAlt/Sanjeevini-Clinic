@@ -356,7 +356,7 @@ export default function AiBotKnowledge() {
                 Groq LLM Configuration & API Key
                 <span className={`text-xs px-2.5 py-0.5 rounded-full font-sans font-semibold border ${
                   status?.groq?.connected 
-                    ? 'bg-green-50 text-green-700 border-green-200' 
+                    ? 'bg-sky-50 text-[#1880B8] border-sky-200' 
                     : 'bg-amber-50 text-amber-700 border-amber-200'
                 }`}>
                   {status?.groq?.connected ? '● Groq Connected' : '○ Local Fallback Active'}
@@ -428,7 +428,7 @@ export default function AiBotKnowledge() {
             <div className="text-xs text-gray-600 flex items-center gap-1.5">
               {status?.groq?.connected ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#1880B8] shrink-0" />
                   <span>Verified: {status?.groq?.message}</span>
                 </>
               ) : (
@@ -725,7 +725,7 @@ export default function AiBotKnowledge() {
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active Documents</p>
             <p className="text-2xl font-bold text-gray-900 mt-1">{documents.length}</p>
-            <p className="text-xs text-green-600 mt-0.5 font-medium">{documents.filter(d => d.is_active).length} In RAG Retrieval</p>
+            <p className="text-xs text-[#1880B8] mt-0.5 font-medium">{documents.filter(d => d.is_active).length} In RAG Retrieval</p>
           </div>
         </div>
 
@@ -831,8 +831,8 @@ export default function AiBotKnowledge() {
             />
 
             {selectedFile && (
-              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 text-green-800 rounded-xl text-sm font-medium">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
+              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-sky-50 border border-sky-200 text-[#1880B8] rounded-xl text-sm font-medium">
+                <CheckCircle2 className="w-4 h-4 text-[#1880B8]" />
                 <span>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
                 <button
                   type="button"
@@ -975,7 +975,7 @@ export default function AiBotKnowledge() {
                         onClick={() => handleToggle(doc.id, doc.is_active)}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                           doc.is_active 
-                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                            ? 'bg-sky-100 text-[#1880B8] hover:bg-sky-200' 
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >

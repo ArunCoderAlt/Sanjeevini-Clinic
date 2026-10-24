@@ -44,7 +44,7 @@ const AdminNavbar = ({ toggleSidebar, user }) => {
               <span className="text-sm font-medium text-gray-900">{user?.name || 'Admin User'}</span>
               <span className="text-xs text-gray-500">{user?.role || 'Administrator'}</span>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#1B5E3B] flex items-center justify-center text-white font-bold">
+            <div className="w-10 h-10 rounded-full bg-[#1880B8] flex items-center justify-center text-white font-bold">
               {(user?.name || 'A').charAt(0).toUpperCase()}
             </div>
           </div>

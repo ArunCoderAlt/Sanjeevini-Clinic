@@ -91,13 +91,13 @@ const Appointments = () => {
         <select
           value={val ? val.charAt(0).toUpperCase() + val.slice(1) : 'Pending'}
           onChange={(e) => handleStatusChange(row._id, e.target.value)}
-          className={`text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1B5E3B] focus:ring focus:ring-[#1B5E3B] focus:ring-opacity-50 py-1 pl-2 pr-8 ${
+          className={`text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 py-1 pl-2 pr-8 ${
             val === 'pending'
               ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
               : val === 'confirmed'
               ? 'bg-blue-50 text-blue-800 border-blue-200'
               : val === 'completed'
-              ? 'bg-green-50 text-green-800 border-green-200'
+              ? 'bg-sky-50 text-[#1880B8] border-sky-200'
               : 'bg-red-50 text-red-800 border-red-200'
           }`}
         >
@@ -134,7 +134,7 @@ const Appointments = () => {
             onClick={() => setFilter(tab)}
             className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
               filter === tab
-                ? 'bg-[#EAF4EE] text-[#1B5E3B]'
+                ? 'bg-[#EAF4EE] text-[#1880B8]'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -168,7 +168,7 @@ const Appointments = () => {
               <div>
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</span>
                 <p className="text-sm font-medium text-gray-800 mt-0.5">
-                  <a href={`tel:${viewModal.data.phone}`} className="text-[#1B5E3B] hover:underline">
+                  <a href={`tel:${viewModal.data.phone}`} className="text-[#1880B8] hover:underline">
                     {viewModal.data.phone}
                   </a>
                 </p>
@@ -220,7 +220,7 @@ const Appointments = () => {
               <button
                 type="button"
                 onClick={() => setViewModal({ isOpen: false, data: null })}
-                className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
               >
                 Close
               </button>

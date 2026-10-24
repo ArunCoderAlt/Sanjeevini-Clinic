@@ -179,20 +179,20 @@ const Treatments = () => {
         </div>
       ),
     },
-    { key: 'name', label: 'Name', sortable: true },
+    { key: 'name', label: 'Treatment Name', sortable: true },
     {
       key: 'category',
       label: 'Category',
       sortable: true,
       render: (val) => (
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EAF4EE] text-[#1B5E3B]">
+        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
           {val}
         </span>
       ),
     },
     {
       key: 'conditions',
-      label: 'Key Conditions',
+      label: 'Common Conditions',
       render: (val) => (
         <span className="truncate block max-w-xs text-xs text-gray-500">
           {Array.isArray(val) ? val.slice(0, 3).join(', ') : '—'}
@@ -206,7 +206,7 @@ const Treatments = () => {
       render: (val) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            val ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-red-100 text-red-800'
           }`}
         >
           {val ? 'Active' : 'Inactive'}
@@ -224,10 +224,10 @@ const Treatments = () => {
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
+          className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer font-medium text-sm"
         >
           <Plus size={18} />
-          <span>Add Treatment</span>
+          <span>Add Specialized Treatment</span>
         </button>
       </div>
 
@@ -235,7 +235,7 @@ const Treatments = () => {
         <Filter size={18} className="text-gray-500 shrink-0" />
         <span className="text-sm font-medium text-gray-600">Filter Category:</span>
         <select
-          className="text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1B5E3B] focus:ring focus:ring-[#1B5E3B] focus:ring-opacity-50 border py-1.5 px-3"
+          className="text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 border py-1.5 px-3"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
@@ -260,7 +260,7 @@ const Treatments = () => {
       <Modal
         isOpen={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
-        title={editingTreatment ? `Edit Treatment: ${editingTreatment.name}` : 'Add New Treatment'}
+        title={editingTreatment ? `Edit Specialized Treatment: ${editingTreatment.name}` : 'Add New Specialized Treatment'}
         maxWidth="max-w-2xl"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -276,7 +276,7 @@ const Treatments = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Acid Peptic Disease (Gastritis)"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -289,7 +289,7 @@ const Treatments = () => {
                 value={formData.category}
                 onChange={handleFormChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -301,7 +301,7 @@ const Treatments = () => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description & Holistic Theory <span className="text-red-500">*</span>
+                Description & Healing Philosophy <span className="text-red-500">*</span>
               </label>
               <textarea
                 name="description"
@@ -310,13 +310,13 @@ const Treatments = () => {
                 onChange={handleFormChange}
                 placeholder="Root cause, holistic perspective, and how Siddha/Ayurveda addresses it..."
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Treated Conditions (comma-separated)
+                Common Conditions (comma-separated)
               </label>
               <input
                 type="text"
@@ -324,13 +324,13 @@ const Treatments = () => {
                 value={formData.conditions}
                 onChange={handleFormChange}
                 placeholder="Acid reflux, GERD, Heartburn, Dyspepsia"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <ImageUploader
-                label="Treatment Photo / Diagram"
+                label="Treatment Image"
                 currentImage={formData.image}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
@@ -349,7 +349,7 @@ const Treatments = () => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Common Symptoms Addressed (one per line)
+                Common Symptoms (one per line)
               </label>
               <textarea
                 name="symptoms"
@@ -357,13 +357,13 @@ const Treatments = () => {
                 value={formData.symptoms}
                 onChange={handleFormChange}
                 placeholder="Upper abdominal pain&#10;Nausea and bloating&#10;Loss of appetite"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Treatment Approaches & Herbal Therapies (one per line)
+                Treatment Approach (one per line)
               </label>
               <textarea
                 name="approaches"
@@ -371,7 +371,7 @@ const Treatments = () => {
                 value={formData.approaches}
                 onChange={handleFormChange}
                 placeholder="Herbal cooling decoctions&#10;Dietary lifestyle modifications (Pathyam)&#10;Stress relaxation & gentle Varmam points"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -384,7 +384,7 @@ const Treatments = () => {
                 name="order"
                 value={formData.order}
                 onChange={handleFormChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1B5E3B] focus:border-[#1B5E3B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>
 
@@ -395,7 +395,7 @@ const Treatments = () => {
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleFormChange}
-                  className="rounded text-[#1B5E3B] focus:ring-[#1B5E3B] h-4 w-4"
+                  className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
                 />
                 <span className="text-sm font-medium text-gray-700">Active (Visible on Website)</span>
               </label>
@@ -414,7 +414,7 @@ const Treatments = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#1B5E3B] hover:bg-[#2E7D5B] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-70 cursor-pointer"
             >
               {submitting ? 'Saving Treatment...' : editingTreatment ? 'Update Treatment' : 'Create Treatment'}
             </button>

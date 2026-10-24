@@ -90,7 +90,7 @@ const Dashboard = () => {
       render: (val) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium
           ${val === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-            val === 'Confirmed' ? 'bg-green-100 text-green-800' :
+            val === 'Confirmed' ? 'bg-sky-100 text-[#1880B8]' :
             val === 'Completed' ? 'bg-blue-100 text-blue-800' :
             'bg-gray-100 text-gray-800'}`}
         >
@@ -134,7 +134,7 @@ const Dashboard = () => {
           title="Active Doctors"
           value={stats.doctors}
           icon={Stethoscope}
-          color="green"
+          color="blue"
         />
       </div>
 
@@ -143,7 +143,7 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Recent Appointments</h3>
-            <Link to="/admin/appointments" className="text-sm text-[#1B5E3B] hover:underline">View All</Link>
+            <Link to="/admin/appointments" className="text-sm text-[#1880B8] hover:underline">View All</Link>
           </div>
           <DataTable
             columns={appointmentCols}
@@ -155,7 +155,7 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Recent Messages</h3>
-            <Link to="/admin/messages" className="text-sm text-[#1B5E3B] hover:underline">View All</Link>
+            <Link to="/admin/messages" className="text-sm text-[#1880B8] hover:underline">View All</Link>
           </div>
           <DataTable
             columns={messageCols}

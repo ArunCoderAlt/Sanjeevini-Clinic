@@ -8,25 +8,25 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#F0F7F3',
-          100: '#DFEFE6',
-          200: '#BFDFCD',
-          300: '#94CBB0',
-          400: '#5BAF8B',
-          500: '#2E7D5B',
-          600: '#1B5E3B',
-          700: '#164E31',
-          800: '#123E27',
-          900: '#0C2B1B',
-          DEFAULT: '#1B5E3B',
-          light: '#2a8b58',
-          dark: '#123e27'
+          50: '#F0F7FD',
+          100: '#E0EFFB',
+          200: '#BCE0F7',
+          300: '#87C7F1',
+          400: '#4AA8E4',
+          500: '#228DD2',
+          600: '#1880B8',
+          700: '#1A4B75',
+          800: '#143B5C',
+          900: '#0E2940',
+          DEFAULT: '#1880B8',
+          light: '#2596D1',
+          dark: '#143B5C'
         },
-        secondary: '#2E7D5B',
-        sage: '#EAF4EE',
-        cream: '#F8F5EC',
-        gold: '#C9A227',
-        dark: '#17221C'
+        secondary: '#1A4B75',
+        sage: '#EBF4FB',
+        cream: '#F8FAFD',
+        gold: '#0284C7',
+        dark: '#0B1E32'
       },
       fontFamily: {
         heading: ['"Playfair Display"', 'serif'],
