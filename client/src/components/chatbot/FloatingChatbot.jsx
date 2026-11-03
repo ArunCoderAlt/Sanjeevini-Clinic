@@ -200,7 +200,7 @@ export default function FloatingChatbot() {
       const assistantMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.reply || 'Thank you for your question. Please contact our clinic directly at +91 94431 89498 for personalized guidance.',
+        content: data.reply || 'Thank you for your question. Please contact our clinic directly at +91 98430 66362 for personalized guidance.',
         sources: data.sources || [],
         modelUsed: data.modelUsed,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -216,7 +216,7 @@ export default function FloatingChatbot() {
         {
           id: `assistant-err-${Date.now()}`,
           role: 'assistant',
-          content: 'Sorry, I encountered an issue retrieving that answer right now. Please call our clinic at **+91 94431 89498** or message us on WhatsApp.',
+          content: 'Sorry, I encountered an issue retrieving that answer right now. Please call our clinic at **+91 98430 66362** or message us on WhatsApp.',
           sources: [],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
@@ -558,7 +558,7 @@ export default function FloatingChatbot() {
 
               {/* Strict RAG Medical Disclaimer */}
               <p className="text-[10px] text-gray-400 text-center mt-2">
-                Answers strictly derived from clinic documents. Emergency? Call <a href="tel:+919443189498" className="text-primary font-medium hover:underline">+91 94431 89498</a>
+                Answers strictly derived from clinic documents. Emergency? Call <a href="tel:+919843066362" className="text-primary font-medium hover:underline">+91 98430 66362</a>
               </p>
             </div>
           </motion.div>

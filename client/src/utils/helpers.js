@@ -15,7 +15,7 @@ export const removeToken = () => localStorage.removeItem('token');
 
 export const DEFAULT_WHATSAPP_MESSAGE = 'Hello Sanjeevini Siddha & Ayurveda Medical Centre, I would like to inquire about consultation and treatments.';
 
-export const generateWhatsAppLink = (phone = '919443189498', message = DEFAULT_WHATSAPP_MESSAGE) => {
+export const generateWhatsAppLink = (phone = '919486838368', message = DEFAULT_WHATSAPP_MESSAGE) => {
   const cleanPhone = String(phone).replace(/[^0-9]/g, '');
   const encodedText = message ? encodeURIComponent(message) : '';
   return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedText}&type=phone_number&app_absent=0`;
@@ -23,7 +23,7 @@ export const generateWhatsAppLink = (phone = '919443189498', message = DEFAULT_W
 
 export const getWhatsAppUrl = generateWhatsAppLink;
 
-export const handleWhatsAppClick = (e, phone = '919443189498', message = DEFAULT_WHATSAPP_MESSAGE) => {
+export const handleWhatsAppClick = (e, phone = '919486838368', message = DEFAULT_WHATSAPP_MESSAGE) => {
   const cleanPhone = String(phone).replace(/[^0-9]/g, '');
   const encodedText = message ? encodeURIComponent(message) : '';
   const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);

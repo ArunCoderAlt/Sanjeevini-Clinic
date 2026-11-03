@@ -44,7 +44,7 @@ const Gallery = () => {
       const data = res.data.data || [];
       setImages(
         data.map((item) => ({
-          id: item._id,
+          id: item._id || item.id,
           url: item.image,
           title: item.title || 'Clinic photo',
           category: item.category || 'clinic',

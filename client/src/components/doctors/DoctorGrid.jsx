@@ -5,20 +5,20 @@ import Loading from '../common/Loading';
 
 const defaultDoctors = [
   {
-    id: 'dr-thiagarajan-saminadane',
-    slug: 'dr-thiagarajan-saminadane',
+    id: 'thiagarajan-saminadane',
+    slug: 'thiagarajan-saminadane',
     name: 'Dr. Thiagarajan Saminadane',
     qualification: 'MD (Siddha)',
     specialization: 'Siddha Medicine',
-    image: 'https://ui-avatars.com/api/?name=Thiagarajan+Saminadane&background=1B5E3B&color=fff&size=500'
+    image: '/images/doctors/dr-thiagarajan.jpg'
   },
   {
-    id: 'dr-subashini-ganesan',
-    slug: 'dr-subashini-ganesan',
+    id: 'subashini-ganesan',
+    slug: 'subashini-ganesan',
     name: 'Dr. Subashini Ganesan',
     qualification: 'BAMS (Ayurveda)',
     specialization: 'Ayurveda',
-    image: 'https://ui-avatars.com/api/?name=Subashini+Ganesan&background=C9A227&color=fff&size=500'
+    image: '/images/doctors/dr-subashini.jpg'
   }
 ];
 
@@ -31,7 +31,21 @@ const DoctorGrid = () => {
       .then((res) => {
         const data = res.data.data || [];
         if (data.length > 0) {
-          setDoctors(data);
+          const mapped = data.map(d => {
+            let image = d.image;
+            if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars'))) {
+              image = '/images/doctors/dr-thiagarajan.jpg';
+            } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars'))) {
+              image = '/images/doctors/dr-subashini.jpg';
+            } else if (!image) {
+              image = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=1B5E3B&color=fff&size=500`;
+            }
+            return {
+              ...d,
+              image
+            };
+          });
+          setDoctors(mapped);
         }
       })
       .catch(() => {
@@ -43,7 +57,7 @@ const DoctorGrid = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto items-stretch">
       {doctors.map((doc) => (
         <DoctorCard key={doc._id || doc.id || doc.slug} doctor={doc} />
       ))}

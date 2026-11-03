@@ -89,34 +89,36 @@ const DataTable = ({
                     </td>
                   ))}
                   {(onEdit || onDelete || onView) && (
-                    <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      {onView && (
-                        <button 
-                          onClick={() => onView(row)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                          title="View"
-                        >
-                          <Eye size={18} />
-                        </button>
-                      )}
-                      {onEdit && (
-                        <button 
-                          onClick={() => onEdit(row)}
-                          className="p-1.5 text-[#1880B8] hover:bg-sky-50 rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                      )}
-                      {onDelete && (
-                        <button 
-                          onClick={() => onDelete(row)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      )}
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {onView && (
+                          <button 
+                            onClick={() => onView(row)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="View"
+                          >
+                            <Eye size={18} />
+                          </button>
+                        )}
+                        {onEdit && (
+                          <button 
+                            onClick={() => onEdit(row)}
+                            className="p-1.5 text-[#1880B8] hover:bg-sky-50 rounded-md transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                        )}
+                        {onDelete && (
+                          <button 
+                            onClick={() => onDelete(row)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>

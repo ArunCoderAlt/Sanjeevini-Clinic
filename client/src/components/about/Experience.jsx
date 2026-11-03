@@ -4,8 +4,8 @@ import Container from '../common/Container';
 import CountUp from '../common/CountUp';
 
 const stats = [
-  { icon: Award, label: 'Years of Excellence', value: '15+' },
-  { icon: Users, label: 'Happy Patients', value: '10,000+' },
+  { icon: Award, label: 'Years of Excellence', value: '21+' },
+  { icon: Users, label: 'Patients Treated Monthly', value: '500+' },
   { icon: Heart, label: 'Therapies Performed', value: '5,000+' },
   { icon: Shield, label: 'Organic Herbs Used', value: '250+' }
 ];

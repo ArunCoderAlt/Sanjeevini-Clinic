@@ -12,8 +12,8 @@ const clinicSeedKnowledge = {
       content: `Sanjeevini Siddha & Ayurveda Medical Centre is a premier traditional healthcare clinic situated in Karaikal, Puducherry (U.T.), India. 
 The clinic blends classical Siddha and Ayurvedic medicine to provide root-cause, holistic healing for both acute and chronic conditions.
 Address: No. 22, Dr. Ambedkar Street, Karaikal - 609602, Puducherry (U.T.), India.
-Primary Contact Number: +91 94431 89498
-Official WhatsApp: +91 94431 89498
+Primary Contact Number: +91 98430 66362
+Official WhatsApp: +91 94868 38368
 Official Email: sanjeevinisiddha@gmail.com
 Google Maps Location: Located on Dr. Ambedkar Street in the heart of Karaikal, easily accessible by public and private transport.`
     },
@@ -23,7 +23,7 @@ Google Maps Location: Located on Dr. Ambedkar Street in the heart of Karaikal, e
 Monday to Saturday: 5:00 PM to 9:30 PM
 Sunday: Closed (Emergency calls or WhatsApp inquiries only)
 Patients are seen during the evening clinic hours from 5:00 PM to 9:30 PM. 
-To consult our doctors, patients can visit directly during consultation hours or contact our front desk at +91 94431 89498 or send a WhatsApp message to arrange their visit.`
+To consult our doctors, patients can visit directly during consultation hours or contact our front desk at +91 98430 66362 or send a WhatsApp message to arrange their visit.`
     },
     {
       title: 'Expert Doctors & Qualifications',
@@ -86,8 +86,8 @@ Pulse diagnosis detects deep metabolic and systemic imbalances before physical s
       title: 'Appointments, Inquiries & Consultation Process',
       content: `How to Consult or Contact Sanjeevini Clinic:
 - In-person clinic visits: Patients can walk in Monday through Saturday between 5:00 PM and 9:30 PM at No. 22, Dr. Ambedkar Street, Karaikal.
-- Phone inquiries: Call +91 94431 89498 for quick information regarding treatment availability, directions, or timings.
-- WhatsApp inquiries: Message +91 94431 89498 anytime to ask general questions or confirm doctor presence.
+- Phone inquiries: Call +91 98430 66362 for quick information regarding treatment availability, directions, or timings.
+- WhatsApp inquiries: Message +91 94868 38368 anytime to ask general questions or confirm doctor presence.
 - Website inquiry form: Use the "Contact Us" form on the website to submit detailed questions, and the clinic team responds promptly.`
     }
   ]

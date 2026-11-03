@@ -13,7 +13,8 @@ const fallbackDoctors = {
     name: 'Dr. Thiagarajan Saminadane',
     qualification: 'MD (Siddha)',
     specialization: 'Siddha Medicine',
-    experience: '15+ Years',
+    experience: '21+ Years',
+    image: '/images/doctors/dr-thiagarajan.jpg',
     languages: ['Tamil', 'English'],
     bio: 'Specialist in chronic lifestyle disorders, arthritis, skin diseases, and traditional Siddha pulse diagnosis (Nadi Parikshai). Experienced in individualized herbal formulations and Varmam therapeutic point stimulation.',
     achievements: [
@@ -26,7 +27,8 @@ const fallbackDoctors = {
     name: 'Dr. Thiagarajan Saminadane',
     qualification: 'MD (Siddha)',
     specialization: 'Siddha Medicine',
-    experience: '15+ Years',
+    experience: '21+ Years',
+    image: '/images/doctors/dr-thiagarajan.jpg',
     languages: ['Tamil', 'English'],
     bio: 'Specialist in chronic lifestyle disorders, arthritis, skin diseases, and traditional Siddha pulse diagnosis (Nadi Parikshai). Experienced in individualized herbal formulations and Varmam therapeutic point stimulation.',
     achievements: [
@@ -40,6 +42,7 @@ const fallbackDoctors = {
     qualification: 'BAMS (Ayurveda)',
     specialization: 'Ayurveda',
     experience: '12+ Years',
+    image: '/images/doctors/dr-subashini.jpg',
     languages: ['Tamil', 'English', 'Hindi'],
     bio: 'Expert in classical Ayurvedic treatments, Panchakarma therapy, women’s reproductive health, digestive disorders, and stress management. Dedicated to balancing the Tridoshas through holistic lifestyle adjustments.',
     achievements: [
@@ -53,6 +56,7 @@ const fallbackDoctors = {
     qualification: 'BAMS (Ayurveda)',
     specialization: 'Ayurveda',
     experience: '12+ Years',
+    image: '/images/doctors/dr-subashini.jpg',
     languages: ['Tamil', 'English', 'Hindi'],
     bio: 'Expert in classical Ayurvedic treatments, Panchakarma therapy, women’s reproductive health, digestive disorders, and stress management. Dedicated to balancing the Tridoshas through holistic lifestyle adjustments.',
     achievements: [

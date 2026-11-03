@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react';
 import { getWhatsAppUrl, handleWhatsAppClick, DEFAULT_WHATSAPP_MESSAGE } from '../../utils/helpers';
 
 export default function FloatingWhatsApp() {
-  const phone = clinicInfo.whatsapp || '919443189498';
+  const phone = clinicInfo.whatsapp || '919486838368';
   const whatsappUrl = getWhatsAppUrl(phone, DEFAULT_WHATSAPP_MESSAGE);
 
   return (

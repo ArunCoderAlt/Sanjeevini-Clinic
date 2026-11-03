@@ -28,9 +28,9 @@ const AppointmentCTA = () => {
               <MessageSquare className="w-5 h-5 mr-2" />
               Contact Us
             </Button>
-            <a href="tel:+919443189498" className="inline-flex items-center justify-center w-full sm:w-auto text-lg py-4 px-8 rounded-full border-2 border-[#244638] text-[#244638] hover:bg-[#244638] hover:text-white transition-colors">
+            <a href="tel:+919843066362" className="inline-flex items-center justify-center w-full sm:w-auto text-lg py-4 px-8 rounded-full border-2 border-[#244638] text-[#244638] hover:bg-[#244638] hover:text-white transition-colors">
               <PhoneCall className="w-5 h-5 mr-2" />
-              +91 94431 89498
+              +91 98430 66362
             </a>
           </div>
         </motion.div>

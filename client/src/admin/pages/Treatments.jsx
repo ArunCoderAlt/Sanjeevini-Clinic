@@ -31,7 +31,6 @@ const initialTreatmentForm = {
   name: '',
   category: 'Gastrointestinal',
   description: '',
-  conditions: '',
   symptoms: '',
   approaches: '',
   image: '',
@@ -81,7 +80,6 @@ const Treatments = () => {
       name: treatment.name || '',
       category: treatment.category || 'Gastrointestinal',
       description: treatment.description || '',
-      conditions: Array.isArray(treatment.conditions) ? treatment.conditions.join(', ') : (treatment.conditions || ''),
       symptoms: Array.isArray(treatment.symptoms) ? treatment.symptoms.join('\n') : (treatment.symptoms || ''),
       approaches: Array.isArray(treatment.approaches) ? treatment.approaches.join('\n') : (treatment.approaches || ''),
       image: treatment.image || '',
@@ -104,7 +102,6 @@ const Treatments = () => {
     e.preventDefault();
     if (!formData.name.trim()) return toast.error('Treatment name is required');
     if (!formData.category) return toast.error('Treatment category is required');
-    if (!formData.description.trim()) return toast.error('Description is required');
 
     setSubmitting(true);
     try {
@@ -118,13 +115,11 @@ const Treatments = () => {
       const payload = {
         name: formData.name.trim(),
         category: formData.category,
-        description: formData.description.trim(),
+        description: formData.description?.trim() || `${formData.name.trim()} treatment protocol`,
         image: finalImageUrl || '',
         order: Number(formData.order) || 0,
         isActive: Boolean(formData.isActive),
-        conditions: formData.conditions
-          ? formData.conditions.split(',').map((c) => c.trim()).filter(Boolean)
-          : [],
+        conditions: [],
         symptoms: formData.symptoms
           ? formData.symptoms.split('\n').map((s) => s.trim()).filter(Boolean)
           : [],
@@ -134,7 +129,7 @@ const Treatments = () => {
       };
 
       if (editingTreatment) {
-        await updateTreatment(editingTreatment._id, payload);
+        await updateTreatment(editingTreatment._id || editingTreatment.id, payload);
         toast.success('Treatment updated successfully');
       } else {
         await createTreatment(payload);
@@ -151,12 +146,12 @@ const Treatments = () => {
     }
   };
 
-  const handleDelete = (row) => setDeleteDialog({ isOpen: true, id: row._id });
+  const handleDelete = (row) => setDeleteDialog({ isOpen: true, id: row._id || row.id });
 
   const confirmDelete = async () => {
     try {
       await deleteTreatment(deleteDialog.id);
-      setTreatments((prev) => prev.filter((t) => t._id !== deleteDialog.id));
+      setTreatments((prev) => prev.filter((t) => (t._id || t.id) !== deleteDialog.id));
       toast.success('Treatment deleted successfully');
     } catch (err) {
       toast.error('Failed to delete treatment.');
@@ -191,11 +186,20 @@ const Treatments = () => {
       ),
     },
     {
-      key: 'conditions',
-      label: 'Common Conditions',
+      key: 'symptoms',
+      label: 'Common Symptoms',
       render: (val) => (
         <span className="truncate block max-w-xs text-xs text-gray-500">
-          {Array.isArray(val) ? val.slice(0, 3).join(', ') : '—'}
+          {Array.isArray(val) && val.length > 0 ? val.slice(0, 3).join(', ') : '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'approaches',
+      label: 'Treatment Approach',
+      render: (val) => (
+        <span className="truncate block max-w-xs text-xs text-gray-500">
+          {Array.isArray(val) && val.length > 0 ? val.slice(0, 2).join(', ') : '—'}
         </span>
       ),
     },
@@ -300,35 +304,6 @@ const Treatments = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description & Healing Philosophy <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="description"
-                rows="3"
-                value={formData.description}
-                onChange={handleFormChange}
-                placeholder="Root cause, holistic perspective, and how Siddha/Ayurveda addresses it..."
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Common Conditions (comma-separated)
-              </label>
-              <input
-                type="text"
-                name="conditions"
-                value={formData.conditions}
-                onChange={handleFormChange}
-                placeholder="Acid reflux, GERD, Heartburn, Dyspepsia"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
               <ImageUploader
                 label="Treatment Image"
                 currentImage={formData.image}
@@ -347,13 +322,13 @@ const Treatments = () => {
               />
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Common Symptoms (one per line)
               </label>
               <textarea
                 name="symptoms"
-                rows="2"
+                rows="4"
                 value={formData.symptoms}
                 onChange={handleFormChange}
                 placeholder="Upper abdominal pain&#10;Nausea and bloating&#10;Loss of appetite"
@@ -361,13 +336,13 @@ const Treatments = () => {
               />
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Treatment Approach (one per line)
               </label>
               <textarea
                 name="approaches"
-                rows="2"
+                rows="4"
                 value={formData.approaches}
                 onChange={handleFormChange}
                 placeholder="Herbal cooling decoctions&#10;Dietary lifestyle modifications (Pathyam)&#10;Stress relaxation & gentle Varmam points"

@@ -36,9 +36,9 @@ const Messages = () => {
         await api.put(`/contact/${id}/read`);
       }
       setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, isRead: !m.isRead } : m))
+        prev.map((m) => ((m._id || m.id) === id ? { ...m, isRead: !m.isRead } : m))
       );
-      if (viewMessage && viewMessage._id === id) {
+      if (viewMessage && (viewMessage._id || viewMessage.id) === id) {
         setViewMessage((prev) => ({ ...prev, isRead: !prev.isRead }));
       }
     } catch (err) {
@@ -47,14 +47,14 @@ const Messages = () => {
   };
 
   const handleDelete = (row) => {
-    setDeleteDialog({ isOpen: true, id: row._id });
+    setDeleteDialog({ isOpen: true, id: row._id || row.id });
   };
 
   const confirmDelete = async () => {
     try {
       await api.delete(`/contact/${deleteDialog.id}`);
-      setMessages((prev) => prev.filter((m) => m._id !== deleteDialog.id));
-      if (viewMessage && viewMessage._id === deleteDialog.id) {
+      setMessages((prev) => prev.filter((m) => (m._id || m.id) !== deleteDialog.id));
+      if (viewMessage && (viewMessage._id || viewMessage.id) === deleteDialog.id) {
         setViewMessage(null);
       }
       toast.success('Message deleted successfully');

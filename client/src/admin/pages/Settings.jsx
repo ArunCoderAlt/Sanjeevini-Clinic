@@ -5,7 +5,8 @@ import api from '../../services/api';
 const defaultSettings = {
   clinicName: 'Sanjeevini Siddha & Ayurveda Medical Centre',
   address: 'No. 22, Dr. Ambedkar Street, Karaikal - 609602, Puducherry (U.T.), India',
-  phone: '+91 94431 89498',
+  phone: '+91 98430 66362',
+  whatsappNumber: '919486838368',
   email: 'sanjeevinisiddha@gmail.com',
   consultationHours: 'Monday – Saturday, 5:00 PM – 9:30 PM',
   mapUrl: 'https://maps.app.goo.gl/Yt69f1M1mUipkFbi9',
@@ -86,6 +87,14 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <input
               type="text" name="phone" value={formData.phone} onChange={handleChange}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+            <input
+              type="text" name="whatsappNumber" value={formData.whatsappNumber || ''} onChange={handleChange}
+              placeholder="919486838368"
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
             />
           </div>

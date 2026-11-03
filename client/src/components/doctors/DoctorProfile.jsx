@@ -3,9 +3,20 @@ import { Award, BookOpen, Clock, Globe } from 'lucide-react';
 import Button from '../common/Button';
 
 const DoctorProfile = ({ doctor }) => {
-  const fallbackAvatar = doctor.name?.includes('Thiagarajan')
-    ? 'https://ui-avatars.com/api/?name=Thiagarajan+Saminadane&background=1B5E3B&color=fff&size=500'
-    : 'https://ui-avatars.com/api/?name=Subashini+Ganesan&background=C9A227&color=fff&size=500';
+  const isThiagarajan = doctor.name?.includes('Thiagarajan');
+  const isSubashini = doctor.name?.includes('Subashini');
+  const fallbackAvatar = isThiagarajan
+    ? '/images/doctors/dr-thiagarajan.jpg'
+    : (isSubashini ? '/images/doctors/dr-subashini.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || 'Doctor')}&background=C9A227&color=fff&size=500`);
+
+  let doctorPhoto = doctor.image;
+  if (isThiagarajan && (!doctorPhoto || doctorPhoto.includes('ui-avatars'))) {
+    doctorPhoto = '/images/doctors/dr-thiagarajan.jpg';
+  } else if (isSubashini && (!doctorPhoto || doctorPhoto.includes('ui-avatars'))) {
+    doctorPhoto = '/images/doctors/dr-subashini.jpg';
+  } else if (!doctorPhoto) {
+    doctorPhoto = fallbackAvatar;
+  }
 
   const expDisplay = doctor.experience
     ? typeof doctor.experience === 'number' || !String(doctor.experience).toLowerCase().includes('year')
@@ -17,9 +28,9 @@ const DoctorProfile = ({ doctor }) => {
     <div className="bg-white rounded-3xl shadow-sm overflow-hidden flex flex-col md:flex-row">
       <div className="md:w-1/3 bg-sage min-h-[360px]">
         <img 
-          src={doctor.image || fallbackAvatar} 
+          src={doctorPhoto} 
           alt={doctor.name} 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top"
         />
       </div>
       <div className="md:w-2/3 p-8 md:p-12">

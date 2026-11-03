@@ -9,7 +9,8 @@ const doctors = [
     slug: 'thiagarajan-saminadane',
     qualification: 'MD (Siddha)',
     specialization: 'Siddha',
-    experience: 20,
+    experience: 21,
+    image: '/images/doctors/dr-thiagarajan.jpg',
     bio: 'Expert in Siddha diagnostic methods and comprehensive health assessment.',
     order: 1
   },
@@ -19,6 +20,7 @@ const doctors = [
     qualification: 'BAMS (Ayurveda)',
     specialization: 'Ayurveda',
     experience: 15,
+    image: '/images/doctors/dr-subashini.jpg',
     bio: 'Expert in Ayurvedic treatments and holistic wellness.',
     order: 2
   }

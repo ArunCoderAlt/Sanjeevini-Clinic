@@ -50,7 +50,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h1 className="text-xl font-bold text-[#38BDF8]">Sanjeevini Admin</h1>
+          <div className="flex items-center gap-3">
+            <img src="/images/logo.png?v=3" alt="Sanjeevini" className="h-8 w-auto object-contain bg-white rounded-full p-0.5" />
+            <h1 className="text-xl font-bold text-[#38BDF8]">Sanjeevini Admin</h1>
+          </div>
           <button 
             className="md:hidden text-gray-300 hover:text-white"
             onClick={() => setIsOpen(false)}

@@ -21,7 +21,7 @@ const Home = () => {
     <PageTransition>
       <Helmet>
         <title>Sanjeevini Siddha & Ayurveda Medical Centre - Natural Healing, Personalized Care</title>
-        <meta name="description" content="Experience Siddha & Ayurveda care designed around your individual wellness journey at Sanjeevini Siddha & Ayurveda Medical Centre." />
+        <meta name="description" content="Experience the timeless traditions of Siddha and Ayurveda with care tailored to your individual wellness journey at Sanjeevini Siddha & Ayurveda Medical Centre." />
       </Helmet>
       <HeroSection />
       <TrustStats />

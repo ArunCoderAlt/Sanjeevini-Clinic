@@ -14,7 +14,6 @@ const initialServiceForm = {
   fullDescription: '',
   image: '',
   icon: 'Leaf',
-  benefits: '',
   procedures: '',
   order: 0,
   isActive: true,
@@ -63,7 +62,6 @@ const Services = () => {
       fullDescription: service.fullDescription || '',
       image: service.image || '',
       icon: service.icon || 'Leaf',
-      benefits: Array.isArray(service.benefits) ? service.benefits.join('\n') : (service.benefits || ''),
       procedures: Array.isArray(service.procedures) ? service.procedures.join('\n') : (service.procedures || ''),
       order: service.order ?? 0,
       isActive: service.isActive ?? true,
@@ -102,16 +100,14 @@ const Services = () => {
         icon: formData.icon.trim() || 'Leaf',
         order: Number(formData.order) || 0,
         isActive: Boolean(formData.isActive),
-        benefits: formData.benefits
-          ? formData.benefits.split('\n').map((b) => b.trim()).filter(Boolean)
-          : [],
+        benefits: [],
         procedures: formData.procedures
           ? formData.procedures.split('\n').map((p) => p.trim()).filter(Boolean)
           : [],
       };
 
       if (editingService) {
-        await updateService(editingService._id, payload);
+        await updateService(editingService._id || editingService.id, payload);
         toast.success('Service updated successfully');
       } else {
         await createService(payload);
@@ -129,13 +125,13 @@ const Services = () => {
   };
 
   const handleDelete = (row) => {
-    setDeleteDialog({ isOpen: true, id: row._id });
+    setDeleteDialog({ isOpen: true, id: row._id || row.id });
   };
 
   const confirmDelete = async () => {
     try {
       await deleteService(deleteDialog.id);
-      setServices((prev) => prev.filter((s) => s._id !== deleteDialog.id));
+      setServices((prev) => prev.filter((s) => (s._id || s.id) !== deleteDialog.id));
       toast.success('Service deleted successfully');
     } catch (err) {
       toast.error('Failed to delete service.');
@@ -163,6 +159,15 @@ const Services = () => {
       key: 'shortDescription',
       label: 'Short Summary',
       render: (val) => <span className="truncate block max-w-xs text-sm text-gray-600" title={val}>{val}</span>,
+    },
+    {
+      key: 'procedures',
+      label: 'Treatment Procedures',
+      render: (val) => (
+        <span className="truncate block max-w-xs text-xs text-gray-500">
+          {Array.isArray(val) && val.length > 0 ? val.slice(0, 2).join(', ') : '—'}
+        </span>
+      ),
     },
     { key: 'order', label: 'Order', sortable: true },
     {
@@ -278,25 +283,11 @@ const Services = () => {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Key Benefits (one per line)
-              </label>
-              <textarea
-                name="benefits"
-                rows="3"
-                value={formData.benefits}
-                onChange={handleFormChange}
-                placeholder="Relieves neuromuscular pain&#10;Stimulates vitality and energy points&#10;Non-invasive natural treatment"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Treatment Procedures (one per line)
               </label>
               <textarea
                 name="procedures"
-                rows="3"
+                rows="4"
                 value={formData.procedures}
                 onChange={handleFormChange}
                 placeholder="Initial diagnosis and nadi examination&#10;Targeted varmam point stimulation&#10;Post-therapy relaxation and herbal guidance"

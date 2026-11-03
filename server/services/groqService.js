@@ -33,7 +33,7 @@ STRICT GROUNDING & ACCURACY MANDATE:
 2. DO NOT HALLUCINATE: Never invent facts, procedures, consultation prices, timings, or doctors not explicitly mentioned in the knowledge base.
 3. CLINIC TIMINGS: Clinic hours are strictly Monday to Saturday, 5:00 PM to 9:30 PM (Sunday is closed).
 4. UNANSWERABLE QUERIES: If the question cannot be answered from the provided knowledge base, reply politely:
-   "I cannot find this specific information in our current clinic guide. For accurate guidance, please speak with our clinic doctors directly at +91 94431 89498 or message us on WhatsApp, or visit us in person at No. 22, Dr. Ambedkar Street, Karaikal."
+   "I cannot find this specific information in our current clinic guide. For accurate guidance, please speak with our clinic doctors directly at +91 98430 66362 or message us on WhatsApp, or visit us in person at No. 22, Dr. Ambedkar Street, Karaikal."
 5. TONE: Warm, compassionate, concise, and respectful. Use bullet points where appropriate for easy reading on mobile devices.
 
 === CLINIC KNOWLEDGE BASE (FROM UPLOADED DOCUMENTS) ===
@@ -141,7 +141,7 @@ ${contextBlock}
 function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   if (!relevantChunks || relevantChunks.length === 0) {
     return {
-      reply: `Namaste! Welcome to Sanjeevini Siddha & Ayurveda Medical Centre.\n\nOur clinic is open Monday to Saturday from 5:00 PM to 9:30 PM at No. 22, Dr. Ambedkar Street, Karaikal.\n\nFor any specific questions or treatments, please call us at +91 94431 89498 or message us on WhatsApp.`,
+      reply: `Namaste! Welcome to Sanjeevini Siddha & Ayurveda Medical Centre.\n\nOur clinic is open Monday to Saturday from 5:00 PM to 9:30 PM at No. 22, Dr. Ambedkar Street, Karaikal.\n\nFor any specific questions or treatments, please call us at +91 98430 66362 or message us on WhatsApp.`,
       modelUsed: 'local-knowledge-fallback',
       sources: []
     };
@@ -154,7 +154,7 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
     : `\n\n*(Admin Tip: Add your GROQ_API_KEY in server/.env for enhanced conversational intelligence)*`;
 
   return {
-    reply: `Namaste! Based on our clinic's documentation:\n\n${topChunk.content.replace(/^\[.*?\]\n/, '')}\n\nFor more details or to consult our doctors, you can call us directly at +91 94431 89498 or visit us Monday to Saturday (5:00 PM – 9:30 PM).${adminNotice}`,
+    reply: `Namaste! Based on our clinic's documentation:\n\n${topChunk.content.replace(/^\[.*?\]\n/, '')}\n\nFor more details or to consult our doctors, you can call us directly at +91 98430 66362 or visit us Monday to Saturday (5:00 PM – 9:30 PM).${adminNotice}`,
     modelUsed: 'local-knowledge-fallback',
     sourceCount: relevantChunks.length,
     sources: relevantChunks.map(c => ({

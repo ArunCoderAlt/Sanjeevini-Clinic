@@ -26,3 +26,21 @@ exports.protect = asyncHandler(async (req, res, next) => {
     return error(res, 'Not authorized, token failed', 401);
   }
 });
+
+exports.optionalAuth = asyncHandler(async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, env.jwtSecret);
+      if (decoded && decoded.id) {
+        req.user = await User.findById(decoded.id).select('-password');
+      }
+    } catch (_) {
+      // Proceed unauthenticated if token is expired or invalid
+    }
+  }
+  next();
+});

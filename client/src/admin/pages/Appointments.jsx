@@ -39,9 +39,9 @@ const Appointments = () => {
     try {
       await updateStatus(id, newStatus.toLowerCase());
       setAppointments((prev) =>
-        prev.map((a) => (a._id === id ? { ...a, status: newStatus.toLowerCase() } : a))
+        prev.map((a) => ((a._id || a.id) === id ? { ...a, status: newStatus.toLowerCase() } : a))
       );
-      if (viewModal.data && viewModal.data._id === id) {
+      if (viewModal.data && (viewModal.data._id || viewModal.data.id) === id) {
         setViewModal((prev) => ({
           ...prev,
           data: { ...prev.data, status: newStatus.toLowerCase() },
@@ -54,13 +54,13 @@ const Appointments = () => {
   };
 
   const handleDelete = (row) => {
-    setDeleteDialog({ isOpen: true, id: row._id });
+    setDeleteDialog({ isOpen: true, id: row._id || row.id });
   };
 
   const confirmDelete = async () => {
     try {
       await deleteAppointment(deleteDialog.id);
-      setAppointments((prev) => prev.filter((a) => a._id !== deleteDialog.id));
+      setAppointments((prev) => prev.filter((a) => (a._id || a.id) !== deleteDialog.id));
       toast.success('Appointment deleted successfully');
     } catch (err) {
       toast.error('Failed to delete appointment.');

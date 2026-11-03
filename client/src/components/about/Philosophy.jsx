@@ -7,8 +7,14 @@ const Philosophy = () => {
     <section className="py-24 bg-cream">
       <Container>
         <div className="flex flex-col md:flex-row gap-12 items-center">
-          <div className="md:w-1/2">
-            <img src="https://images.unsplash.com/photo-1542840410-3092f99611a3?w=800&q=80" alt="Herbal Medicine" className="rounded-3xl shadow-xl w-full" />
+          <div className="md:w-1/2 flex justify-center">
+            <div className="relative max-w-md w-full rounded-3xl overflow-hidden shadow-2xl bg-[#030a16] border border-gold/20">
+              <img 
+                src="/images/about/samc-philosophy.jpg" 
+                alt="Sanjeevini SAMC Philosophy Emblem" 
+                className="w-full h-auto max-h-[520px] object-cover mx-auto" 
+              />
+            </div>
           </div>
           <div className="md:w-1/2">
             <SectionTitle title="Our Philosophy" align="left" />

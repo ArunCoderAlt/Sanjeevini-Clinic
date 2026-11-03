@@ -120,7 +120,7 @@ const Doctors = () => {
       };
 
       if (editingDoctor) {
-        await updateDoctor(editingDoctor._id, payload);
+        await updateDoctor(editingDoctor._id || editingDoctor.id, payload);
         toast.success('Doctor updated successfully');
       } else {
         await createDoctor(payload);
@@ -138,13 +138,13 @@ const Doctors = () => {
   };
 
   const handleDelete = (row) => {
-    setDeleteDialog({ isOpen: true, id: row._id });
+    setDeleteDialog({ isOpen: true, id: row._id || row.id });
   };
 
   const confirmDelete = async () => {
     try {
       await deleteDoctor(deleteDialog.id);
-      setDoctors((prev) => prev.filter((d) => d._id !== deleteDialog.id));
+      setDoctors((prev) => prev.filter((d) => (d._id || d.id) !== deleteDialog.id));
       toast.success('Doctor deleted successfully');
     } catch (err) {
       toast.error('Failed to delete doctor.');

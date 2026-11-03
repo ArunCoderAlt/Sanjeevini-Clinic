@@ -32,7 +32,7 @@ const Testimonials = () => {
   const fetchTestimonials = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getTestimonials();
+      const res = await getTestimonials({ all: 'true' });
       setTestimonials(res.data.data || []);
     } catch (err) {
       if (err.response?.status !== 401) {
@@ -48,13 +48,13 @@ const Testimonials = () => {
   }, [fetchTestimonials]);
 
   const toggleStatus = async (id, field) => {
-    const item = testimonials.find((t) => t._id === id);
+    const item = testimonials.find((t) => (t._id || t.id) === id);
     if (!item) return;
     const updated = { [field]: !item[field] };
     try {
       await updateTestimonial(id, updated);
       setTestimonials((prev) =>
-        prev.map((t) => (t._id === id ? { ...t, ...updated } : t))
+        prev.map((t) => ((t._id || t.id) === id ? { ...t, ...updated } : t))
       );
       toast.success('Status updated');
     } catch (err) {
@@ -97,13 +97,13 @@ const Testimonials = () => {
   };
 
   const handleDelete = (row) => {
-    setDeleteDialog({ isOpen: true, id: row._id });
+    setDeleteDialog({ isOpen: true, id: row._id || row.id });
   };
 
   const confirmDelete = async () => {
     try {
       await deleteTestimonial(deleteDialog.id);
-      setTestimonials((prev) => prev.filter((t) => t._id !== deleteDialog.id));
+      setTestimonials((prev) => prev.filter((t) => (t._id || t.id) !== deleteDialog.id));
       toast.success('Testimonial deleted successfully');
     } catch (err) {
       toast.error('Failed to delete testimonial.');

@@ -2,17 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   Pentagon Network Background Pattern
+   Visible on full-width section backgrounds only.
+   Stripped from rounded cards, inputs, buttons & text containers so it
+   never overlaps readable content.
+   ========================================================================== */
+
+:root {
+  --bg-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cg fill='none' stroke='%23B8D4EE' stroke-width='1.2' opacity='0.5'%3E%3Cpolygon points='90,40 140,11 190,40 190,98 140,127 90,98'/%3E%3Cpolygon points='380,200 440,165 500,200 500,270 440,305 380,270'/%3E%3Cpolygon points='120,380 168,355 216,380 216,430 168,455 120,430'/%3E%3Cpolygon points='460,450 500,427 540,450 540,496 500,519 460,496'/%3E%3Cline x1='190' y1='98' x2='380' y2='200'/%3E%3Cline x1='216' y1='430' x2='380' y2='270'/%3E%3Cline x1='140' y1='127' x2='168' y2='355'/%3E%3Cline x1='500' y1='305' x2='500' y2='427'/%3E%3C/g%3E%3Cg fill='%23A8C8E8' opacity='0.6'%3E%3Ccircle cx='90' cy='40' r='3.5'/%3E%3Ccircle cx='140' cy='11' r='3.5'/%3E%3Ccircle cx='190' cy='40' r='3.5'/%3E%3Ccircle cx='190' cy='98' r='3.5'/%3E%3Ccircle cx='140' cy='127' r='3.5'/%3E%3Ccircle cx='90' cy='98' r='3.5'/%3E%3Ccircle cx='380' cy='200' r='4'/%3E%3Ccircle cx='440' cy='165' r='4'/%3E%3Ccircle cx='500' cy='200' r='4'/%3E%3Ccircle cx='500' cy='270' r='4'/%3E%3Ccircle cx='440' cy='305' r='4'/%3E%3Ccircle cx='380' cy='270' r='4'/%3E%3Ccircle cx='120' cy='380' r='3.5'/%3E%3Ccircle cx='168' cy='355' r='3.5'/%3E%3Ccircle cx='216' cy='380' r='3.5'/%3E%3Ccircle cx='216' cy='430' r='3.5'/%3E%3Ccircle cx='168' cy='455' r='3.5'/%3E%3Ccircle cx='120' cy='430' r='3.5'/%3E%3Ccircle cx='460' cy='450' r='3'/%3E%3Ccircle cx='500' cy='427' r='3'/%3E%3Ccircle cx='540' cy='450' r='3'/%3E%3Ccircle cx='540' cy='496' r='3'/%3E%3Ccircle cx='500' cy='519' r='3'/%3E%3Ccircle cx='460' cy='496' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Step 1 — Apply pentagon pattern to body + all light section/page backgrounds */
+body,
+.bg-white,
+.bg-cream,
+.bg-gray-50,
+.bg-gray-100,
+.bg-sage {
+  background-image: var(--bg-pattern) !important;
+  background-size: 600px 600px !important;
+  background-repeat: repeat !important;
+}
+
+/* Step 2 — Strip pattern from rounded card / panel elements.
+   Any element with a rounded-* corner class is a card/chip — keep it clean. */
+[class*="rounded-sm"],
+[class*="rounded-md"],
+[class*="rounded-lg"],
+[class*="rounded-xl"],
+[class*="rounded-2xl"],
+[class*="rounded-3xl"],
+[class*="rounded-full"] {
+  background-image: none !important;
+}
+
+/* Step 3 — Strip from navbars, headers, sidebars, footers & interactive elements.
+   Compound selectors (nav.bg-white) beat the .bg-white rule above. */
+nav, nav.bg-white, nav.bg-cream, nav.bg-sage,
+nav[class*="bg-white"],
+header, header.bg-white, header.bg-cream,
+header[class*="bg-white"],
+aside, aside[class],
+footer, footer[class],
+input, textarea, select, button,
+table, thead, tbody, tfoot, tr, th, td,
+label, a {
+  background-image: none !important;
+}
+
+/* Also strip from anything inside nav/header/aside/footer */
+nav *, header *, aside *, footer * {
+  background-image: none !important;
+}
+
+/* Escape hatch — force remove pattern from any element */
+.no-bg-pattern {
+  background-image: none !important;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-cream text-dark font-body antialiased;
+    @apply text-dark font-body antialiased;
+    background-color: #F8FAFD;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-semibold;
   }
 }
+
 
 @layer utilities {
   .text-gradient {

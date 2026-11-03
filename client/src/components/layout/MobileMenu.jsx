@@ -9,15 +9,22 @@ import { classNames, getWhatsAppUrl, handleWhatsAppClick, DEFAULT_WHATSAPP_MESSA
 
 export default function MobileMenu({ isOpen, onClose, currentPath }) {
   return (
-    <motion.div
+    <motion.nav
       initial={{ opacity: 0, x: '100%' }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: '100%' }}
       transition={{ type: "tween", duration: 0.3 }}
-      className="fixed inset-0 z-[60] bg-white flex flex-col"
+      className="fixed inset-0 z-[60] bg-white flex flex-col no-bg-pattern"
+      aria-label="Mobile Navigation Menu"
     >
       <div className="flex justify-between items-center p-6 border-b border-gray-100">
-        <span className="font-heading font-bold text-2xl text-primary">Sanjeevini</span>
+        <div className="flex items-center gap-3">
+          <img src="/images/logo.png?v=3" alt="Sanjeevini Siddha" className="h-10 w-auto object-contain" />
+          <div className="flex flex-col">
+            <span className="font-heading font-bold text-2xl text-primary leading-none">Sanjeevini</span>
+            <span className="text-[10px] font-medium text-gray-500 tracking-wider mt-1">Since 2005</span>
+          </div>
+        </div>
         <button onClick={onClose} className="p-2 text-gray-500 hover:text-primary">
           <X className="w-6 h-6" />
         </button>
@@ -75,7 +82,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
 
       <div className="p-6 bg-sage/30 mt-auto">
         <div className="space-y-3 text-sm text-gray-600">
-          <a href={`tel:${clinicInfo.phone.replace(/\\s/g, '')}`} className="flex items-center">
+          <a href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`} className="flex items-center">
             <Phone className="w-4 h-4 mr-3 text-primary" />
             {clinicInfo.phone}
           </a>
@@ -95,6 +102,6 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
           </a>
         </div>
       </div>
-    </motion.div>
+    </motion.nav>
   );
 }

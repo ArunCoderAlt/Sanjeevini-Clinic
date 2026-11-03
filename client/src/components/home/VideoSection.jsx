@@ -63,7 +63,6 @@ const VideoSection = () => {
     <section className="py-24 bg-cream" id="home-videos">
       <Container>
         <SectionTitle 
-          title="Watch & Learn" 
           subtitle="Official YouTube Showreel"
           description="Explore our healing practices, hospital facilities, and authentic therapies in Karaikal through our official YouTube channel."
         />

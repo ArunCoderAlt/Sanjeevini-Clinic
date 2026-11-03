@@ -35,7 +35,7 @@ const Dashboard = () => {
           setStats(prev => ({ ...prev, appointments: appts.length, pendingAppointments: pending }));
           setRecentAppointments(
             appts.slice(0, 5).map(a => ({
-              id: a._id,
+              id: a._id || a.id,
               name: a.name,
               date: a.preferredDate ? new Date(a.preferredDate).toLocaleDateString('en-IN') : '—',
               time: a.preferredTime || '—',
@@ -51,7 +51,7 @@ const Dashboard = () => {
           setStats(prev => ({ ...prev, messages: msgs.length, unreadMessages: unread }));
           setRecentMessages(
             msgs.slice(0, 5).map(m => ({
-              id: m._id,
+              id: m._id || m.id,
               name: m.name,
               subject: m.subject || '(No subject)',
               date: m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-IN') : '—',

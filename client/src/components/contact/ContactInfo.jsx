@@ -32,8 +32,8 @@ const ContactInfo = () => {
         </div>
         <div>
           <h4 className="text-xl font-serif text-primary-700 mb-2">Phone</h4>
-          <a href="tel:+919443189498" className="text-gray-600 hover:text-primary-600 transition-colors inline-block mb-1">
-            +91 94431 89498
+          <a href="tel:+919843066362" className="text-gray-600 hover:text-primary-600 transition-colors inline-block mb-1">
+            +91 98430 66362
           </a>
         </div>
       </div>
@@ -65,7 +65,7 @@ const ContactInfo = () => {
           >
             Chat directly on WhatsApp
           </a>
-          <p className="text-xs text-gray-500">+91 94431 89498 • Instant consultation inquiries</p>
+          <p className="text-xs text-gray-500">+91 94868 38368 • Instant consultation inquiries</p>
         </div>
       </div>
     </div>

@@ -13,61 +13,61 @@ const fallbackTreatments = {
   'gastritis': {
     name: 'Gastritis & Ulcer Care',
     category: 'Gastrointestinal',
-    conditions: ['Acid Peptic Disease', 'Gastric & Duodenal Ulcers', 'Chronic Acidity', 'GERD & Heartburn'],
+    symptoms: ['Upper abdominal burning and ache', 'Nausea, bloating, and indigestion', 'Acid reflux and chest tightness', 'Loss of appetite'],
     approaches: ['Herbal pitta-pacifying formulations', 'Mucosal healing decoctions', 'Personalized dietary guidelines', 'Stress-reduction therapies']
   },
   'ibs': {
     name: 'Irritable Bowel Syndrome (IBS)',
     category: 'Gastrointestinal',
-    conditions: ['Chronic Indigestion', 'Altered Bowel Habits', 'Abdominal Cramping & Bloating', 'Food Intolerances'],
+    symptoms: ['Abdominal cramping and bloating', 'Altered bowel habits and irregularity', 'Digestive gas and abdominal pressure', 'Food trigger sensitivity'],
     approaches: ['Gut microbiome rejuvenation', 'Medicated Takradhara therapy', 'Digestive enzyme stimulation', 'Herbal gut stabilizers']
   },
   'psoriasis': {
     name: 'Psoriasis & Eczema Care',
     category: 'Dermatology',
-    conditions: ['Plaque Psoriasis', 'Chronic Atopic Eczema', 'Scalp Psoriasis', 'Dry Skin Dermatitis'],
+    symptoms: ['Dry, itchy, red patches on skin', 'Silvery scales and peeling', 'Skin inflammation and irritation', 'Cracked skin prone to bleeding'],
     approaches: ['Deep cellular blood purification', 'Traditional medicated herbal oils', 'Pitta-Raktha balancing herbal regimens', 'Strict natural dietary protocol']
   },
   'pcos': {
     name: 'PCOS & Women’s Health',
     category: 'Women\'s Health',
-    conditions: ['Polycystic Ovarian Syndrome (PCOS)', 'Irregular Menstrual Cycles', 'Hormonal Imbalance', 'Weight Fluctuations'],
+    symptoms: ['Irregular or delayed menstrual cycles', 'Hormonal weight fluctuations', 'Acne and unwanted facial hair', 'Fatigue and mood changes'],
     approaches: ['Endocrine-balancing herbal formulas', 'Metabolic correction regimens', 'Uterine tonics', 'Holistic nutrition and cycle tracking']
   },
   'arthritis': {
     name: 'Arthritis & Joint Pain Management',
     category: 'Musculoskeletal',
-    conditions: ['Osteoarthritis', 'Rheumatoid Arthritis', 'Cervical & Lumbar Spondylosis', 'Chronic Knee & Back Pain'],
+    symptoms: ['Joint stiffness, particularly in the morning', 'Chronic pain in knees, hips, or back', 'Swelling and reduced flexibility', 'Difficulty walking or bending'],
     approaches: ['Traditional Varmam vital-point therapy', 'Thokkanam medicated oil massage', 'Cartilage-strengthening herbal decoctions', 'Gentle rehabilitative movement']
   },
   'kidney-stones': {
     name: 'Kidney Stones Management',
     category: 'Kidney',
-    conditions: ['Renal Calculi', 'Ureteric Stones', 'Urinary Tract Discomfort', 'Recurrent Stone Formation'],
+    symptoms: ['Sharp pain in lower back or side', 'Burning sensation during urination', 'Cloudy or discolored urine', 'Frequent urge to urinate'],
     approaches: ['Stone-dissolving (Lithotriptic) herbal formulations', 'Natural diuretic decoctions', 'Fluid-balance counseling', 'Preventive lifestyle counseling']
   },
   'asthma': {
     name: 'Asthma & Respiratory Care',
     category: 'Respiratory',
-    conditions: ['Bronchial Asthma', 'Chronic Allergic Bronchitis', 'Seasonal Wheezing', 'Chronic Sinusitis'],
+    symptoms: ['Shortness of breath and wheezing', 'Persistent dry or productive cough', 'Chest tightness and congestion', 'Sleep disruption due to breathing discomfort'],
     approaches: ['Airway clearance herbal formulations', 'Kapha-balancing steam inhalation', 'Immunity-modulating rasayanas', 'Pranayama breathing guidance']
   },
   'migraine': {
     name: 'Migraine & Neurological Relief',
     category: 'Neurology',
-    conditions: ['Chronic Migraine', 'Tension Headaches', 'Trigeminal Neuralgia', 'Stress-Induced Headaches'],
+    symptoms: ['Throbbing pain on one side of head', 'Sensitivity to light and sound', 'Nausea, dizziness, or visual aura', 'Neck stiffness and fatigue'],
     approaches: ['Nasya herbal nasal administration', 'Shirodhara oil therapy', 'Nervous system soothing herbs', 'Identification and control of triggers']
   },
   'piles': {
     name: 'Anorectal Care (Piles, Fissure, Fistula)',
     category: 'Anorectal',
-    conditions: ['Hemorrhoids (Piles)', 'Anal Fissures', 'Fistula in Ano', 'Chronic Constipation'],
+    symptoms: ['Pain or discomfort during bowel movements', 'Bleeding or swelling in anal region', 'Itching and persistent irritation', 'Chronic constipation and straining'],
     approaches: ['Non-surgical traditional Siddha medications', 'Medicated sitz baths (Avagaha sweda)', 'Digestive fire optimization', 'Topical healing oils and herbal pastes']
   },
   'diabetes': {
     name: 'Diabetes & Metabolic Wellness',
     category: 'Other',
-    conditions: ['Type 2 Diabetes Mellitus', 'Prediabetes & Insulin Resistance', 'Metabolic Syndrome', 'Diabetic Neuropathy Symptoms'],
+    symptoms: ['Frequent urination and excessive thirst', 'Unexplained fatigue and low energy', 'Slow-healing cuts or skin sores', 'Tingling or numbness in hands/feet'],
     approaches: ['Insulin-sensitizing herbal preparations', 'Glycemic control through dietary herbs', 'Microvascular and nerve protection', 'Comprehensive lifestyle counseling']
   }
 };
@@ -90,8 +90,8 @@ const TreatmentDetails = () => {
         if (data && data.name) {
           setTreatment({
             ...data,
-            conditions: data.conditions?.length ? data.conditions : ['Chronic symptoms', 'Acute flare-ups', 'Underlying elemental imbalance'],
-            approaches: data.approaches?.length ? data.approaches : ['Holistic Siddha diagnosis', 'Customized herbal formulations', 'Targeted therapy and dietary care']
+            symptoms: data.symptoms?.length ? data.symptoms : ['Discomfort & Persistent Irritation', 'Digestive or Bodily Imbalance', 'Fatigue or Disrupted Wellness'],
+            approaches: data.approaches?.length ? data.approaches : ['Holistic Siddha & Ayurveda diagnosis', 'Customized herbal formulations', 'Targeted therapy and dietary care']
           });
         } else {
           // Check fallback
@@ -99,7 +99,7 @@ const TreatmentDetails = () => {
           const fallback = fallbackTreatments[key] || {
             name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
             category: 'General Healthcare',
-            conditions: ['Individualized symptom assessment', 'Elemental Dosha imbalance'],
+            symptoms: ['Individualized symptom assessment', 'Elemental Dosha imbalance', 'Physical discomfort or fatigue'],
             approaches: ['Pulse examination (Nadi Parikshai)', 'Authentic herbal therapies', 'Lifestyle and dietary adjustments']
           };
           setTreatment(fallback);
@@ -111,7 +111,7 @@ const TreatmentDetails = () => {
         const fallback = fallbackTreatments[key] || {
           name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
           category: 'General Healthcare',
-          conditions: ['Individualized symptom assessment', 'Elemental Dosha imbalance'],
+          symptoms: ['Individualized symptom assessment', 'Elemental Dosha imbalance', 'Physical discomfort or fatigue'],
           approaches: ['Pulse examination (Nadi Parikshai)', 'Authentic herbal therapies', 'Lifestyle and dietary adjustments']
         };
         setTreatment(fallback);

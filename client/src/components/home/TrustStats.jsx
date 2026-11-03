@@ -5,10 +5,10 @@ import Container from '../common/Container';
 import CountUp from '../common/CountUp';
 
 const stats = [
-  { icon: Award, count: '15+', label: 'Years Experience' },
-  { icon: Users, count: '10,000+', label: 'Patients Treated' },
+  { icon: Award, count: '21+', label: 'Years of Clinical Experience' },
+  { icon: Users, count: '500+', label: 'Patients Treated Every Month' },
   { icon: HeartPulse, count: '2', label: 'Expert Doctors' },
-  { icon: Activity, count: '4', label: 'Specialized Services' }
+  { icon: Activity, count: '13', label: 'Specialized Services' }
 ];
 
 const TrustStats = () => {
@@ -33,7 +33,7 @@ const TrustStats = () => {
                 <div className="text-4xl md:text-5xl font-serif font-bold mb-2 text-white drop-shadow-sm">
                   <CountUp value={stat.count} delay={index * 0.15} duration={2} />
                 </div>
-                <div className="text-white/90 text-sm md:text-base uppercase tracking-wider font-medium">{stat.label}</div>
+                <div className="text-white/90 text-xs sm:text-sm md:text-base uppercase tracking-wider font-medium leading-snug">{stat.label}</div>
               </motion.div>
             );
           })}
