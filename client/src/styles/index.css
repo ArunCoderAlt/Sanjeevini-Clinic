@@ -26,14 +26,15 @@ body,
 }
 
 /* Step 2 — Strip pattern from rounded card / panel elements.
-   Any element with a rounded-* corner class is a card/chip — keep it clean. */
-[class*="rounded-sm"],
-[class*="rounded-md"],
-[class*="rounded-lg"],
-[class*="rounded-xl"],
-[class*="rounded-2xl"],
-[class*="rounded-3xl"],
-[class*="rounded-full"] {
+   Any element with a rounded-* corner class is a card/chip — keep it clean.
+   Exempt gradients so buttons/chips with backgrounds work properly. */
+[class*="rounded-sm"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-md"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-lg"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-2xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-3xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
+[class*="rounded-full"]:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   background-image: none !important;
 }
 
@@ -45,10 +46,18 @@ header, header.bg-white, header.bg-cream,
 header[class*="bg-white"],
 aside, aside[class],
 footer, footer[class],
-input, textarea, select, button,
+input, textarea, select,
+button:not([class*="bg-gradient-"]):not([class*="gradient"]),
 table, thead, tbody, tfoot, tr, th, td,
-label, a {
+label,
+a:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   background-image: none !important;
+}
+
+/* Dedicated Instagram brand gradient button */
+.instagram-gradient-btn {
+  background: linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%) !important;
+  color: #ffffff !important;
 }
 
 /* Also strip from anything inside nav/header/aside/footer */

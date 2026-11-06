@@ -3,36 +3,34 @@ import { motion } from 'framer-motion';
 import { PhoneCall, MessageSquare } from 'lucide-react';
 import Container from '../common/Container';
 import Button from '../common/Button';
+import { clinicInfo } from '../../data/clinicInfo';
 
 const AppointmentCTA = () => {
   return (
-    <section className="py-20 bg-[#F8F5EC] relative overflow-hidden">
-      {/* Decorative circles */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full border-4 border-white/10"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full border-4 border-white/10"></div>
-      
-      <Container className="relative z-10 text-center">
+    <section className="py-12 md:py-16 bg-[#FAF8F5] relative overflow-hidden" id="appointment-cta">
+      <Container className="relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto"
         >
-          <h2 className="text-4xl md:text-5xl font-serif mb-6 text-[#3D3428]">Ready to Start Your Healing Journey?</h2>
-          <p className="text-[#655B4B] text-lg mb-10">
-            Connect with our specialists and take the first step towards natural, holistic wellness.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button to="/contact#contact-form" variant="primary" className="bg-[#244638] text-white hover:bg-[#1a3228] w-full sm:w-auto text-lg py-4 px-8 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 mr-2" />
-              Contact Us
-            </Button>
-            <a href="tel:+919843066362" className="inline-flex items-center justify-center w-full sm:w-auto text-lg py-4 px-8 rounded-full border-2 border-[#244638] text-[#244638] hover:bg-[#244638] hover:text-white transition-colors">
-              <PhoneCall className="w-5 h-5 mr-2" />
-              +91 98430 66362
-            </a>
-          </div>
+          <Button
+            to="/contact#contact-form"
+            variant="primary"
+            className="w-full sm:w-auto text-base py-3.5 px-8 rounded-full shadow-md hover:shadow-lg flex items-center justify-center font-medium transition-all"
+          >
+            <MessageSquare className="w-5 h-5 mr-2" />
+            <span>Contact Us</span>
+          </Button>
+
+          <a
+            href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`}
+            className="inline-flex items-center justify-center w-full sm:w-auto text-base py-3.5 px-8 rounded-full border-2 border-primary-600 text-primary-700 bg-white hover:bg-primary-600 hover:text-white transition-all shadow-sm hover:shadow-md font-medium"
+          >
+            <PhoneCall className="w-5 h-5 mr-2" />
+            <span>{clinicInfo.phone}</span>
+          </a>
         </motion.div>
       </Container>
     </section>

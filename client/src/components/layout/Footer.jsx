@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, MapPin, Phone, Mail, Clock, Youtube, Instagram } from 'lucide-react';
+import { Leaf, MapPin, Phone, Mail, Clock, Youtube, Instagram, Facebook } from 'lucide-react';
 import Container from '../common/Container';
 import { clinicInfo } from '../../data/clinicInfo';
 import { footerLinks } from '../../data/navigation';
@@ -12,22 +12,49 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-6">
-            <Link to="/" className="flex items-center gap-2 text-white">
-              <Leaf className="w-8 h-8 text-gold" />
+            <Link to="/" className="flex items-center gap-3 text-white">
+              <img src="/images/logo.png?v=4" alt="Sanjeevini Logo" className="w-10 h-10 rounded-full bg-white p-1 object-contain shadow-sm shrink-0" />
               <span className="font-heading font-bold text-2xl">Sanjeevini</span>
             </Link>
             <p className="text-sm leading-relaxed">
               Experience the ancient wisdom of Siddha and Ayurveda for holistic healing and wellness.
             </p>
-            <div className="flex space-x-4">
-              <a href={clinicInfo.socialLinks.twitter} target="_blank" rel="noreferrer" aria-label="Twitter" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-white transition-colors">
-                𝕏
+            <div className="flex space-x-3.5">
+              <a
+                href={clinicInfo.socialLinks.instagram}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram @sanjeevinisiddha"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-500 hover:text-white transition-all text-pink-400"
+              >
+                <Instagram className="w-5 h-5" />
               </a>
-              <a href={clinicInfo.socialLinks.youtube} target="_blank" rel="noreferrer" aria-label="YouTube channel @SanjeeviniSiddha" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors text-red-500">
+              <a
+                href={clinicInfo.socialLinks.youtube}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="YouTube channel @SanjeeviniSiddha"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors text-red-500"
+              >
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href={clinicInfo.socialLinks.instagram} target="_blank" rel="noreferrer" aria-label="Instagram @sanjeevinisiddha" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-500 hover:text-white transition-all text-pink-400">
-                <Instagram className="w-5 h-5" />
+              <a
+                href={clinicInfo.socialLinks.facebook}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook @sanjeevinisiddha"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-colors text-blue-400"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href={clinicInfo.socialLinks.twitter}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X (formerly Twitter)"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/25 hover:text-white transition-colors text-gray-300 font-bold text-sm"
+              >
+                𝕏
               </a>
             </div>
           </div>

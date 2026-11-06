@@ -12,7 +12,7 @@ const defaultSettings = {
   mapUrl: 'https://maps.app.goo.gl/Yt69f1M1mUipkFbi9',
   socialLinks: {
     twitter: 'https://twitter.com/Sanjeevini_KKL',
-    facebook: '',
+    facebook: 'https://www.facebook.com/sanjeevinisiddha/',
     instagram: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     youtube: 'https://www.youtube.com/@SanjeeviniSiddha',
   },

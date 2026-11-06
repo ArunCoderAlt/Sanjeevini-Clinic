@@ -278,20 +278,14 @@ const InstagramReels = () => {
   return (
     <div className="relative">
       {/* Section Header with Elevated Navigation Pill (Zero Overlap with Videos) */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
-        <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-[#833ab4]/10 via-[#fd1d1d]/10 to-[#fcb045]/10 border border-[#833ab4]/20 mb-4 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+        <div>
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-[#833ab4]/10 via-[#fd1d1d]/10 to-[#fcb045]/10 border border-[#833ab4]/20 shadow-sm">
             <Instagram className="w-4.5 h-4.5 text-[#E1306C]" />
             <span className="text-sm font-semibold bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] bg-clip-text text-transparent">
               @sanjeevinisiddha
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-serif text-primary-700 font-bold mb-3">
-            Trending Instagram Reels
-          </h2>
-          <p className="text-gray-600 text-sm md:text-base">
-            Watch continuous clinical demonstrations, authentic Siddha medicine preparations, pulse diagnosis, and daily wellness tips from Dr. Thiagarajan.
-          </p>
         </div>
 
         {/* Clean Header Navigation Controls - ZERO overlap on video cards! */}
@@ -365,11 +359,11 @@ const InstagramReels = () => {
           href={clinicInfo.socialLinks.instagram}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-full text-white bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 transition-all shadow-md font-medium text-xs sm:text-sm hover:scale-105 hover:shadow-xl cursor-pointer"
+          className="instagram-gradient-btn inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full text-white bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 transition-all shadow-md font-semibold text-xs sm:text-sm hover:scale-105 hover:shadow-xl cursor-pointer"
         >
-          <Instagram className="w-4 h-4" />
-          <span>Follow @sanjeevinisiddha for Daily Health Reels</span>
-          <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+          <Instagram className="w-4 h-4 text-white" />
+          <span className="text-white font-semibold">Follow @sanjeevinisiddha for Daily Health Reels</span>
+          <ExternalLink className="w-3.5 h-3.5 text-white/90" />
         </a>
       </div>
 

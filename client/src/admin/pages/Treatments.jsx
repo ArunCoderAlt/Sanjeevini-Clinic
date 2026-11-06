@@ -187,7 +187,7 @@ const Treatments = () => {
     },
     {
       key: 'symptoms',
-      label: 'Common Symptoms',
+      label: 'Common Conditions',
       render: (val) => (
         <span className="truncate block max-w-xs text-xs text-gray-500">
           {Array.isArray(val) && val.length > 0 ? val.slice(0, 3).join(', ') : '—'}
@@ -324,7 +324,7 @@ const Treatments = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Common Symptoms (one per line)
+                Common Conditions (one per line)
               </label>
               <textarea
                 name="symptoms"

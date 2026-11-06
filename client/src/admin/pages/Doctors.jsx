@@ -15,7 +15,6 @@ const initialDoctorForm = {
   experience: '',
   consultationHours: 'Monday – Saturday, 5:00 PM – 9:30 PM',
   bio: '',
-  languages: 'Tamil, English',
   achievements: '',
   image: '',
   order: 0,
@@ -67,7 +66,6 @@ const Doctors = () => {
       experience: doctor.experience ?? '',
       consultationHours: doctor.consultationHours || '',
       bio: doctor.bio || '',
-      languages: Array.isArray(doctor.languages) ? doctor.languages.join(', ') : (doctor.languages || ''),
       achievements: Array.isArray(doctor.achievements) ? doctor.achievements.join('\n') : (doctor.achievements || ''),
       image: doctor.image || '',
       order: doctor.order ?? 0,
@@ -111,9 +109,7 @@ const Doctors = () => {
         image: finalImageUrl || '',
         order: Number(formData.order) || 0,
         isActive: Boolean(formData.isActive),
-        languages: formData.languages
-          ? formData.languages.split(',').map((l) => l.trim()).filter(Boolean)
-          : [],
+        languages: [],
         achievements: formData.achievements
           ? formData.achievements.split('\n').map((a) => a.trim()).filter(Boolean)
           : [],
@@ -290,20 +286,6 @@ const Doctors = () => {
                 value={formData.consultationHours}
                 onChange={handleFormChange}
                 placeholder="e.g. Mon – Sat, 5:00 PM – 9:30 PM"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Languages (comma-separated)
-              </label>
-              <input
-                type="text"
-                name="languages"
-                value={formData.languages}
-                onChange={handleFormChange}
-                placeholder="Tamil, English"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
               />
             </div>

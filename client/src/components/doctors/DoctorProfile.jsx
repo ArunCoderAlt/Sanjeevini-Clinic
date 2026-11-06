@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, BookOpen, Clock, Globe } from 'lucide-react';
+import { Award, BookOpen, Clock } from 'lucide-react';
 import Button from '../common/Button';
 
 const DoctorProfile = ({ doctor }) => {
@@ -38,7 +38,7 @@ const DoctorProfile = ({ doctor }) => {
         <p className="text-xl text-gold font-medium mb-2">{doctor.qualification}</p>
         <p className="text-gray-500 mb-8">{doctor.specialization}</p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-8 border-y border-sage py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 border-y border-sage py-8">
           <div className="flex items-center">
             <Clock className="w-6 h-6 text-primary-600 mr-3 shrink-0" />
             <div>
@@ -46,15 +46,8 @@ const DoctorProfile = ({ doctor }) => {
               <p className="font-medium text-gray-800">{expDisplay}</p>
             </div>
           </div>
-          <div className="flex items-center">
-            <Globe className="w-6 h-6 text-primary-600 mr-3 shrink-0" />
-            <div>
-              <p className="text-sm text-gray-500">Languages</p>
-              <p className="font-medium text-gray-800">{Array.isArray(doctor.languages) ? doctor.languages.join(', ') : (doctor.languages || 'Tamil, English')}</p>
-            </div>
-          </div>
           {doctor.consultationHours && (
-            <div className="col-span-2 sm:col-span-1 flex items-center">
+            <div className="flex items-center">
               <Clock className="w-6 h-6 text-primary-600 mr-3 shrink-0" />
               <div>
                 <p className="text-sm text-gray-500">Hours</p>

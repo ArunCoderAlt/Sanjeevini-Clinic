@@ -30,14 +30,14 @@ const TreatmentDetails = ({ treatment }) => {
       </div>
       <h1 className="text-3xl md:text-5xl font-serif text-primary-700 mb-8">{treatment.name}</h1>
 
-      <div className={`grid grid-cols-1 ${hasSymptoms && hasApproaches ? 'md:grid-cols-2' : ''} gap-6 md:gap-8`}>
+      <div className="flex flex-col gap-6 md:gap-8">
         {hasSymptoms && (
-          <div className="p-6 md:p-8 bg-sage/40 rounded-2xl border border-sage flex flex-col h-full">
+          <div className="p-6 md:p-8 bg-sage/40 rounded-2xl border border-sage">
             <h3 className="text-xl font-serif text-primary-700 flex items-center mb-5">
               <Stethoscope className="w-6 h-6 mr-3 text-primary-600 shrink-0" />
-              Common Symptoms
+              Common Conditions
             </h3>
-            <ul className="space-y-3.5 flex-1">
+            <ul className="space-y-3.5">
               {treatment.symptoms.map((sym, idx) => (
                 <li key={idx} className="flex items-start text-gray-700 text-sm md:text-base">
                   <span className="w-2 h-2 bg-primary-600 rounded-full mt-2 mr-3 shrink-0" />
@@ -49,12 +49,12 @@ const TreatmentDetails = ({ treatment }) => {
         )}
 
         {hasApproaches && (
-          <div className="p-6 md:p-8 bg-sage/40 rounded-2xl border border-sage flex flex-col h-full">
+          <div className="p-6 md:p-8 bg-sage/40 rounded-2xl border border-sage">
             <h3 className="text-xl font-serif text-primary-700 flex items-center mb-5">
               <Activity className="w-6 h-6 mr-3 text-primary-600 shrink-0" />
               Treatment Approach
             </h3>
-            <ul className="space-y-3.5 flex-1">
+            <ul className="space-y-3.5">
               {treatment.approaches.map((app, idx) => (
                 <li key={idx} className="flex items-start text-gray-700 text-sm md:text-base">
                   <span className="w-2 h-2 bg-primary-600 rounded-full mt-2 mr-3 shrink-0" />

@@ -46,8 +46,8 @@ export default function Navbar() {
         scrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-3" : "bg-white py-5"
       )}>
         <Container className="flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2.5">
-            <img src="/images/logo.png?v=3" alt="Sanjeevini Siddha" className="h-10 w-auto object-contain" />
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 sm:h-12 w-auto object-contain rounded-full shadow-xs" />
             <div className="flex flex-col">
               <span className="font-heading font-bold text-xl sm:text-2xl text-[#1880B8] leading-none">Sanjeevini</span>
               <span className="text-[10px] sm:text-[11px] font-medium text-gray-500 tracking-wider mt-1">Since 2005</span>

@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { MapPin, ExternalLink } from 'lucide-react';
 import PageTransition from '../components/common/PageTransition';
 import Container from '../components/common/Container';
 import ContactInfo from '../components/contact/ContactInfo';
 import ContactForm from '../components/contact/ContactForm';
 import GoogleMap from '../components/contact/GoogleMap';
 import ConsultationHours from '../components/contact/ConsultationHours';
+import { clinicInfo } from '../data/clinicInfo';
 
 const Contact = () => {
   useEffect(() => {
@@ -48,8 +50,28 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="w-full h-96 rounded-2xl overflow-hidden shadow-sm">
-            <GoogleMap />
+          {/* Location Map Section */}
+          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-sage">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <span className="text-xs uppercase tracking-wider font-bold text-primary-600 block mb-1">Our Location</span>
+                <h3 className="text-2xl font-serif text-primary-700 font-bold">Find Us on Google Maps</h3>
+                <p className="text-gray-600 text-sm mt-1">{clinicInfo.address}</p>
+              </div>
+              <a
+                href={clinicInfo.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-md shrink-0 self-start sm:self-auto hover:shadow-lg"
+              >
+                <MapPin className="w-4 h-4 text-gold" />
+                <span>Get Directions</span>
+                <ExternalLink className="w-4 h-4 ml-1 opacity-80" />
+              </a>
+            </div>
+            <div className="w-full h-[420px] rounded-2xl overflow-hidden shadow-inner border border-gray-200">
+              <GoogleMap />
+            </div>
           </div>
         </Container>
       </div>
