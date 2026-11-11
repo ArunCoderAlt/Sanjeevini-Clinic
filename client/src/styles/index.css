@@ -67,16 +67,19 @@ button, input, textarea, select, a {
   box-shadow: inherit;
 }
 
-/* Step 3 — Strip pattern from interactive elements, headers & sidebars (Footer has its own dark gradient) */
-nav, nav.bg-white, nav.bg-cream, nav.bg-sage,
-nav[class*="bg-white"],
+/* Step 3 — Strip pattern from interactive elements, headers & sidebars (Nav and Footer have their own gradients) */
 header, header.bg-white, header.bg-cream,
 header[class*="bg-white"],
 aside, aside[class],
 input, textarea, select,
 button:not([class*="bg-gradient-"]):not([class*="gradient"]),
 table, thead, tbody, tfoot, tr, th, td,
-label {
+table *, thead *, tbody *, tfoot *, tr *, th *, td *,
+th.bg-gray-50, tr.bg-gray-50, thead.bg-gray-50,
+th[class*="bg-"], thead[class*="bg-"], tr[class*="bg-"], td[class*="bg-"],
+table .bg-gray-50, table .bg-gray-100,
+label,
+[role="dialog"], [role="dialog"] * {
   background-image: none !important;
 }
 
@@ -86,8 +89,7 @@ label {
   color: #ffffff !important;
 }
 
-/* Strip pattern from anything inside nav/header/aside */
-nav *:not([class*="bg-gradient-"]):not([class*="gradient"]),
+/* Strip pattern from anything inside header/aside */
 header *:not([class*="bg-gradient-"]):not([class*="gradient"]),
 aside *:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   background-image: none !important;
@@ -157,15 +159,53 @@ aside *:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   }
   
   /* Headings on light backgrounds */
-  body h1:not(.text-white):not([class*="text-white"]),
-  body h2:not(.text-white):not([class*="text-white"]),
-  body h3:not(.text-white):not([class*="text-white"]),
-  body h4:not(.text-white):not([class*="text-white"]),
-  body h5:not(.text-white):not([class*="text-white"]),
-  body h6:not(.text-white):not([class*="text-white"]) {
+  body h1:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
+  body h2:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
+  body h3:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
+  body h4:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
+  body h5:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
+  body h6:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *) {
     @apply font-heading font-semibold;
     color: #09223D !important;
   }
+}
+
+/* Admin Sidebar Typography & Contrast Protection */
+aside h1,
+aside h1 *,
+aside h2,
+aside h3,
+aside h4,
+aside [class*="font-heading"] {
+  color: #FFFFFF !important;
+}
+
+aside span.text-\[\#38BDF8\],
+aside [class*="text-[#38BDF8]"] {
+  color: #38BDF8 !important;
+}
+
+aside a {
+  color: #B0C8DD !important;
+}
+
+aside a:hover {
+  color: #FFFFFF !important;
+}
+
+aside a.active,
+aside a[class*="from-[#144979]"],
+aside .active {
+  color: #FFFFFF !important;
+  background-image: linear-gradient(135deg, #144979 0%, #0C294A 100%) !important;
+}
+
+aside button {
+  color: #B0C8DD !important;
+}
+
+aside button:hover {
+  color: #F87171 !important;
 }
 
 /* Dark Sections keep pure white headings and labels */
@@ -252,15 +292,28 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ==========================================================================
-   Step 7 — Navigation & Layout Components
+   Step 7 — Navigation & Layout Components (Uniform Light Blue Navbar)
    ========================================================================== */
 nav,
 nav.bg-white,
-nav[class*="bg-white"] {
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(228, 241, 252, 0.94) 100%) !important;
-  background-color: rgba(235, 245, 254, 0.95) !important;
-  border-bottom: 1px solid rgba(188, 224, 247, 0.8) !important;
+nav[class*="bg-white"],
+nav[class*="navbar"],
+.navbar-light-blue {
+  background-image: linear-gradient(180deg, #E6F2FA 0%, #D8ECF8 100%) !important;
+  background-color: #D8ECF8 !important;
+  border-bottom: 1px solid #B8D5ED !important;
+  box-shadow: 0 4px 16px rgba(10, 36, 64, 0.06) !important;
   backdrop-filter: blur(12px) !important;
+}
+
+/* Ensure all sub-containers, flexboxes, and link wrappers inside nav are transparent */
+nav > div,
+nav div,
+nav .flex,
+nav .container,
+nav [class*="Container"] {
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 @layer utilities {

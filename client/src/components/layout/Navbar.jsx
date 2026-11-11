@@ -42,8 +42,8 @@ export default function Navbar() {
   return (
     <>
       <nav className={classNames(
-        "sticky top-0 z-50 transition-all duration-300",
-        scrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-3" : "bg-white py-5"
+        "sticky top-0 z-50 transition-all duration-300 navbar-light-blue",
+        scrolled ? "bg-[#DBECF8]/95 backdrop-blur-md shadow-md py-3" : "bg-[#DBECF8] py-5"
       )}>
         <Container className="flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3">

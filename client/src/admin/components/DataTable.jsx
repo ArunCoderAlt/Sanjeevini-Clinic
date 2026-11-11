@@ -38,15 +38,15 @@ const DataTable = ({
 
   if (loading) {
     return (
-      <div className="w-full bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+      <div className="w-full bg-white rounded-xl shadow-sm overflow-hidden border border-[#C2DCF2]">
         <div className="animate-pulse flex flex-col">
-          <div className="h-12 bg-gray-100 border-b border-gray-200"></div>
+          <div className="h-12 bg-[#EBF4FC] border-b border-[#C2DCF2]"></div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 border-b border-gray-100 flex items-center px-6 gap-4">
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div key={i} className="h-16 border-b border-[#EBF4FC] flex items-center px-6 gap-4">
+              <div className="h-4 bg-[#DCEEFB] rounded w-1/4"></div>
+              <div className="h-4 bg-[#DCEEFB] rounded w-1/4"></div>
+              <div className="h-4 bg-[#DCEEFB] rounded w-1/4"></div>
+              <div className="h-4 bg-[#DCEEFB] rounded w-1/4"></div>
             </div>
           ))}
         </div>
@@ -55,18 +55,18 @@ const DataTable = ({
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="w-full bg-white rounded-xl shadow-sm border border-[#C2DCF2] overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full whitespace-nowrap text-left">
-          <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm font-semibold">
+        <table className="w-full whitespace-nowrap text-left border-collapse">
+          <thead className="bg-[#EBF4FC] border-b border-[#C2DCF2] text-[#09223D] text-sm font-semibold">
             <tr>
               {columns.map((col, index) => (
                 <th 
                   key={index} 
-                  className={`px-6 py-4 ${col.sortable ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+                  className={`px-6 py-4 font-semibold text-[#09223D] ${col.sortable ? 'cursor-pointer hover:bg-[#DFEFFB]' : ''}`}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 font-semibold text-[#09223D]">
                     {col.label}
                     {col.sortable && sortConfig.key === col.key && (
                       sortConfig.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />
@@ -75,16 +75,16 @@ const DataTable = ({
                 </th>
               ))}
               {(onEdit || onDelete || onView) && (
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4 text-right font-semibold text-[#09223D]">Actions</th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[#EBF4FC] bg-white">
             {sortedData.length > 0 ? (
               sortedData.map((row, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-gray-50 transition-colors">
+                <tr key={rowIndex} className="hover:bg-[#F0F7FD] transition-colors">
                   {columns.map((col, colIndex) => (
-                    <td key={colIndex} className="px-6 py-4 text-sm text-gray-700">
+                    <td key={colIndex} className="px-6 py-4 text-sm text-[#243B52] font-medium">
                       {col.render ? col.render(row[col.key], row) : row[col.key]}
                     </td>
                   ))}
@@ -127,7 +127,7 @@ const DataTable = ({
               <tr>
                 <td 
                   colSpan={columns.length + (onEdit || onDelete || onView ? 1 : 0)} 
-                  className="px-6 py-12 text-center text-gray-500"
+                  className="px-6 py-12 text-center text-[#475E75] font-medium bg-white/70"
                 >
                   {emptyMessage}
                 </td>
