@@ -1,47 +1,56 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Loading from '../components/common/Loading';
-import PageTransition from '../components/common/PageTransition';
 
-const Home = lazy(() => import('../pages/Home'));
-const About = lazy(() => import('../pages/About'));
-const Doctors = lazy(() => import('../pages/Doctors'));
-const DoctorDetails = lazy(() => import('../pages/DoctorDetails'));
-const ServiceDetails = lazy(() => import('../pages/ServiceDetails'));
-const Services = lazy(() => import('../pages/Services'));
-const Treatments = lazy(() => import('../pages/Treatments'));
-const TreatmentDetails = lazy(() => import('../pages/TreatmentDetails'));
-const Gallery = lazy(() => import('../pages/Gallery'));
-const SwarnaBindu = lazy(() => import('../pages/SwarnaBindu'));
-const Testimonials = lazy(() => import('../pages/Testimonials'));
-const Contact = lazy(() => import('../pages/Contact'));
-const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'));
-const Terms = lazy(() => import('../pages/Terms'));
-const NotFound = lazy(() => import('../pages/NotFound'));
+// Public pages directly imported for instant navigation with zero delay
+import Home from '../pages/Home';
+import About from '../pages/About';
+import Doctors from '../pages/Doctors';
+import DoctorDetails from '../pages/DoctorDetails';
+import Services from '../pages/Services';
+import ServiceDetails from '../pages/ServiceDetails';
+import Treatments from '../pages/Treatments';
+import TreatmentDetails from '../pages/TreatmentDetails';
+import Gallery from '../pages/Gallery';
+import SwarnaBindu from '../pages/SwarnaBindu';
+import Testimonials from '../pages/Testimonials';
+import Contact from '../pages/Contact';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import Terms from '../pages/Terms';
+import NotFound from '../pages/NotFound';
+
+// Admin portal lazy loaded
 const AdminRoutes = lazy(() => import('./AdminRoutes'));
 
 export default function AppRoutes() {
+  const location = useLocation();
+
   return (
-    <Suspense fallback={<Loading fullPage />}>
-      <Routes>
-        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-        <Route path="/doctors" element={<PageTransition><Doctors /></PageTransition>} />
-        <Route path="/doctors/:slug" element={<PageTransition><DoctorDetails /></PageTransition>} />
-        <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
-        <Route path="/services/:slug" element={<PageTransition><ServiceDetails /></PageTransition>} />
-        <Route path="/treatments" element={<PageTransition><Treatments /></PageTransition>} />
-        <Route path="/treatments/:slug" element={<PageTransition><TreatmentDetails /></PageTransition>} />
-        <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
-        <Route path="/swarna-bindu" element={<PageTransition><SwarnaBindu /></PageTransition>} />
-        <Route path="/testimonials" element={<PageTransition><Testimonials /></PageTransition>} />
-        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
-        <Route path="/appointment" element={<Navigate to="/contact" replace />} />
-        <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-        <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-      </Routes>
-    </Suspense>
+    <Routes location={location} key={location.pathname}>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/doctors" element={<Doctors />} />
+      <Route path="/doctors/:slug" element={<DoctorDetails />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/services/:slug" element={<ServiceDetails />} />
+      <Route path="/treatments" element={<Treatments />} />
+      <Route path="/treatments/:slug" element={<TreatmentDetails />} />
+      <Route path="/gallery" element={<Gallery />} />
+      <Route path="/swarna-bindu" element={<SwarnaBindu />} />
+      <Route path="/testimonials" element={<Testimonials />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/appointment" element={<Navigate to="/contact" replace />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route
+        path="/admin/*"
+        element={
+          <Suspense fallback={<Loading fullPage />}>
+            <AdminRoutes />
+          </Suspense>
+        }
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }

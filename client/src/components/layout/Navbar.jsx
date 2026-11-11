@@ -34,8 +34,6 @@ export default function Navbar() {
       } else {
         window.scrollTo({ top: 400, behavior: 'smooth' });
       }
-    } else {
-      navigate('/contact#contact-form');
     }
   };
 
