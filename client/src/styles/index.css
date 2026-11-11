@@ -23,6 +23,16 @@
    Step 1 — Full-width Sections & Page Backgrounds
    Layered pentagon pattern gently overlaid on the soothing Light Blue Gradient
    ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body,
 .bg-white,
 .bg-cream,

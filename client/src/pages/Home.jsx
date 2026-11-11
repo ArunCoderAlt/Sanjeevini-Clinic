@@ -13,7 +13,6 @@ import InstagramSection from '../components/home/InstagramSection';
 import GalleryPreview from '../components/home/GalleryPreview';
 import VideoSection from '../components/home/VideoSection';
 import Testimonials from '../components/home/Testimonials';
-import AppointmentCTA from '../components/home/AppointmentCTA';
 import Newsletter from '../components/home/Newsletter';
 
 const Home = () => {
@@ -35,7 +34,6 @@ const Home = () => {
       <GalleryPreview />
       <VideoSection />
       <Testimonials />
-      <AppointmentCTA />
       <Newsletter />
     </PageTransition>
   );

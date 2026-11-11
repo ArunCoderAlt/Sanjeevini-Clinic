@@ -21,6 +21,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const botRoutes = require('./routes/botRoutes');
 const reelRoutes = require('./routes/reelRoutes');
+const swarnaBinduRoutes = require('./routes/swarnaBinduRoutes');
 
 const app = express();
 
@@ -113,6 +114,7 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/bot', botRoutes);
+app.use('/api/swarna-bindu', swarnaBinduRoutes);
 
 // Static uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));

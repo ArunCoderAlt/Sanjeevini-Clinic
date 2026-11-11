@@ -8,6 +8,7 @@ import Doctors from './pages/Doctors';
 import Services from './pages/Services';
 import Treatments from './pages/Treatments';
 import Gallery from './pages/Gallery';
+import SwarnaBinduAdmin from './pages/SwarnaBinduAdmin';
 import ReelsAdmin from './pages/ReelsAdmin';
 import Testimonials from './pages/Testimonials';
 import Messages from './pages/Messages';
@@ -63,6 +64,7 @@ const AdminApp = () => {
             <Route path="services" element={<Services />} />
             <Route path="treatments" element={<Treatments />} />
             <Route path="gallery" element={<Gallery />} />
+            <Route path="swarna-bindu" element={<SwarnaBinduAdmin />} />
             <Route path="reels" element={<ReelsAdmin />} />
             <Route path="testimonials" element={<Testimonials />} />
             <Route path="messages" element={<Messages />} />

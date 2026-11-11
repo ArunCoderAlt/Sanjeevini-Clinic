@@ -1,15 +1,33 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Activity, HeartHandshake } from 'lucide-react';
+import { Leaf, Activity, HeartHandshake, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
 
 const services = [
-  { id: 'varmam', slug: 'varmam-therapy', icon: Activity, title: 'Varmam Therapy', desc: 'Traditional therapeutic technique targeting vital energy points for pain relief and healing.', img: '/images/services/varmam.jpg' },
-  { id: 'thokkanam', slug: 'thokkanam-therapy', icon: HeartHandshake, title: 'Thokkanam Therapy', desc: 'Traditional Siddha physical therapy and massage for neurological and musculoskeletal issues.', img: '/images/services/thokkanam.jpg' },
-  { id: 'wellness', slug: 'wellness-support', icon: Leaf, title: 'Wellness Support', desc: 'Holistic wellness, diet planning, and preventive care programs.', img: '/images/services/wellness.jpg' }
+  { 
+    id: 'varmam', 
+    slug: 'varmam-therapy', 
+    icon: Activity, 
+    title: 'Varmam Therapy', 
+    desc: 'Traditional Siddha therapeutic technique targeting vital energy points (Varmam) to release trapped energy, restore neuromuscular pathways, and relieve chronic pain.' 
+  },
+  { 
+    id: 'thokkanam', 
+    slug: 'thokkanam-therapy', 
+    icon: HeartHandshake, 
+    title: 'Thokkanam Therapy', 
+    desc: 'Classical physical manipulation and traditional medicated herbal oil body therapy for neurological recovery, joint mobility, and musculoskeletal restoration.' 
+  },
+  { 
+    id: 'wellness', 
+    slug: 'wellness-support', 
+    icon: Leaf, 
+    title: 'Holistic Wellness Support', 
+    desc: 'Comprehensive preventive health programs including personalized dietary counseling (Pathya Aaharam), seasonal cleansing regimens, and herbal rejuvenatives.' 
+  }
 ];
 
 const ServicesPreview = () => {
@@ -31,19 +49,27 @@ const ServicesPreview = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white rounded-2xl shadow-sm border border-sage hover:border-primary-600 transition-colors overflow-hidden flex flex-col h-full"
+                className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full"
               >
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img src={service.img} alt={service.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="w-10 h-10 bg-sage rounded-full flex items-center justify-center mb-3">
-                    <Icon className="w-5 h-5 text-primary-700" />
+                <div>
+                  <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
+                    <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="text-xl font-serif text-primary-700 mb-3">{service.title}</h3>
-                  <p className="text-gray-600 mb-4 flex-grow">{service.desc}</p>
-                  <Link to={`/services/${service.slug}`} className="text-gold font-medium hover:text-primary-600 transition-colors mt-auto inline-flex items-center">
-                    Learn More <span className="ml-2">→</span>
+                  <h3 className="text-2xl font-serif text-[#0C2B4B] font-bold mb-3.5 group-hover:text-[#144979] transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
+                    {service.desc}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 mt-auto">
+                  <Link 
+                    to={`/services/${service.slug}`} 
+                    className="text-[#144979] font-semibold hover:text-[#0C2B4B] transition-colors inline-flex items-center text-sm"
+                  >
+                    <span>Learn More</span>
+                    <ArrowRight className="ml-1.5 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </Link>
                 </div>
               </motion.div>
@@ -52,7 +78,7 @@ const ServicesPreview = () => {
         </div>
         
         <div className="text-center">
-          <Button to="/services" variant="outline">
+          <Button to="/services" variant="outline" className="px-8 py-3.5 rounded-full font-medium shadow-xs">
             View All Services
           </Button>
         </div>

@@ -10,9 +10,17 @@ import Loading from '../components/common/Loading';
 import { getTreatmentBySlug } from '../services/treatmentService';
 
 const fallbackTreatments = {
+  'gastrointestinal': {
+    name: 'Gastrointestinal Treatments - வயிறு / குடல் சார்ந்த நோய்கள்',
+    category: 'Gastrointestinal',
+    image: '/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png',
+    symptoms: ['Upper abdominal burning and ache', 'Nausea, bloating, and indigestion', 'Acid reflux and chest tightness', 'Loss of appetite'],
+    approaches: ['Herbal pitta-pacifying formulations', 'Mucosal healing decoctions', 'Personalized dietary guidelines', 'Stress-reduction therapies']
+  },
   'gastritis': {
     name: 'Gastritis & Ulcer Care',
     category: 'Gastrointestinal',
+    image: '/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png',
     symptoms: ['Upper abdominal burning and ache', 'Nausea, bloating, and indigestion', 'Acid reflux and chest tightness', 'Loss of appetite'],
     approaches: ['Herbal pitta-pacifying formulations', 'Mucosal healing decoctions', 'Personalized dietary guidelines', 'Stress-reduction therapies']
   },

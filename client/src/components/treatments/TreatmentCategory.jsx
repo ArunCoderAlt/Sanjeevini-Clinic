@@ -7,15 +7,15 @@ const categories = [
 
 const TreatmentCategory = ({ activeCategory, setActiveCategory }) => {
   return (
-    <div className="flex flex-wrap justify-center gap-3 mt-8">
+    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
       {categories.map(cat => (
         <button
           key={cat}
           onClick={() => setActiveCategory(cat)}
-          className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
             activeCategory === cat 
-              ? 'bg-primary-700 text-white' 
-              : 'bg-white text-gray-600 hover:bg-sage border border-transparent'
+              ? 'bg-primary-700 text-white shadow-sm' 
+              : 'bg-white text-gray-600 hover:bg-sage border border-slate-200/70'
           }`}
         >
           {cat}

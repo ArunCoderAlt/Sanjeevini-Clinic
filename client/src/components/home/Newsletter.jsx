@@ -30,10 +30,10 @@ const Newsletter = () => {
   return (
     <section className="py-20 bg-sage">
       <Container>
-        <div className="bg-white rounded-3xl p-8 md:p-16 shadow-sm max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
-          <div className="md:w-1/2">
-            <h2 className="text-3xl font-serif text-primary-700 mb-4">Subscribe to our Wellness Newsletter</h2>
-            <p className="text-gray-600">Get health tips, herbal remedies, and clinic updates directly to your inbox.</p>
+        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-16 shadow-sm max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+          <div className="md:w-1/2 text-center md:text-left">
+            <h2 className="text-2xl sm:text-3xl font-serif text-primary-700 mb-3 sm:mb-4">Subscribe to our Wellness Newsletter</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Get health tips, herbal remedies, and clinic updates directly to your inbox.</p>
           </div>
 
           <div className="md:w-1/2 w-full">

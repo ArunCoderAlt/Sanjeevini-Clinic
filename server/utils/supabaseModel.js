@@ -11,6 +11,7 @@ const {
   fallbackGallery,
   fallbackUsers,
   fallbackReels,
+  fallbackSwarnaBindu,
 } = require('../data/fallbackData');
 
 // In-memory data stores for flawless local development and offline fallback
@@ -26,6 +27,7 @@ const memoryStores = {
   appointments: [],
   contact_messages: [],
   newsletters: [],
+  swarna_bindu: [...fallbackSwarnaBindu],
   groq_key_periods: [],
   groq_usage_logs: [],
 };

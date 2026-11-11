@@ -43,7 +43,7 @@ const Contact = () => {
               </div>
             </div>
             <div>
-              <div id="contact-form" className="bg-white p-8 rounded-2xl shadow-sm h-full scroll-mt-28 transition-all duration-300">
+              <div id="contact-form" className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm h-full scroll-mt-28 transition-all duration-300">
                 <h3 className="text-2xl font-serif text-primary-700 mb-6">Send a Message</h3>
                 <ContactForm />
               </div>

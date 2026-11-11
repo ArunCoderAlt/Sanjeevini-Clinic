@@ -55,14 +55,14 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center space-x-8">
-            <div className="flex space-x-6">
+          <div className="hidden lg:flex items-center space-x-4 xl:space-x-7">
+            <div className="flex space-x-3.5 xl:space-x-5">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
                   className={classNames(
-                    "text-sm font-medium transition-colors hover:text-[#0C2B4B]",
+                    "text-xs xl:text-sm font-medium transition-colors hover:text-[#0C2B4B] whitespace-nowrap py-1",
                     location.pathname === link.path ? "text-[#0C2B4B] border-b-2 border-[#0C2B4B] font-semibold" : "text-[#243B52]"
                   )}
                 >

@@ -10,11 +10,11 @@ const DoctorProfile = ({ doctor }) => {
     : (isSubashini ? '/images/doctors/dr-subashini.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || 'Doctor')}&background=C9A227&color=fff&size=500`);
 
   let doctorPhoto = doctor.image;
-  if (isThiagarajan && (!doctorPhoto || doctorPhoto.includes('ui-avatars'))) {
+  if (isThiagarajan && (!doctorPhoto || doctorPhoto.includes('ui-avatars') || doctorPhoto.includes('unsplash.com'))) {
     doctorPhoto = '/images/doctors/dr-thiagarajan.jpg';
-  } else if (isSubashini && (!doctorPhoto || doctorPhoto.includes('ui-avatars'))) {
+  } else if (isSubashini && (!doctorPhoto || doctorPhoto.includes('ui-avatars') || doctorPhoto.includes('unsplash.com'))) {
     doctorPhoto = '/images/doctors/dr-subashini.jpg';
-  } else if (!doctorPhoto) {
+  } else if (!doctorPhoto || doctorPhoto.includes('unsplash.com')) {
     doctorPhoto = fallbackAvatar;
   }
 
@@ -28,7 +28,7 @@ const DoctorProfile = ({ doctor }) => {
     <div className="bg-white rounded-3xl shadow-lg border border-slate-200/80 p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden">
       <div className="flex flex-col md:flex-row items-start gap-8 lg:gap-12">
         {/* Doctor Image Container with fixed proportional aspect ratio */}
-        <div className="w-full sm:w-72 md:w-80 lg:w-96 shrink-0 mx-auto md:mx-0">
+        <div className="w-full max-w-[280px] sm:max-w-none sm:w-72 md:w-80 lg:w-96 shrink-0 mx-auto md:mx-0">
           <div className="aspect-[3/4] w-full rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-100 md:sticky md:top-28">
             <img 
               src={doctorPhoto} 

@@ -285,7 +285,7 @@ const Gallery = () => {
                   alt={img.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = '/images/front-image.jpg';
+                    e.currentTarget.src = '/images/about/clinic-building.jpg';
                   }}
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">

@@ -4,16 +4,17 @@ import { getTreatments } from '../../services/treatmentService';
 
 // Comprehensive clinic treatments catalog
 const defaultTreatments = [
-  { id: 'gastritis', slug: 'gastritis', name: 'Gastritis & Ulcer', category: 'Gastrointestinal', icon: '🌿', desc: 'Natural relief for acidity, inflammation, and ulcers.' },
-  { id: 'ibs', slug: 'ibs', name: 'Irritable Bowel Syndrome', category: 'Gastrointestinal', icon: '🍃', desc: 'Holistic management of digestion and bowel irregularity.' },
-  { id: 'psoriasis', slug: 'psoriasis', name: 'Psoriasis & Eczema', category: 'Dermatology', icon: '✨', desc: 'Deep cellular healing for chronic skin conditions.' },
-  { id: 'pcos', slug: 'pcos', name: 'PCOS & Menstrual Disorders', category: 'Women\'s Health', icon: '🌸', desc: 'Hormonal balancing through natural remedies.' },
-  { id: 'arthritis', slug: 'arthritis', name: 'Arthritis & Joint Pain', category: 'Musculoskeletal', icon: '🦴', desc: 'Pain relief and cartilage health restoration.' },
-  { id: 'kidney-stones', slug: 'kidney-stones', name: 'Kidney Stones', category: 'Kidney', icon: '💧', desc: 'Dissolving and expelling renal stones naturally.' },
-  { id: 'asthma', slug: 'asthma', name: 'Asthma & Bronchitis', category: 'Respiratory', icon: '🫁', desc: 'Enhancing lung capacity and clearing airways.' },
-  { id: 'migraine', slug: 'migraine', name: 'Migraine & Neurology', category: 'Neurology', icon: '🧠', desc: 'Nervous system soothing and trigger management.' },
-  { id: 'piles', slug: 'piles', name: 'Piles, Fissure, Fistula', category: 'Anorectal', icon: '⚕️', desc: 'Non-surgical traditional interventions.' },
-  { id: 'diabetes', slug: 'diabetes', name: 'Diabetes Management', category: 'Other', icon: '🩸', desc: 'Blood sugar regulation and metabolic correction.' }
+  { id: 'gastritis', slug: 'gastrointestinal', name: 'Gastrointestinal Treatments - வயிறு / குடல் சார்ந்த நோய்கள்', category: 'Gastrointestinal', icon: '🌿', desc: 'Holistic treatments for Gastrointestinal conditions.', image: '/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png' },
+  { id: 'dermatology', slug: 'dermatology', name: 'Dermatology Treatments - தோல் நோய்கள்', category: 'Dermatology', icon: '✨', desc: 'Holistic treatments for Dermatology conditions.' },
+  { id: 'womens-health', slug: 'womens-health', name: 'Women\'s Health Treatments', category: 'Women\'s Health', icon: '🌸', desc: 'Holistic treatments for Women\'s Health conditions.' },
+  { id: 'kidney', slug: 'kidney', name: 'Kidney Treatments', category: 'Kidney', icon: '💧', desc: 'Holistic treatments for Kidney conditions.' },
+  { id: 'musculoskeletal', slug: 'musculoskeletal', name: 'Musculoskeletal Treatments', category: 'Musculoskeletal', icon: '🦴', desc: 'Holistic treatments for Musculoskeletal conditions.' },
+  { id: 'pediatrics', slug: 'pediatrics', name: 'Pediatrics Treatments', category: 'Pediatrics', icon: '👶', desc: 'Holistic treatments for Pediatrics conditions.' },
+  { id: 'respiratory', slug: 'respiratory', name: 'Respiratory Treatments', category: 'Respiratory', icon: '🫁', desc: 'Holistic treatments for Respiratory conditions.' },
+  { id: 'neurology', slug: 'neurology', name: 'Neurology Treatments', category: 'Neurology', icon: '🧠', desc: 'Holistic treatments for Neurology conditions.' },
+  { id: 'anorectal', slug: 'anorectal', name: 'Anorectal Treatments', category: 'Anorectal', icon: '⚕️', desc: 'Holistic treatments for Anorectal conditions.' },
+  { id: 'mens-health', slug: 'mens-health', name: 'Men\'s Health Treatments', category: 'Men\'s Health', icon: '⚡', desc: 'Holistic treatments for Men\'s Health conditions.' },
+  { id: 'other', slug: 'other', name: 'Other Treatments', category: 'Other', icon: '🌿', desc: 'Holistic treatments for general wellness.' }
 ];
 
 const TreatmentGrid = ({ searchTerm, activeCategory }) => {
@@ -26,14 +27,15 @@ const TreatmentGrid = ({ searchTerm, activeCategory }) => {
         const data = res.data.data || res.data || [];
         if (Array.isArray(data) && data.length > 0) {
           const mapped = data.map(t => {
-            const def = defaultTreatments.find(d => d.slug === t.slug || d.name.toLowerCase() === t.name.toLowerCase()) || {};
+            const def = defaultTreatments.find(d => d.slug === t.slug || d.category?.toLowerCase() === t.category?.toLowerCase() || d.name.toLowerCase() === t.name.toLowerCase()) || {};
             return {
               id: t._id || t.id || t.slug || def.id,
               slug: t.slug || def.slug || t._id,
-              name: t.name,
-              category: t.category,
-              desc: t.description || def.desc,
-              icon: t.icon || def.icon || '🌿'
+              name: t.name || def.name,
+              category: t.category || def.category,
+              desc: t.description || t.desc || def.desc,
+              icon: t.icon || def.icon || '🌿',
+              image: t.image || def.image || null,
             };
           });
           setItems(mapped);

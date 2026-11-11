@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
 const { getSupabase } = require('../config/supabase');
@@ -11,6 +12,17 @@ exports.uploadImage = asyncHandler(async (req, res) => {
 
   let finalUrl = `/uploads/${req.file.filename}`;
   let storageProvider = 'local';
+
+  // Sync to client/public/uploads for direct Vite dev and preview access
+  try {
+    const clientUploadsDir = path.join(__dirname, '../../client/public/uploads');
+    if (!fs.existsSync(clientUploadsDir)) {
+      fs.mkdirSync(clientUploadsDir, { recursive: true });
+    }
+    if (req.file.path) {
+      fs.copyFileSync(req.file.path, path.join(clientUploadsDir, req.file.filename));
+    }
+  } catch (_) {}
 
   // Attempt to upload to Supabase Storage if configured
   try {

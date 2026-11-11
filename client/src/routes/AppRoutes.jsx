@@ -12,6 +12,7 @@ const Services = lazy(() => import('../pages/Services'));
 const Treatments = lazy(() => import('../pages/Treatments'));
 const TreatmentDetails = lazy(() => import('../pages/TreatmentDetails'));
 const Gallery = lazy(() => import('../pages/Gallery'));
+const SwarnaBindu = lazy(() => import('../pages/SwarnaBindu'));
 const Testimonials = lazy(() => import('../pages/Testimonials'));
 const Contact = lazy(() => import('../pages/Contact'));
 const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'));
@@ -32,6 +33,7 @@ export default function AppRoutes() {
         <Route path="/treatments" element={<PageTransition><Treatments /></PageTransition>} />
         <Route path="/treatments/:slug" element={<PageTransition><TreatmentDetails /></PageTransition>} />
         <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
+        <Route path="/swarna-bindu" element={<PageTransition><SwarnaBindu /></PageTransition>} />
         <Route path="/testimonials" element={<PageTransition><Testimonials /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/appointment" element={<Navigate to="/contact" replace />} />

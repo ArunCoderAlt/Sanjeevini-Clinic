@@ -13,7 +13,8 @@ import {
   LogOut,
   X,
   Bot,
-  Film
+  Film,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -28,6 +29,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { name: 'Services', path: '/admin/services', icon: Heart },
     { name: 'Treatments', path: '/admin/treatments', icon: Pill },
     { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
+    { name: 'Swarna Bindu', path: '/admin/swarna-bindu', icon: Sparkles },
     { name: 'Instagram Reels', path: '/admin/reels', icon: Film },
     { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquare },
     { name: 'Messages', path: '/admin/messages', icon: Mail },

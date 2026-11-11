@@ -64,7 +64,7 @@ const Testimonials = () => {
           >
             {items.map((t, idx) => (
               <SwiperSlide key={t.id || idx}>
-                <div className="bg-white p-8 rounded-2xl h-full flex flex-col relative mt-6 shadow-xl border border-white/50">
+                <div className="bg-white p-6 sm:p-8 rounded-2xl h-full flex flex-col relative mt-6 shadow-xl border border-white/50">
                   <div className="absolute -top-6 left-8 bg-gold w-12 h-12 rounded-full flex items-center justify-center text-white shadow-md">
                     <Quote className="w-5 h-5" fill="currentColor" />
                   </div>

@@ -33,12 +33,12 @@ const DoctorGrid = () => {
         if (data.length > 0) {
           const mapped = data.map(d => {
             let image = d.image;
-            if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars'))) {
+            if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
               image = '/images/doctors/dr-thiagarajan.jpg';
-            } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars'))) {
+            } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
               image = '/images/doctors/dr-subashini.jpg';
-            } else if (!image) {
-              image = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=1B5E3B&color=fff&size=500`;
+            } else if (!image || image.includes('unsplash.com')) {
+              image = '/images/doctors/dr-thiagarajan.jpg';
             }
             return {
               ...d,
@@ -57,7 +57,7 @@ const DoctorGrid = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto items-stretch">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto items-stretch">
       {doctors.map((doc) => (
         <DoctorCard key={doc._id || doc.id || doc.slug} doctor={doc} />
       ))}

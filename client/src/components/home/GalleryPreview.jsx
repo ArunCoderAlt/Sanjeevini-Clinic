@@ -1,108 +1,116 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Eye } from 'lucide-react';
+import { ChevronRight, ArrowUpRight } from 'lucide-react';
 import Container from '../common/Container';
 import Button from '../common/Button';
-import GalleryLightbox from '../gallery/GalleryLightbox';
 
+// 100% Authentic Clinic Images provided and uploaded by user
 const clinicGalleryImages = [
   {
-    src: '/images/gallery/clinic-front.jpg',
-    title: 'Sanjeevini Clinic Front & Campus',
-    category: 'Hospital Facility',
-    alt: 'Sanjeevini Siddha & Ayurveda Medical Centre front exterior in Karaikal',
+    src: '/images/hero/slide-1.png',
+    title: 'Rooted in Tradition, Focused on Health',
+    category: 'Holistic Care',
+    alt: 'Siddha and Ayurveda comprehensive care at Sanjeevini',
   },
   {
-    src: '/images/services/consultation.jpg',
-    title: 'Dr. Thiagarajan Nadi Parikshai Pulse Diagnosis',
+    src: '/images/hero/slide-2.png',
+    title: 'Traditional Medicine & Personalized Wellness',
+    category: 'Wellness',
+    alt: 'Natural healing and wellness care at Sanjeevini',
+  },
+  {
+    src: '/images/hero/slide-3.png',
+    title: 'Consultation & Individualized Treatment Plans',
     category: 'Consultation',
-    alt: 'Traditional Siddha pulse examination at Sanjeevini',
+    alt: 'Specialist Siddha and Ayurvedic consultation at Karaikal',
   },
   {
-    src: '/images/services/varmam.jpg',
-    title: 'Varmam Vital Point Therapeutic Stimulation',
-    category: 'Specialized Therapy',
-    alt: 'Siddha Varmam treatment for neuromuscular rehabilitation',
+    src: '/images/hero/slide-4.png',
+    title: 'Specialised Point Stimulation & Care',
+    category: 'Specialized Care',
+    alt: 'Traditional Siddha point stimulation and therapeutic care at Sanjeevini',
   },
   {
-    src: '/images/about/herbs.jpg',
-    title: 'Authentic Herbal Pharmacy & Choornams',
-    category: 'In-house Pharmacy',
-    alt: 'Natural herbs, oils, and formulations prepared by experts',
+    src: '/images/hero/slide-5.png',
+    title: 'Ayush Certified Traditional Formulations',
+    category: 'Herbal Medicine',
+    alt: 'Authentic Siddha & Ayurvedic medicines and herbs',
   },
   {
-    src: '/images/services/thokkanam.jpg',
-    title: 'Traditional Thokkanam Body Therapy',
-    category: 'Body Therapy',
-    alt: 'Therapeutic Siddha body massage and steam treatment',
-  },
-  {
-    src: '/images/treatments/digestive.jpg',
-    title: 'Inpatient Care & Panchakarma Recovery Room',
-    category: 'Patient Rooms',
-    alt: 'Calm healing recovery rooms at Sanjeevini Hospital',
+    src: '/images/about/samc-philosophy.jpg',
+    title: 'Ancient Wisdom & SAMC Philosophy',
+    category: 'Philosophy',
+    alt: 'Sanjeevini SAMC healing emblem and philosophy',
   },
 ];
 
 const GalleryPreview = () => {
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const openLightbox = (idx) => {
-    setCurrentIndex(idx);
-    setLightboxOpen(true);
-  };
-
   return (
     <section className="py-16 md:py-20 bg-white relative" id="home-gallery">
       <Container>
-        {/* Aligned Photo Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {clinicGalleryImages.map((item, idx) => (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 sm:mb-10 gap-4">
+          <div>
+            <span className="text-xs uppercase tracking-widest font-bold text-sky-700 mb-2 block">
+              Clinic Campus &amp; Care
+            </span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#0C2B4B] font-bold">
+              Our Clinic &amp; Facilities
+            </h2>
+            <p className="text-gray-600 text-xs sm:text-base mt-2 max-w-xl">
+              Explore authentic glimpses of Sanjeevini Siddha &amp; Ayurveda Medical Centre in Karaikal.
+            </p>
+          </div>
+          <Button to="/gallery" variant="outline" className="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-full">
+            <span>View Full Gallery</span>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* 6-item photo grid with authentic clinic assets - Clean inline display with no popup modals */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          {clinicGalleryImages.map((img, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: idx * 0.08 }}
-              onClick={() => openLightbox(idx)}
-              className="aspect-[4/3] rounded-2xl overflow-hidden relative group shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-sage/60 bg-gray-100"
+              transition={{ delay: idx * 0.08, duration: 0.4 }}
+              className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 bg-slate-900 aspect-[16/10]"
             >
-              <img
-                src={item.src}
-                alt={item.alt}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
+              <Link to="/gallery" className="block w-full h-full relative" aria-label={`View ${img.title} in gallery`}>
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
 
-              {/* Hover Overlay with Expand Icon */}
-              <div className="absolute inset-0 bg-primary-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/95 text-primary-700 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                  <Eye className="w-5 h-5" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                <div className="absolute top-3 right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-              </div>
+
+                <div className="absolute bottom-3 sm:bottom-4 left-3.5 sm:left-4 right-3.5 sm:right-4">
+                  <span className="inline-block px-2 sm:px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-1 sm:mb-1.5">
+                    {img.category}
+                  </span>
+                  <h3 className="text-white text-sm sm:text-base font-serif font-bold leading-snug drop-shadow-sm">
+                    {img.title}
+                  </h3>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>
 
-        {/* View Full Gallery CTA */}
-        <div className="flex items-center justify-center mt-10">
+        <div className="text-center mt-10">
           <Button to="/gallery" variant="outline" className="px-8 py-3.5 shadow-sm text-sm font-medium">
-            <span>Explore Full Clinic Photo Gallery</span>
-            <ChevronRight className="w-4 h-4 ml-1" />
+            Explore All Photos &amp; Facility Tour →
           </Button>
         </div>
       </Container>
-
-      {/* Lightbox Modal */}
-      {lightboxOpen && (
-        <GalleryLightbox
-          images={clinicGalleryImages}
-          currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
-          onClose={() => setLightboxOpen(false)}
-        />
-      )}
     </section>
   );
 };
