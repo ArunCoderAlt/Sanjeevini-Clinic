@@ -33,11 +33,12 @@ const features = [
 
 const WhyChooseUs = () => {
   return (
-    <section className="py-24 bg-sage">
+    <section className="py-24 bg-dark-section">
       <Container>
         <SectionTitle 
           title="Why Choose Us" 
           subtitle="Experience the difference of authentic traditional medicine."
+          light
         />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
@@ -50,14 +51,14 @@ const WhyChooseUs = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between"
+                className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between border border-white/50"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-600 transition-colors">
+                    <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-600 transition-colors shadow-xs">
                       <Icon className="w-7 h-7 text-primary-600 group-hover:text-white transition-colors" />
                     </div>
-                    <span className="text-2xl font-serif font-bold text-primary-200 group-hover:text-gold transition-colors">
+                    <span className="text-2xl font-serif font-bold text-primary-300 group-hover:text-gold transition-colors">
                       {feature.number}
                     </span>
                   </div>

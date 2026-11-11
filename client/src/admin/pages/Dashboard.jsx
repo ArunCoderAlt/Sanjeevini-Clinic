@@ -142,8 +142,8 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Recent Appointments</h3>
-            <Link to="/admin/appointments" className="text-sm text-[#0C2B4B] hover:underline">View All</Link>
+            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Appointments</h3>
+            <Link to="/admin/appointments" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
           </div>
           <DataTable
             columns={appointmentCols}
@@ -154,8 +154,8 @@ const Dashboard = () => {
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Recent Messages</h3>
-            <Link to="/admin/messages" className="text-sm text-[#0C2B4B] hover:underline">View All</Link>
+            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Messages</h3>
+            <Link to="/admin/messages" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
           </div>
           <DataTable
             columns={messageCols}

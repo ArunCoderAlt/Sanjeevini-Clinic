@@ -46,13 +46,16 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-[#0B1E32] text-white flex flex-col transform transition-transform duration-300 ease-in-out
+        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-[#0B1E32] text-white flex flex-col transform transition-transform duration-300 ease-in-out admin-sidebar
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        style={{ backgroundColor: '#0B1E32', backgroundImage: 'none' }}
       >
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700/60" style={{ backgroundColor: '#0B1E32' }}>
           <div className="flex items-center gap-3">
             <img src="/images/logo.png?v=4" alt="Sanjeevini" className="h-9 w-auto object-contain bg-white rounded-full p-0.5 shadow-sm" />
-            <h1 className="text-xl font-bold text-[#38BDF8]">Sanjeevini Admin</h1>
+            <span className="text-xl font-bold text-white tracking-wide admin-brand-title" style={{ color: '#FFFFFF' }}>
+              Sanjeevini
+            </span>
           </div>
           <button 
             className="md:hidden text-gray-300 hover:text-white"
@@ -62,36 +65,45 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-1 px-3">
+        <nav 
+          className="admin-sidebar-nav flex-1 overflow-y-auto py-4"
+          style={{ backgroundColor: 'transparent', backgroundImage: 'none', borderBottom: 'none', boxShadow: 'none' }}
+        >
+          <ul className="space-y-1.5 px-3">
             {navItems.map((item) => (
               <li key={item.name}>
                 <NavLink
                   to={item.path}
                   end={item.path === '/admin'}
                   className={({ isActive }) => 
-                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200
+                    `flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200
                     ${isActive 
-                      ? 'bg-primary-600 text-white shadow-sm' 
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`
+                      ? 'bg-gradient-to-r from-[#144979] to-[#0C2B4B] text-white shadow-md font-semibold' 
+                      : 'text-slate-300 hover:bg-[#132A45] hover:text-white'}`
                   }
+                  style={({ isActive }) => ({
+                    color: isActive ? '#FFFFFF' : '#CBD5E1',
+                    backgroundColor: isActive ? '#144979' : 'transparent',
+                    backgroundImage: isActive ? 'linear-gradient(135deg, #144979 0%, #0C2B4B 100%)' : 'none',
+                  })}
                   onClick={() => setIsOpen(false)}
                 >
-                  <item.icon size={20} />
-                  <span>{item.name}</span>
+                  <item.icon size={20} className="shrink-0" />
+                  <span className="truncate">{item.name}</span>
                 </NavLink>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-gray-700/60" style={{ backgroundColor: '#0B1E32' }}>
           <button 
             onClick={logout}
-            className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
+            className="flex items-center gap-3 px-4 py-3 w-full text-left text-slate-300 rounded-lg hover:bg-[#132A45] hover:text-white transition-colors"
+            style={{ color: '#CBD5E1' }}
           >
             <LogOut size={20} />
-            <span>Logout</span>
+            <span className="font-medium text-sm">Logout</span>
           </button>
         </div>
       </aside>

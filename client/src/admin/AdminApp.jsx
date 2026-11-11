@@ -42,7 +42,7 @@ const AdminApp = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#F0F6FC] overflow-hidden">
+    <div className="admin-portal flex h-screen bg-[#F0F6FC] overflow-hidden">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       

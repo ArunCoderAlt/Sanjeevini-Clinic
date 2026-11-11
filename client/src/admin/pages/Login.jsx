@@ -34,10 +34,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
+    <div className="admin-portal min-h-screen flex items-center justify-center bg-[#F0F6FC] py-12 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: '#F0F6FC', backgroundImage: 'none' }}>
+      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100" style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}>
         <div>
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900" style={{ color: '#0F172A' }}>
             Sanjeevini Admin
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">

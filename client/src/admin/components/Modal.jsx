@@ -28,7 +28,7 @@ const Modal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="admin-portal fixed inset-0 z-50 overflow-y-auto"
       aria-labelledby="modal-title"
       role="dialog"
       aria-modal="true"
@@ -48,6 +48,7 @@ const Modal = ({
         {/* Modal Window */}
         <div
           className={`inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle w-full ${maxWidth}`}
+          style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">

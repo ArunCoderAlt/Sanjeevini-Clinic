@@ -19,7 +19,10 @@ const AdminNavbar = ({ toggleSidebar, user }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm z-10 py-3 px-4 md:px-6">
+    <header 
+      className="bg-white shadow-xs border-b border-slate-200/80 z-10 py-3.5 px-4 md:px-6"
+      style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button 
@@ -28,7 +31,7 @@ const AdminNavbar = ({ toggleSidebar, user }) => {
           >
             <Menu size={24} />
           </button>
-          <h2 className="text-xl font-semibold text-gray-800 hidden sm:block">
+          <h2 className="text-xl font-bold text-slate-800 hidden sm:block" style={{ color: '#0F172A' }}>
             {getPageTitle()}
           </h2>
         </div>

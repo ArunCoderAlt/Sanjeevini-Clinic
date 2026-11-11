@@ -249,13 +249,10 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ==========================================================================
-   Step 7 — Navigation & Layout Components (Uniform Light Blue Navbar)
+   Step 7 — Public Website Navigation (Uniform Light Blue Navbar)
    ========================================================================== */
-nav,
-nav.bg-white,
-nav[class*="bg-white"],
-nav[class*="navbar"],
-.navbar-light-blue {
+.navbar-light-blue,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) {
   background-image: linear-gradient(180deg, #E6F2FA 0%, #D8ECF8 100%) !important;
   background-color: #D8ECF8 !important;
   border-bottom: 1px solid #B8D5ED !important;
@@ -263,12 +260,12 @@ nav[class*="navbar"],
   backdrop-filter: blur(12px) !important;
 }
 
-/* Ensure all sub-containers, flexboxes, and link wrappers inside nav are transparent */
-nav > div,
-nav div,
-nav .flex,
-nav .container,
-nav [class*="Container"] {
+/* Ensure sub-containers inside public website nav are transparent */
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) > div,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) div,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) .flex,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) .container,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) [class*="Container"] {
   background-color: transparent !important;
   background-image: none !important;
 }
@@ -383,3 +380,236 @@ footer [aria-label*="Twitter"] {
   background-color: rgba(255, 255, 255, 0.1) !important;
   color: #E2EEF8 !important;
 }
+
+/* ==========================================================================
+   Step 9 — Midnight Navy Dark Section System
+   Color matched precisely to user's uploaded image (#081E36)
+   Applied to Why Choose Us, Our Medical Team, and What Our Patients Say
+   ========================================================================== */
+.bg-dark-section,
+section.bg-dark-section {
+  background-color: #081E36 !important;
+  background-image: linear-gradient(180deg, #0A223D 0%, #081E36 50%, #05162A 100%) !important;
+  color: #FFFFFF !important;
+  position: relative !important;
+}
+
+/* Headings in Dark Sections */
+.bg-dark-section h1,
+.bg-dark-section h2,
+.bg-dark-section [class*="heading"],
+.bg-dark-section .text-white {
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Section Title Subtitle in Dark Sections */
+.bg-dark-section .text-secondary,
+.bg-dark-section .text-gold {
+  color: #38BDF8 !important;
+}
+
+/* Ensure cards inside dark sections retain clean, crisp white card styles */
+.bg-dark-section [class*="rounded-"].bg-white,
+.bg-dark-section [class*="rounded-"].bg-cream {
+  background-image: linear-gradient(145deg, #FFFFFF 0%, #EEF6FD 50%, #DEEFFB 100%) !important;
+  background-color: #EEF6FD !important;
+  border-color: rgba(194, 220, 242, 0.6) !important;
+}
+
+/* Swiper pagination inside dark section */
+.bg-dark-section .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.4) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease;
+}
+
+.bg-dark-section .swiper-pagination-bullet-active {
+  background: #38BDF8 !important;
+  width: 24px !important;
+  border-radius: 4px !important;
+}
+
+/* ==========================================================================
+   Admin Portal UI Isolation & High-Contrast Styling
+   Completely isolated to .admin-portal so public website remains untouched.
+   ========================================================================== */
+.admin-portal {
+  background-color: #F0F6FC !important;
+  background-image: none !important;
+  color: #0F172A;
+}
+
+/* Strip any website background patterns and gradients from Admin Portal */
+.admin-portal,
+.admin-portal .bg-white,
+.admin-portal .bg-gray-50,
+.admin-portal .bg-gray-100,
+.admin-portal [class*="rounded-"].bg-white,
+.admin-portal table,
+.admin-portal thead,
+.admin-portal tbody,
+.admin-portal tr,
+.admin-portal th,
+.admin-portal td {
+  background-image: none !important;
+}
+
+/* Admin Sidebar - Deep Dark Theme with High Visibility */
+.admin-portal aside,
+.admin-portal .admin-sidebar {
+  background-color: #0B1E32 !important;
+  background-image: none !important;
+}
+
+.admin-portal aside h1,
+.admin-portal .admin-sidebar h1 {
+  color: #38BDF8 !important;
+}
+
+.admin-portal aside nav,
+.admin-portal .admin-sidebar nav,
+.admin-portal .admin-sidebar-nav {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.admin-portal aside nav a,
+.admin-portal .admin-sidebar nav a {
+  color: #CBD5E1 !important;
+  background-image: none !important;
+}
+
+.admin-portal aside nav a span,
+.admin-portal .admin-sidebar nav a span {
+  color: inherit !important;
+}
+
+.admin-portal aside nav a:hover,
+.admin-portal .admin-sidebar nav a:hover {
+  color: #FFFFFF !important;
+  background-color: #132A45 !important;
+}
+
+.admin-portal aside nav a.active,
+.admin-portal .admin-sidebar nav a.active,
+.admin-portal aside nav a[class*="bg-primary"],
+.admin-portal .admin-sidebar nav a[class*="bg-primary"] {
+  background-image: linear-gradient(135deg, #144979 0%, #0C294A 100%) !important;
+  background-color: #144979 !important;
+  color: #FFFFFF !important;
+}
+
+.admin-portal aside nav a.active span,
+.admin-portal .admin-sidebar nav a.active span {
+  color: #FFFFFF !important;
+}
+
+.admin-portal aside button,
+.admin-portal .admin-sidebar button {
+  color: #CBD5E1 !important;
+  background-image: none !important;
+}
+
+.admin-portal aside button:hover,
+.admin-portal .admin-sidebar button:hover {
+  color: #FFFFFF !important;
+  background-color: #132A45 !important;
+}
+
+/* Admin Navbar / Header */
+.admin-portal header {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+.admin-portal header h2 {
+  color: #0F172A !important;
+}
+
+/* Admin Cards & Content Containers */
+.admin-portal .bg-white {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Scoped exclusively to the main scrollable content area */
+.admin-portal main h1,
+.admin-portal main h2,
+.admin-portal main h3,
+.admin-portal main h4 {
+  color: #0F172A !important;
+}
+
+/* Sidebar brand title and highlights - 100% visible on dark background */
+.admin-portal aside .admin-brand-title,
+.admin-portal .admin-sidebar .admin-brand-title,
+.admin-brand-title {
+  color: #FFFFFF !important;
+}
+
+.admin-portal aside .admin-brand-accent,
+.admin-portal .admin-sidebar .admin-brand-accent,
+.admin-brand-accent {
+  color: #38BDF8 !important;
+}
+
+.admin-portal aside h1,
+.admin-portal .admin-sidebar h1 {
+  color: #FFFFFF !important;
+}
+
+/* Admin Data Tables */
+.admin-portal table {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+.admin-portal thead,
+.admin-portal thead tr,
+.admin-portal thead th {
+  background-color: #F8FAFC !important;
+  background-image: none !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  border-color: #E2E8F0 !important;
+}
+
+.admin-portal tbody tr {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border-color: #F1F5F9 !important;
+}
+
+.admin-portal tbody tr:hover {
+  background-color: #F8FAFC !important;
+}
+
+.admin-portal td {
+  color: #1E293B !important;
+}
+
+/* Form controls in Admin */
+.admin-portal input,
+.admin-portal select,
+.admin-portal textarea {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+.admin-portal input:focus,
+.admin-portal select:focus,
+.admin-portal textarea:focus {
+  border-color: #144979 !important;
+  box-shadow: 0 0 0 2px rgba(20, 73, 121, 0.2) !important;
+}
+

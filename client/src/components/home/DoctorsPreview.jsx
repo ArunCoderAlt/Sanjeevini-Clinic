@@ -59,11 +59,12 @@ const DoctorsPreview = () => {
   }, []);
 
   return (
-    <section className="py-24 bg-cream">
+    <section className="py-24 bg-dark-section">
       <Container>
         <SectionTitle 
           title="Our Medical Team" 
           subtitle="Expert practitioners dedicated to your well-being."
+          light
         />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-16 max-w-4xl mx-auto items-stretch">
@@ -74,9 +75,9 @@ const DoctorsPreview = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.2 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-md group border border-sage h-full flex flex-col justify-between"
+              className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group border border-white/50 h-full flex flex-col justify-between"
             >
-              <div className="aspect-[4/5] overflow-hidden bg-sage relative">
+              <div className="aspect-[4/5] overflow-hidden bg-slate-800 relative">
                 <img 
                   src={doc.img} 
                   alt={doc.name} 

@@ -38,9 +38,12 @@ const DataTable = ({
 
   if (loading) {
     return (
-      <div className="w-full bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-        <div className="animate-pulse flex flex-col">
-          <div className="h-12 bg-gray-100 border-b border-gray-200"></div>
+      <div 
+        className="w-full bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200"
+        style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
+      >
+        <div className="animate-pulse flex flex-col" style={{ backgroundColor: '#FFFFFF' }}>
+          <div className="h-12 bg-slate-100 border-b border-gray-200"></div>
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-16 border-b border-gray-100 flex items-center px-6 gap-4">
               <div className="h-4 bg-gray-200 rounded w-1/4"></div>
@@ -55,18 +58,25 @@ const DataTable = ({
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div 
+      className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+      style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
+    >
       <div className="overflow-x-auto">
-        <table className="w-full whitespace-nowrap text-left">
-          <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm font-semibold">
+        <table className="w-full whitespace-nowrap text-left" style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}>
+          <thead 
+            className="border-b border-gray-200 text-slate-700 text-sm font-semibold"
+            style={{ backgroundColor: '#F8FAFC', backgroundImage: 'none' }}
+          >
             <tr>
               {columns.map((col, index) => (
                 <th 
                   key={index} 
-                  className={`px-6 py-4 ${col.sortable ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+                  className={`px-6 py-4 ${col.sortable ? 'cursor-pointer hover:bg-slate-100' : ''}`}
+                  style={{ backgroundColor: '#F8FAFC', backgroundImage: 'none', color: '#334155' }}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 font-semibold text-slate-700">
                     {col.label}
                     {col.sortable && sortConfig.key === col.key && (
                       sortConfig.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />
@@ -75,16 +85,29 @@ const DataTable = ({
                 </th>
               ))}
               {(onEdit || onDelete || onView) && (
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th 
+                  className="px-6 py-4 text-right"
+                  style={{ backgroundColor: '#F8FAFC', backgroundImage: 'none', color: '#334155' }}
+                >
+                  Actions
+                </th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 bg-white" style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}>
             {sortedData.length > 0 ? (
               sortedData.map((row, rowIndex) => (
-                <tr key={rowIndex} className="hover:bg-gray-50 transition-colors">
+                <tr 
+                  key={rowIndex} 
+                  className="hover:bg-slate-50 transition-colors"
+                  style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
+                >
                   {columns.map((col, colIndex) => (
-                    <td key={colIndex} className="px-6 py-4 text-sm text-gray-700">
+                    <td 
+                      key={colIndex} 
+                      className="px-6 py-4 text-sm text-slate-800"
+                      style={{ color: '#1E293B', backgroundColor: 'transparent' }}
+                    >
                       {col.render ? col.render(row[col.key], row) : row[col.key]}
                     </td>
                   ))}
@@ -124,10 +147,11 @@ const DataTable = ({
                 </tr>
               ))
             ) : (
-              <tr>
+              <tr style={{ backgroundColor: '#FFFFFF', backgroundImage: 'none' }}>
                 <td 
                   colSpan={columns.length + (onEdit || onDelete || onView ? 1 : 0)} 
-                  className="px-6 py-12 text-center text-gray-500"
+                  className="px-6 py-12 text-center text-slate-500 font-medium"
+                  style={{ color: '#64748B', backgroundColor: '#FFFFFF', backgroundImage: 'none' }}
                 >
                   {emptyMessage}
                 </td>
