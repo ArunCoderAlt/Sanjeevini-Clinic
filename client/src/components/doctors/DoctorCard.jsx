@@ -17,8 +17,8 @@ const DoctorCard = ({ doctor }) => {
   }
 
   return (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-sage h-full flex flex-col justify-between group">
-      <div className="aspect-[4/5] bg-sage relative overflow-hidden">
+    <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-slate-200/80 h-full flex flex-col justify-between group">
+      <div className="aspect-[4/5] bg-slate-100 relative overflow-hidden">
         <img 
           src={image} 
           alt={doctor.name} 
