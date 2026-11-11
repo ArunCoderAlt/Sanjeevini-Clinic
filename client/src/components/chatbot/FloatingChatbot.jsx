@@ -307,7 +307,7 @@ export default function FloatingChatbot() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen(!isOpen)}
-          className="relative bg-gradient-to-r from-[#0E2940] to-[#1880B8] text-white p-4 rounded-full shadow-2xl hover:shadow-primary/40 transition-all flex items-center justify-center border-2 border-gold/40 group"
+          className="relative bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white p-4 rounded-full shadow-2xl hover:shadow-primary/40 transition-all flex items-center justify-center border-2 border-gold/40 group"
           aria-label="Open AI Assistant"
           title="Chat with Sanjeevini AI"
         >
@@ -332,7 +332,7 @@ export default function FloatingChatbot() {
             className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[410px] h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#0E2940] via-[#143B5C] to-[#1880B8] text-white p-4 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0">
+            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white p-4 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0">
               <div className="flex items-center space-x-3">
                 <div className="relative w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner">
                   <Bot className="w-5 h-5 text-gold" />

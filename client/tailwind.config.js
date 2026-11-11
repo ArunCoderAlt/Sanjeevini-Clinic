@@ -12,21 +12,21 @@ export default {
           100: '#E0EFFB',
           200: '#BCE0F7',
           300: '#87C7F1',
-          400: '#4AA8E4',
-          500: '#228DD2',
-          600: '#1880B8',
-          700: '#1A4B75',
-          800: '#143B5C',
-          900: '#0E2940',
-          DEFAULT: '#1880B8',
-          light: '#2596D1',
-          dark: '#143B5C'
+          400: '#3A96D4',
+          500: '#1A6DA8',
+          600: '#144979',
+          700: '#0C2B4B',
+          800: '#081D33',
+          900: '#05121F',
+          DEFAULT: '#144979',
+          light: '#1D62A1',
+          dark: '#081D33'
         },
-        secondary: '#1A4B75',
-        sage: '#EBF4FB',
-        cream: '#F8FAFD',
+        secondary: '#0C2B4B',
+        sage: '#E3EFF9',
+        cream: '#EEF6FD',
         gold: '#0284C7',
-        dark: '#0B1E32'
+        dark: '#07192C'
       },
       fontFamily: {
         heading: ['"Playfair Display"', 'serif'],
@@ -67,8 +67,8 @@ export default {
           '50%': { transform: 'translateY(-10px)' },
         },
         'pulse-glow': {
-          '0%, 100%': { opacity: '1', boxShadow: '0 0 0 0 rgba(27, 94, 59, 0.4)' },
-          '50%': { opacity: '.8', boxShadow: '0 0 0 10px rgba(27, 94, 59, 0)' }
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 0 0 rgba(20, 73, 121, 0.4)' },
+          '50%': { opacity: '.8', boxShadow: '0 0 0 10px rgba(20, 73, 121, 0)' }
         }
       }
     },

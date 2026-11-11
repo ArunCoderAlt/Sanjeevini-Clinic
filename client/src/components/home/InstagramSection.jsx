@@ -421,7 +421,7 @@ const InstagramSection = () => {
 
   return (
     <section
-      className="py-20 bg-gradient-to-b from-[#FAF8F5] via-white to-[#FAF8F5] relative overflow-hidden"
+      className="py-20 bg-gradient-to-b from-[#EDF5FB] via-[#F4F9FD] to-[#DFEEF8] relative overflow-hidden"
       id="home-instagram"
     >
       <Container>

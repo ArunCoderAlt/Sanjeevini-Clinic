@@ -13,7 +13,7 @@ const stats = [
 
 const TrustStats = () => {
   return (
-    <section className="bg-primary-600 py-16 text-white shadow-inner relative z-10">
+    <section className="bg-gradient-to-r from-[#144979] via-[#0C294A] to-[#071A2F] py-16 text-white shadow-inner relative z-10">
       <Container>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => {
@@ -28,12 +28,12 @@ const TrustStats = () => {
                 className="text-center"
               >
                 <div className="flex justify-center mb-4">
-                  <Icon className="w-10 h-10 text-gold" />
+                  <Icon className="w-10 h-10 text-[#38BDF8]" />
                 </div>
-                <div className="text-4xl md:text-5xl font-serif font-bold mb-2 text-white drop-shadow-sm">
+                <div className="text-4xl md:text-5xl font-serif font-bold mb-2 text-white drop-shadow-md">
                   <CountUp value={stat.count} delay={index * 0.15} duration={2} />
                 </div>
-                <div className="text-white/90 text-xs sm:text-sm md:text-base uppercase tracking-wider font-medium leading-snug">{stat.label}</div>
+                <div className="text-[#E0EFFB] text-xs sm:text-sm md:text-base uppercase tracking-wider font-medium leading-snug drop-shadow-sm">{stat.label}</div>
               </motion.div>
             );
           })}

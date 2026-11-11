@@ -49,8 +49,8 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-3">
             <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 sm:h-12 w-auto object-contain rounded-full shadow-xs" />
             <div className="flex flex-col">
-              <span className="font-heading font-bold text-xl sm:text-2xl text-[#1880B8] leading-none">Sanjeevini</span>
-              <span className="text-[10px] sm:text-[11px] font-medium text-gray-500 tracking-wider mt-1">Since 2005</span>
+              <span className="font-heading font-bold text-xl sm:text-2xl text-[#0C2B4B] leading-none">Sanjeevini</span>
+              <span className="text-[10px] sm:text-[11px] font-medium text-[#475E75] tracking-wider mt-1">Since 2005</span>
             </div>
           </Link>
 
@@ -62,8 +62,8 @@ export default function Navbar() {
                   key={link.name}
                   to={link.path}
                   className={classNames(
-                    "text-sm font-medium transition-colors hover:text-[#1880B8]",
-                    location.pathname === link.path ? "text-[#1880B8] border-b-2 border-[#1880B8]" : "text-gray-600"
+                    "text-sm font-medium transition-colors hover:text-[#0C2B4B]",
+                    location.pathname === link.path ? "text-[#0C2B4B] border-b-2 border-[#0C2B4B] font-semibold" : "text-[#243B52]"
                   )}
                 >
                   {link.name}

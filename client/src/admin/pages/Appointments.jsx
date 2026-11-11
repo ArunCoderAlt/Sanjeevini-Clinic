@@ -91,13 +91,13 @@ const Appointments = () => {
         <select
           value={val ? val.charAt(0).toUpperCase() + val.slice(1) : 'Pending'}
           onChange={(e) => handleStatusChange(row._id, e.target.value)}
-          className={`text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 py-1 pl-2 pr-8 ${
+          className={`text-sm rounded-md border-gray-300 shadow-xs focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 py-1 pl-2 pr-8 ${
             val === 'pending'
               ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
               : val === 'confirmed'
               ? 'bg-blue-50 text-blue-800 border-blue-200'
               : val === 'completed'
-              ? 'bg-sky-50 text-[#1880B8] border-sky-200'
+              ? 'bg-sky-50 text-[#0C2B4B] border-sky-200'
               : 'bg-red-50 text-red-800 border-red-200'
           }`}
         >
@@ -134,7 +134,7 @@ const Appointments = () => {
             onClick={() => setFilter(tab)}
             className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
               filter === tab
-                ? 'bg-[#EAF4EE] text-[#1880B8]'
+                ? 'bg-[#EAF4EE] text-[#0C2B4B]'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -168,7 +168,7 @@ const Appointments = () => {
               <div>
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</span>
                 <p className="text-sm font-medium text-gray-800 mt-0.5">
-                  <a href={`tel:${viewModal.data.phone}`} className="text-[#1880B8] hover:underline">
+                  <a href={`tel:${viewModal.data.phone}`} className="text-[#0C2B4B] hover:underline">
                     {viewModal.data.phone}
                   </a>
                 </p>

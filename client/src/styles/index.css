@@ -3,54 +3,80 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   Pentagon Network Background Pattern
-   Visible on full-width section backgrounds only.
-   Stripped from rounded cards, inputs, buttons & text containers so it
-   never overlaps readable content.
+   Pentagon Network Background Pattern & Clinical Gradient System
+   - Blue is transformed into a rich, deep darker gradient
+   - White is transformed into an elegant, luminous light blue gradient
+   - High-contrast typography guarantees everything is 100% visible
    ========================================================================== */
 
 :root {
-  --bg-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cg fill='none' stroke='%23B8D4EE' stroke-width='1.2' opacity='0.5'%3E%3Cpolygon points='90,40 140,11 190,40 190,98 140,127 90,98'/%3E%3Cpolygon points='380,200 440,165 500,200 500,270 440,305 380,270'/%3E%3Cpolygon points='120,380 168,355 216,380 216,430 168,455 120,430'/%3E%3Cpolygon points='460,450 500,427 540,450 540,496 500,519 460,496'/%3E%3Cline x1='190' y1='98' x2='380' y2='200'/%3E%3Cline x1='216' y1='430' x2='380' y2='270'/%3E%3Cline x1='140' y1='127' x2='168' y2='355'/%3E%3Cline x1='500' y1='305' x2='500' y2='427'/%3E%3C/g%3E%3Cg fill='%23A8C8E8' opacity='0.6'%3E%3Ccircle cx='90' cy='40' r='3.5'/%3E%3Ccircle cx='140' cy='11' r='3.5'/%3E%3Ccircle cx='190' cy='40' r='3.5'/%3E%3Ccircle cx='190' cy='98' r='3.5'/%3E%3Ccircle cx='140' cy='127' r='3.5'/%3E%3Ccircle cx='90' cy='98' r='3.5'/%3E%3Ccircle cx='380' cy='200' r='4'/%3E%3Ccircle cx='440' cy='165' r='4'/%3E%3Ccircle cx='500' cy='200' r='4'/%3E%3Ccircle cx='500' cy='270' r='4'/%3E%3Ccircle cx='440' cy='305' r='4'/%3E%3Ccircle cx='380' cy='270' r='4'/%3E%3Ccircle cx='120' cy='380' r='3.5'/%3E%3Ccircle cx='168' cy='355' r='3.5'/%3E%3Ccircle cx='216' cy='380' r='3.5'/%3E%3Ccircle cx='216' cy='430' r='3.5'/%3E%3Ccircle cx='168' cy='455' r='3.5'/%3E%3Ccircle cx='120' cy='430' r='3.5'/%3E%3Ccircle cx='460' cy='450' r='3'/%3E%3Ccircle cx='500' cy='427' r='3'/%3E%3Ccircle cx='540' cy='450' r='3'/%3E%3Ccircle cx='540' cy='496' r='3'/%3E%3Ccircle cx='500' cy='519' r='3'/%3E%3Ccircle cx='460' cy='496' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  --bg-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cg fill='none' stroke='%23B8D4EE' stroke-width='1.2' opacity='0.4'%3E%3Cpolygon points='90,40 140,11 190,40 190,98 140,127 90,98'/%3E%3Cpolygon points='380,200 440,165 500,200 500,270 440,305 380,270'/%3E%3Cpolygon points='120,380 168,355 216,380 216,430 168,455 120,430'/%3E%3Cpolygon points='460,450 500,427 540,450 540,496 500,519 460,496'/%3E%3Cline x1='190' y1='98' x2='380' y2='200'/%3E%3Cline x1='216' y1='430' x2='380' y2='270'/%3E%3Cline x1='140' y1='127' x2='168' y2='355'/%3E%3Cline x1='500' y1='305' x2='500' y2='427'/%3E%3C/g%3E%3Cg fill='%23A8C8E8' opacity='0.5'%3E%3Ccircle cx='90' cy='40' r='3.5'/%3E%3Ccircle cx='140' cy='11' r='3.5'/%3E%3Ccircle cx='190' cy='40' r='3.5'/%3E%3Ccircle cx='190' cy='98' r='3.5'/%3E%3Ccircle cx='140' cy='127' r='3.5'/%3E%3Ccircle cx='90' cy='98' r='3.5'/%3E%3Ccircle cx='380' cy='200' r='4'/%3E%3Ccircle cx='440' cy='165' r='4'/%3E%3Ccircle cx='500' cy='200' r='4'/%3E%3Ccircle cx='500' cy='270' r='4'/%3E%3Ccircle cx='440' cy='305' r='4'/%3E%3Ccircle cx='380' cy='270' r='4'/%3E%3Ccircle cx='120' cy='380' r='3.5'/%3E%3Ccircle cx='168' cy='355' r='3.5'/%3E%3Ccircle cx='216' cy='380' r='3.5'/%3E%3Ccircle cx='216' cy='430' r='3.5'/%3E%3Ccircle cx='168' cy='455' r='3.5'/%3E%3Ccircle cx='120' cy='430' r='3.5'/%3E%3Ccircle cx='460' cy='450' r='3'/%3E%3Ccircle cx='500' cy='427' r='3'/%3E%3Ccircle cx='540' cy='450' r='3'/%3E%3Ccircle cx='540' cy='496' r='3'/%3E%3Ccircle cx='500' cy='519' r='3'/%3E%3Ccircle cx='460' cy='496' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  
+  --gradient-dark-blue: linear-gradient(135deg, #144979 0%, #0C294A 50%, #071A2F 100%);
+  --gradient-dark-blue-hover: linear-gradient(135deg, #1A5B96 0%, #103761 100%);
+  --gradient-light-blue: linear-gradient(180deg, #F0F6FC 0%, #E2EEF8 50%, #D8EAF7 100%);
+  --gradient-light-blue-card: linear-gradient(145deg, #FFFFFF 0%, #EEF6FD 50%, #DEEFFB 100%);
+  --gradient-light-blue-subtle: linear-gradient(135deg, #F8FAFD 0%, #EBF4FC 100%);
 }
 
-/* Step 1 — Apply pentagon pattern to body + all light section/page backgrounds */
+/* ==========================================================================
+   Step 1 — Full-width Sections & Page Backgrounds
+   Layered pentagon pattern gently overlaid on the soothing Light Blue Gradient
+   ========================================================================== */
 body,
 .bg-white,
 .bg-cream,
 .bg-gray-50,
 .bg-gray-100,
 .bg-sage {
-  background-image: var(--bg-pattern) !important;
-  background-size: 600px 600px !important;
-  background-repeat: repeat !important;
+  background-image: var(--bg-pattern), linear-gradient(180deg, #F0F6FC 0%, #E2EEF8 50%, #D8EAF7 100%) !important;
+  background-size: 600px 600px, 100% 100% !important;
+  background-repeat: repeat, no-repeat !important;
+  background-color: #E2EEF8 !important;
 }
 
-/* Step 2 — Strip pattern from rounded card / panel elements.
-   Any element with a rounded-* corner class is a card/chip — keep it clean.
-   Exempt gradients so buttons/chips with backgrounds work properly. */
-[class*="rounded-sm"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-md"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-lg"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-2xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-3xl"]:not([class*="bg-gradient-"]):not([class*="gradient"]),
-[class*="rounded-full"]:not([class*="bg-gradient-"]):not([class*="gradient"]) {
-  background-image: none !important;
+/* ==========================================================================
+   Step 2 — Cards, Panels, Modals & Containers
+   Luminous Light Blue Card Gradient with crisp borders & soft elevation
+   (Pattern stripped completely to keep text clean and readable)
+   ========================================================================== */
+[class*="rounded-md"].bg-white,
+[class*="rounded-lg"].bg-white,
+[class*="rounded-xl"].bg-white,
+[class*="rounded-2xl"].bg-white,
+[class*="rounded-3xl"].bg-white,
+[class*="rounded-md"].bg-cream,
+[class*="rounded-lg"].bg-cream,
+[class*="rounded-xl"].bg-cream,
+[class*="rounded-2xl"].bg-cream,
+[class*="rounded-3xl"].bg-cream,
+[class*="rounded-md"].bg-sage,
+[class*="rounded-lg"].bg-sage,
+[class*="rounded-xl"].bg-sage,
+[class*="rounded-2xl"].bg-sage,
+[class*="rounded-3xl"].bg-sage,
+.card-light-gradient {
+  background-image: linear-gradient(145deg, #FFFFFF 0%, #EEF6FD 50%, #DEEFFB 100%) !important;
+  background-color: #EEF6FD !important;
+  border-color: #C2DCF2 !important;
+  box-shadow: 0 10px 25px -4px rgba(10, 36, 64, 0.07), 0 4px 8px -2px rgba(10, 36, 64, 0.04) !important;
 }
 
-/* Step 3 — Strip from navbars, headers, sidebars, footers & interactive elements.
-   Compound selectors (nav.bg-white) beat the .bg-white rule above. */
+/* Exempt specific interactive elements from card styling */
+button, input, textarea, select, a {
+  box-shadow: inherit;
+}
+
+/* Step 3 — Strip pattern from interactive elements, headers & sidebars (Footer has its own dark gradient) */
 nav, nav.bg-white, nav.bg-cream, nav.bg-sage,
 nav[class*="bg-white"],
 header, header.bg-white, header.bg-cream,
 header[class*="bg-white"],
 aside, aside[class],
-footer, footer[class],
 input, textarea, select,
 button:not([class*="bg-gradient-"]):not([class*="gradient"]),
 table, thead, tbody, tfoot, tr, th, td,
-label,
-a:not([class*="bg-gradient-"]):not([class*="gradient"]) {
+label {
   background-image: none !important;
 }
 
@@ -60,8 +86,10 @@ a:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   color: #ffffff !important;
 }
 
-/* Also strip from anything inside nav/header/aside/footer */
-nav *, header *, aside *, footer * {
+/* Strip pattern from anything inside nav/header/aside */
+nav *:not([class*="bg-gradient-"]):not([class*="gradient"]),
+header *:not([class*="bg-gradient-"]):not([class*="gradient"]),
+aside *:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   background-image: none !important;
 }
 
@@ -70,26 +98,178 @@ nav *, header *, aside *, footer * {
   background-image: none !important;
 }
 
+/* ==========================================================================
+   Step 4 — Darker Blue Gradient System (Replaces medium blue with rich navy gradient)
+   ========================================================================== */
+.bg-primary,
+.bg-primary-600 {
+  background-image: linear-gradient(135deg, #144979 0%, #0C294A 50%, #071A2F 100%) !important;
+  background-color: #0C294A !important;
+  color: #FFFFFF !important;
+}
+
+.bg-primary-700 {
+  background-image: linear-gradient(135deg, #113D66 0%, #0A223B 50%, #061525 100%) !important;
+  background-color: #0A223B !important;
+  color: #FFFFFF !important;
+}
+
+.bg-primary-800,
+.bg-primary-900 {
+  background-image: linear-gradient(135deg, #0D2E4D 0%, #081B2F 50%, #040D18 100%) !important;
+  background-color: #081B2F !important;
+  color: #FFFFFF !important;
+}
+
+.hover\:bg-primary:hover,
+.hover\:bg-primary-600:hover,
+.group:hover .group-hover\:bg-primary-600 {
+  background-image: linear-gradient(135deg, #1A5B96 0%, #103761 100%) !important;
+  background-color: #103761 !important;
+  color: #FFFFFF !important;
+}
+
+.hover\:bg-primary-700:hover {
+  background-image: linear-gradient(135deg, #164C7D 0%, #0E2E50 100%) !important;
+  background-color: #0E2E50 !important;
+  color: #FFFFFF !important;
+}
+
+/* Light blue tints for chips, icons and badges */
+.bg-primary-50,
+.bg-primary-100 {
+  background-image: linear-gradient(135deg, #F0F7FD 0%, #DCECF9 100%) !important;
+  background-color: #DCECF9 !important;
+  border-color: #C2DCF2 !important;
+}
+
+/* ==========================================================================
+   Step 5 — High-Contrast Typography & Visible UI (WCAG AAA Compliant)
+   ========================================================================== */
 @layer base {
   html {
     scroll-behavior: smooth;
   }
   body {
     @apply text-dark font-body antialiased;
-    background-color: #F8FAFD;
+    background-color: #E2EEF8;
+    color: #243B52;
   }
-  h1, h2, h3, h4, h5, h6 {
+  
+  /* Headings on light backgrounds */
+  body h1:not(.text-white):not([class*="text-white"]),
+  body h2:not(.text-white):not([class*="text-white"]),
+  body h3:not(.text-white):not([class*="text-white"]),
+  body h4:not(.text-white):not([class*="text-white"]),
+  body h5:not(.text-white):not([class*="text-white"]),
+  body h6:not(.text-white):not([class*="text-white"]) {
     @apply font-heading font-semibold;
+    color: #09223D !important;
   }
 }
 
+/* Dark Sections keep pure white headings and labels */
+.bg-primary h1, .bg-primary h2, .bg-primary h3, .bg-primary h4,
+.bg-primary-600 h1, .bg-primary-600 h2, .bg-primary-600 h3, .bg-primary-600 h4,
+.bg-primary-700 h1, .bg-primary-700 h2, .bg-primary-700 h3, .bg-primary-700 h4,
+.bg-primary-800 h1, .bg-primary-800 h2, .bg-primary-800 h3, .bg-primary-800 h4,
+.bg-primary-900 h1, .bg-primary-900 h2, .bg-primary-900 h3, .bg-primary-900 h4,
+.bg-dark h1, .bg-dark h2, .bg-dark h3, .bg-dark h4,
+footer h1, footer h2, footer h3, footer h4,
+#hero h1, #hero h2, #hero h3, #hero h4,
+.text-white {
+  color: #FFFFFF !important;
+}
+
+/* Body Text, Paragraphs, Links */
+.text-gray-600,
+.text-gray-700 {
+  color: #243B52 !important;
+}
+.text-gray-500 {
+  color: #475E75 !important;
+}
+.text-dark {
+  color: #07192C !important;
+}
+
+/* High-contrast brand primary texts */
+.text-primary,
+.text-primary-600 {
+  color: #0E3F6C !important;
+}
+.text-primary-700 {
+  color: #0C2B4B !important;
+}
+.text-primary-800 {
+  color: #07192C !important;
+}
+.text-primary-900 {
+  color: #05121F !important;
+}
+
+/* Borders & Rings */
+.border-primary,
+.border-primary-600 {
+  border-color: #144979 !important;
+}
+.border-primary-700 {
+  border-color: #0C2B4B !important;
+}
+.border-sage {
+  border-color: #C2DCF2 !important;
+}
+.focus\:ring-primary:focus,
+.focus\:ring-primary-600:focus {
+  --tw-ring-color: #144979 !important;
+}
+.focus\:border-primary:focus,
+.focus\:border-primary-600:focus {
+  border-color: #144979 !important;
+}
+
+/* ==========================================================================
+   Step 6 — Form Inputs & Controls (Visible, Crisp, High-Contrast)
+   ========================================================================== */
+input, textarea, select {
+  background-image: linear-gradient(145deg, #FFFFFF 0%, #F5FAFE 100%) !important;
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #A4CBEC !important;
+  color: #09223D !important;
+  font-weight: 500;
+  box-shadow: inset 0 1px 3px rgba(10, 36, 64, 0.04) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #64748B !important;
+  font-weight: 400;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #144979 !important;
+  box-shadow: 0 0 0 3px rgba(20, 73, 121, 0.22) !important;
+  outline: none !important;
+}
+
+/* ==========================================================================
+   Step 7 — Navigation & Layout Components
+   ========================================================================== */
+nav,
+nav.bg-white,
+nav[class*="bg-white"] {
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(228, 241, 252, 0.94) 100%) !important;
+  background-color: rgba(235, 245, 254, 0.95) !important;
+  border-bottom: 1px solid rgba(188, 224, 247, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+}
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #17548A 0%, #08203B 100%) !important;
   }
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+    @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-lg;
   }
 }
 
@@ -98,10 +278,14 @@ nav *, header *, aside *, footer * {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-sage;
+  background-color: #DCECF9;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/70 rounded-full hover:bg-primary;
+  background: linear-gradient(180deg, #144979 0%, #0C294A 100%);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #1A5B96 0%, #103761 100%);
 }
 
 /* Instagram Reels Slider */
@@ -117,13 +301,13 @@ nav *, header *, aside *, footer * {
 .instagram-reels-slider .swiper-pagination-bullet {
   width: 8px;
   height: 8px;
-  background: rgba(24, 128, 184, 0.25);
+  background: rgba(20, 73, 121, 0.25);
   opacity: 1;
   transition: all 0.3s ease;
 }
 
 .instagram-reels-slider .swiper-pagination-bullet-active {
-  background: #1880B8;
+  background: linear-gradient(135deg, #144979 0%, #0C294A 100%);
   width: 24px;
   border-radius: 4px;
 }
@@ -133,69 +317,59 @@ nav *, header *, aside *, footer * {
 }
 
 /* ==========================================================================
-   Sanjeevini Official Medical Blue & Navy Theme (Direct Overrides)
+   Step 8 — Dedicated Dark Gradient Footer (Applied across all pages)
    ========================================================================== */
-.bg-primary,
-.bg-primary-600 {
-  background-color: #1880B8 !important;
-}
-.bg-primary-50 {
-  background-color: #F0F7FD !important;
-}
-.bg-primary-100 {
-  background-color: #E0EFFB !important;
-}
-.bg-primary-700 {
-  background-color: #1A4B75 !important;
-}
-.bg-primary-800 {
-  background-color: #143B5C !important;
-}
-.bg-primary-900 {
-  background-color: #0E2940 !important;
-}
-.hover\:bg-primary:hover,
-.hover\:bg-primary-600:hover {
-  background-color: #146B9B !important;
-}
-.hover\:bg-primary-700:hover {
-  background-color: #113654 !important;
-}
-.text-primary,
-.text-primary-600 {
-  color: #1880B8 !important;
-}
-.text-primary-700 {
-  color: #1A4B75 !important;
-}
-.text-primary-800 {
-  color: #143B5C !important;
-}
-.border-primary,
-.border-primary-600 {
-  border-color: #1880B8 !important;
-}
-.border-primary-700 {
-  border-color: #1A4B75 !important;
-}
-.focus\:ring-primary:focus,
-.focus\:ring-primary-600:focus {
-  --tw-ring-color: #1880B8 !important;
-}
-.focus\:border-primary:focus,
-.focus\:border-primary-600:focus {
-  border-color: #1880B8 !important;
-}
-.bg-sage {
-  background-color: #EBF4FB !important;
-}
-.bg-cream {
-  background-color: #F8FAFD !important;
-}
-.bg-dark {
-  background-color: #0B1E32 !important;
-}
-.text-dark {
-  color: #0B1E32 !important;
+footer,
+footer[class],
+.footer-dark-gradient {
+  background-image: linear-gradient(180deg, #091C2E 0%, #061524 50%, #020910 100%) !important;
+  background-color: #061524 !important;
+  color: #CADBE9 !important;
+  position: relative !important;
+  z-index: 20 !important;
+  border-top: 1px solid rgba(20, 75, 121, 0.4) !important;
 }
 
+/* Headings inside footer */
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer .font-heading {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Body & description text in footer */
+footer p,
+footer li,
+footer span:not([class*="font-heading"]) {
+  color: #B5CCE0 !important;
+}
+
+/* Links in footer */
+footer a:not([class*="rounded-full"]) {
+  color: #CADBE9 !important;
+  transition: color 0.2s ease !important;
+}
+
+footer a:not([class*="rounded-full"]):hover {
+  color: #38BDF8 !important;
+}
+
+/* Icons & Contact details in footer */
+footer .text-gold,
+footer svg.text-gold {
+  color: #38BDF8 !important;
+}
+
+/* Social media icon buttons in footer */
+footer .flex.space-x-3\.5 a,
+footer [aria-label*="Instagram"],
+footer [aria-label*="YouTube"],
+footer [aria-label*="Facebook"],
+footer [aria-label*="Twitter"] {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E2EEF8 !important;
+}

@@ -7,7 +7,7 @@ import { clinicInfo } from '../../data/clinicInfo';
 
 const AppointmentCTA = () => {
   return (
-    <section className="py-12 md:py-16 bg-[#FAF8F5] relative overflow-hidden" id="appointment-cta">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-[#EDF5FB] via-[#F4F9FD] to-[#DFEEF8] relative overflow-hidden" id="appointment-cta">
       <Container className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -26,7 +26,7 @@ const AppointmentCTA = () => {
 
           <a
             href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`}
-            className="inline-flex items-center justify-center w-full sm:w-auto text-base py-3.5 px-8 rounded-full border-2 border-primary-600 text-primary-700 bg-white hover:bg-primary-600 hover:text-white transition-all shadow-sm hover:shadow-md font-medium"
+            className="inline-flex items-center justify-center w-full sm:w-auto text-base py-3.5 px-8 rounded-full border-2 border-[#0E355C] text-[#0A2644] bg-gradient-to-r from-white to-[#E3EFF9] hover:bg-gradient-to-r hover:from-[#144979] hover:to-[#0A2644] hover:text-white transition-all shadow-sm hover:shadow-md font-medium"
           >
             <PhoneCall className="w-5 h-5 mr-2" />
             <span>{clinicInfo.phone}</span>

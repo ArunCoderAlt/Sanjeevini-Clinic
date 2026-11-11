@@ -210,7 +210,7 @@ const Treatments = () => {
       render: (val) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-red-100 text-red-800'
+            val ? 'bg-sky-100 text-[#0C2B4B]' : 'bg-red-100 text-red-800'
           }`}
         >
           {val ? 'Active' : 'Inactive'}
@@ -239,7 +239,7 @@ const Treatments = () => {
         <Filter size={18} className="text-gray-500 shrink-0" />
         <span className="text-sm font-medium text-gray-600">Filter Category:</span>
         <select
-          className="text-sm rounded-md border-gray-300 shadow-xs focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 border py-1.5 px-3"
+          className="text-sm rounded-md border-gray-300 shadow-xs focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 border py-1.5 px-3"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
@@ -280,7 +280,7 @@ const Treatments = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Acid Peptic Disease (Gastritis)"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -293,7 +293,7 @@ const Treatments = () => {
                 value={formData.category}
                 onChange={handleFormChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -332,7 +332,7 @@ const Treatments = () => {
                 value={formData.symptoms}
                 onChange={handleFormChange}
                 placeholder="Upper abdominal pain&#10;Nausea and bloating&#10;Loss of appetite"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -346,7 +346,7 @@ const Treatments = () => {
                 value={formData.approaches}
                 onChange={handleFormChange}
                 placeholder="Herbal cooling decoctions&#10;Dietary lifestyle modifications (Pathyam)&#10;Stress relaxation & gentle Varmam points"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -359,7 +359,7 @@ const Treatments = () => {
                 name="order"
                 value={formData.order}
                 onChange={handleFormChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -370,7 +370,7 @@ const Treatments = () => {
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleFormChange}
-                  className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
+                  className="rounded text-[#0C2B4B] focus:ring-[#0C2B4B] h-4 w-4"
                 />
                 <span className="text-sm font-medium text-gray-700">Active (Visible on Website)</span>
               </label>

@@ -6,7 +6,7 @@ import Container from '../common/Container';
 
 export default function TopBar() {
   return (
-    <div className="bg-dark text-gray-300 py-2 text-sm hidden md:block">
+    <div className="bg-gradient-to-r from-[#07192C] via-[#0A223B] to-[#07192C] text-gray-200 py-2 text-sm hidden md:block border-b border-[#143B5C]/40">
       <Container className="flex justify-between items-center">
         <div className="flex items-center space-x-6">
           <a href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`} className="flex items-center hover:text-gold transition-colors">

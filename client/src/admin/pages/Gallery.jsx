@@ -201,7 +201,7 @@ const Gallery = () => {
                 value={uploadTitle}
                 onChange={(e) => setUploadTitle(e.target.value)}
                 placeholder="e.g. Traditional Therapy Room"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -212,7 +212,7 @@ const Gallery = () => {
               <select
                 value={uploadCategory}
                 onChange={(e) => setUploadCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8] capitalize"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B] capitalize"
               >
                 {categories.map((c) => (
                   <option key={c} value={c} className="capitalize">
@@ -230,7 +230,7 @@ const Gallery = () => {
                 type="number"
                 value={uploadOrder}
                 onChange={(e) => setUploadOrder(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
           </div>
@@ -339,7 +339,7 @@ const Gallery = () => {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
             />
           </div>
 
@@ -350,7 +350,7 @@ const Gallery = () => {
             <select
               value={editCategory}
               onChange={(e) => setEditCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8] capitalize"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B] capitalize"
             >
               {categories.map((c) => (
                 <option key={c} value={c} className="capitalize">
@@ -368,7 +368,7 @@ const Gallery = () => {
               type="number"
               value={editOrder}
               onChange={(e) => setEditOrder(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
             />
           </div>
 
@@ -378,7 +378,7 @@ const Gallery = () => {
                 type="checkbox"
                 checked={editIsActive}
                 onChange={(e) => setEditIsActive(e.target.checked)}
-                className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
+                className="rounded text-[#0C2B4B] focus:ring-[#0C2B4B] h-4 w-4"
               />
               <span className="text-sm font-medium text-gray-700">Active (Visible in Gallery)</span>
             </label>

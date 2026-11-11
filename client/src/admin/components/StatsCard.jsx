@@ -2,8 +2,8 @@ import React from 'react';
 
 const StatsCard = ({ title, value, icon: Icon, color = 'blue', change }) => {
   const colorClasses = {
-    green: 'bg-sky-100 text-[#1880B8]',
-    blue: 'bg-sky-100 text-[#1880B8]',
+    green: 'bg-sky-100 text-[#0C2B4B]',
+    blue: 'bg-sky-100 text-[#0C2B4B]',
     orange: 'bg-orange-100 text-orange-600',
     purple: 'bg-purple-100 text-purple-600',
     red: 'bg-red-100 text-red-600',

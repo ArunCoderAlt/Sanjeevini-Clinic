@@ -103,7 +103,7 @@ const DataTable = ({
                         {onEdit && (
                           <button 
                             onClick={() => onEdit(row)}
-                            className="p-1.5 text-[#1880B8] hover:bg-sky-50 rounded-md transition-colors"
+                            className="p-1.5 text-[#0C2B4B] hover:bg-sky-50 rounded-md transition-colors"
                             title="Edit"
                           >
                             <Edit2 size={18} />

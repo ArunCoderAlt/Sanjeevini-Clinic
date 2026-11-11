@@ -19,11 +19,11 @@ export default function Button({
   const baseStyles = "inline-flex items-center justify-center font-medium rounded-md transition-colors duration-300 gap-2 cursor-pointer";
   
   const variants = {
-    primary: "bg-[#1880B8] text-white hover:bg-[#146B9B] shadow-md",
-    secondary: "bg-transparent border-2 border-[#1880B8] text-[#1880B8] hover:bg-[#1880B8] hover:text-white",
-    outline: "bg-transparent border-2 border-[#1880B8] text-[#1880B8] hover:bg-[#1880B8] hover:text-white shadow-sm",
-    gold: "bg-[#0284C7] text-white hover:bg-[#0275B1] shadow-md",
-    white: "bg-white text-[#1880B8] hover:bg-gray-50 shadow-sm"
+    primary: "bg-gradient-to-r from-[#144979] via-[#0E355C] to-[#0A2644] hover:from-[#1A5B96] hover:via-[#134778] hover:to-[#0D3157] text-white shadow-md hover:shadow-lg border border-[#144979]/40",
+    secondary: "bg-white/80 border-2 border-[#0E355C] text-[#0E355C] hover:bg-gradient-to-r hover:from-[#144979] hover:to-[#0A2644] hover:text-white shadow-sm",
+    outline: "bg-transparent border-2 border-[#0E355C] text-[#0E355C] hover:bg-gradient-to-r hover:from-[#144979] hover:to-[#0A2644] hover:text-white hover:border-transparent shadow-sm",
+    gold: "bg-gradient-to-r from-[#0284C7] to-[#0369A1] hover:from-[#0369A1] hover:to-[#075985] text-white shadow-md",
+    white: "bg-gradient-to-r from-white to-[#E3EFF9] text-[#0A2644] border border-[#B8D7EF] hover:from-[#EBF4FC] hover:to-[#D8EAF7] shadow-sm font-semibold"
   };
   
   const sizes = {

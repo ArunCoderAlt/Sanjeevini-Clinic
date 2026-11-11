@@ -14,18 +14,18 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: '100%' }}
       transition={{ type: "tween", duration: 0.3 }}
-      className="fixed inset-0 z-[60] bg-white flex flex-col no-bg-pattern"
+      className="fixed inset-0 z-[60] bg-gradient-to-b from-white via-[#F0F6FC] to-[#E2EEF8] flex flex-col no-bg-pattern"
       aria-label="Mobile Navigation Menu"
     >
-      <div className="flex justify-between items-center p-6 border-b border-gray-100">
+      <div className="flex justify-between items-center p-6 border-b border-[#C2DCF2]">
         <div className="flex items-center gap-3">
           <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 w-auto object-contain rounded-full shadow-xs" />
           <div className="flex flex-col">
-            <span className="font-heading font-bold text-2xl text-primary leading-none">Sanjeevini</span>
-            <span className="text-[10px] font-medium text-gray-500 tracking-wider mt-1">Since 2005</span>
+            <span className="font-heading font-bold text-2xl text-[#0C2B4B] leading-none">Sanjeevini</span>
+            <span className="text-[10px] font-medium text-[#475E75] tracking-wider mt-1">Since 2005</span>
           </div>
         </div>
-        <button onClick={onClose} className="p-2 text-gray-500 hover:text-primary">
+        <button onClick={onClose} className="p-2 text-[#475E75] hover:text-[#0C2B4B]">
           <X className="w-6 h-6" />
         </button>
       </div>
@@ -43,7 +43,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
               onClick={onClose}
               className={classNames(
                 "block text-lg py-2 font-medium",
-                currentPath === link.path ? "text-primary" : "text-gray-700"
+                currentPath === link.path ? "text-[#0C2B4B] font-semibold" : "text-[#243B52]"
               )}
             >
               {link.name}

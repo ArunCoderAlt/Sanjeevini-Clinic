@@ -163,7 +163,7 @@ const Services = () => {
       render: (val) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
-            val ? 'bg-sky-100 text-[#1880B8]' : 'bg-red-100 text-red-800'
+            val ? 'bg-sky-100 text-[#0C2B4B]' : 'bg-red-100 text-red-800'
           }`}
         >
           {val ? 'Active' : 'Inactive'}
@@ -216,7 +216,7 @@ const Services = () => {
                 onChange={handleFormChange}
                 placeholder="e.g. Varmam Therapy"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -231,7 +231,7 @@ const Services = () => {
                 onChange={handleFormChange}
                 placeholder="Brief summary shown on services list cards..."
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -245,7 +245,7 @@ const Services = () => {
                 value={formData.fullDescription}
                 onChange={handleFormChange}
                 placeholder="In-depth details of what the service covers, healing theory, techniques used..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -277,7 +277,7 @@ const Services = () => {
                 name="order"
                 value={formData.order}
                 onChange={handleFormChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#1880B8] focus:border-[#1880B8]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
               />
             </div>
 
@@ -288,7 +288,7 @@ const Services = () => {
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleFormChange}
-                  className="rounded text-[#1880B8] focus:ring-[#1880B8] h-4 w-4"
+                  className="rounded text-[#0C2B4B] focus:ring-[#0C2B4B] h-4 w-4"
                 />
                 <span className="text-sm font-medium text-gray-700">Active (Visible on Website)</span>
               </label>

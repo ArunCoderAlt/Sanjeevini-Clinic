@@ -73,21 +73,21 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Clinic Name</label>
             <input
               type="text" name="clinicName" value={formData.clinicName} onChange={handleChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
             <textarea
               name="address" value={formData.address} onChange={handleChange} rows="2"
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             ></textarea>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <input
               type="text" name="phone" value={formData.phone} onChange={handleChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
           <div>
@@ -95,21 +95,21 @@ const Settings = () => {
             <input
               type="text" name="whatsappNumber" value={formData.whatsappNumber || ''} onChange={handleChange}
               placeholder="919486838368"
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email" name="email" value={formData.email} onChange={handleChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Consultation Hours</label>
             <input
               type="text" name="consultationHours" value={formData.consultationHours} onChange={handleChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
           <div className="col-span-2">
@@ -117,7 +117,7 @@ const Settings = () => {
             <input
               type="text" name="mapUrl" value={formData.mapUrl || ''} onChange={handleChange}
               placeholder="https://maps.app.goo.gl/..."
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
             />
           </div>
         </div>
@@ -134,7 +134,7 @@ const Settings = () => {
                   value={formData.socialLinks?.[platform] || ''}
                   onChange={handleSocialChange}
                   placeholder={`https://${platform}.com/...`}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#1880B8] focus:ring focus:ring-[#1880B8] focus:ring-opacity-50 p-2 border"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#0C2B4B] focus:ring focus:ring-[#0C2B4B] focus:ring-opacity-50 p-2 border"
                 />
               </div>
             ))}
