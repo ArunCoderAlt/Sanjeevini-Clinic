@@ -46,15 +46,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-gradient-to-b from-[#091C2E] via-[#061524] to-[#020910] text-white flex flex-col transform transition-transform duration-300 ease-in-out border-r border-[#143B5C]/40
+        className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-[#0B1E32] text-white flex flex-col transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-[#143B5C]/40">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
-            <img src="/images/logo.png?v=4" alt="Sanjeevini" className="h-9 w-auto object-contain bg-white rounded-full p-0.5 shadow-sm shrink-0" />
-            <h1 className="text-xl font-bold text-white tracking-wide">
-              Sanjeevini <span className="text-[#38BDF8]">Admin</span>
-            </h1>
+            <img src="/images/logo.png?v=4" alt="Sanjeevini" className="h-9 w-auto object-contain bg-white rounded-full p-0.5 shadow-sm" />
+            <h1 className="text-xl font-bold text-[#38BDF8]">Sanjeevini Admin</h1>
           </div>
           <button 
             className="md:hidden text-gray-300 hover:text-white"
@@ -72,10 +70,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                   to={item.path}
                   end={item.path === '/admin'}
                   className={({ isActive }) => 
-                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
+                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200
                     ${isActive 
-                      ? 'bg-gradient-to-r from-[#144979] to-[#0C294A] text-white shadow-md font-semibold' 
-                      : 'text-[#B0C8DD] hover:bg-white/10 hover:text-white font-medium'}`
+                      ? 'bg-primary-600 text-white shadow-sm' 
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`
                   }
                   onClick={() => setIsOpen(false)}
                 >
@@ -87,10 +85,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-[#143B5C]/40">
+        <div className="p-4 border-t border-gray-700">
           <button 
             onClick={logout}
-            className="flex items-center gap-3 px-4 py-3 w-full text-left text-[#B0C8DD] rounded-lg hover:bg-red-500/20 hover:text-red-400 font-medium transition-colors"
+            className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
           >
             <LogOut size={20} />
             <span>Logout</span>

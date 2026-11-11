@@ -74,12 +74,7 @@ aside, aside[class],
 input, textarea, select,
 button:not([class*="bg-gradient-"]):not([class*="gradient"]),
 table, thead, tbody, tfoot, tr, th, td,
-table *, thead *, tbody *, tfoot *, tr *, th *, td *,
-th.bg-gray-50, tr.bg-gray-50, thead.bg-gray-50,
-th[class*="bg-"], thead[class*="bg-"], tr[class*="bg-"], td[class*="bg-"],
-table .bg-gray-50, table .bg-gray-100,
-label,
-[role="dialog"], [role="dialog"] * {
+label {
   background-image: none !important;
 }
 
@@ -159,53 +154,15 @@ aside *:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   }
   
   /* Headings on light backgrounds */
-  body h1:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
-  body h2:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
-  body h3:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
-  body h4:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
-  body h5:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *),
-  body h6:not(.text-white):not([class*="text-white"]):not(aside *):not(footer *) {
+  body h1:not(.text-white):not([class*="text-white"]),
+  body h2:not(.text-white):not([class*="text-white"]),
+  body h3:not(.text-white):not([class*="text-white"]),
+  body h4:not(.text-white):not([class*="text-white"]),
+  body h5:not(.text-white):not([class*="text-white"]),
+  body h6:not(.text-white):not([class*="text-white"]) {
     @apply font-heading font-semibold;
     color: #09223D !important;
   }
-}
-
-/* Admin Sidebar Typography & Contrast Protection */
-aside h1,
-aside h1 *,
-aside h2,
-aside h3,
-aside h4,
-aside [class*="font-heading"] {
-  color: #FFFFFF !important;
-}
-
-aside span.text-\[\#38BDF8\],
-aside [class*="text-[#38BDF8]"] {
-  color: #38BDF8 !important;
-}
-
-aside a {
-  color: #B0C8DD !important;
-}
-
-aside a:hover {
-  color: #FFFFFF !important;
-}
-
-aside a.active,
-aside a[class*="from-[#144979]"],
-aside .active {
-  color: #FFFFFF !important;
-  background-image: linear-gradient(135deg, #144979 0%, #0C294A 100%) !important;
-}
-
-aside button {
-  color: #B0C8DD !important;
-}
-
-aside button:hover {
-  color: #F87171 !important;
 }
 
 /* Dark Sections keep pure white headings and labels */
