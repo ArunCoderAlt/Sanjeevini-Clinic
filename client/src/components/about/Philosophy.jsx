@@ -8,13 +8,13 @@ const Philosophy = () => {
       <Container>
         <div className="flex flex-col md:flex-row gap-12 items-center">
           <div className="md:w-1/2 flex justify-center">
-            <div className="relative max-w-md w-full rounded-3xl overflow-hidden shadow-2xl bg-[#030a16] border border-gold/20">
+            <div className="relative max-w-sm sm:max-w-md w-full aspect-[6/7] rounded-3xl overflow-hidden shadow-2xl bg-[#020712] border border-gold/25">
               <img 
                 src="/images/about/samc-philosophy.jpg" 
                 alt="Sanjeevini SAMC Philosophy Emblem" 
                 loading="lazy"
                 decoding="async"
-                className="w-full h-auto max-h-[520px] object-cover mx-auto" 
+                className="w-full h-full object-cover object-center" 
               />
             </div>
           </div>
