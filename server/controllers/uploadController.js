@@ -10,7 +10,9 @@ exports.uploadImage = asyncHandler(async (req, res) => {
     return error(res, 'Please provide an image file to upload', 400);
   }
 
-  let finalUrl = `/uploads/${req.file.filename}`;
+  const host = req.get('host');
+  const baseUrl = host ? `${req.protocol}://${host}` : '';
+  let finalUrl = baseUrl ? `${baseUrl}/uploads/${req.file.filename}` : `/uploads/${req.file.filename}`;
   let storageProvider = 'local';
 
   // Sync to client/public/uploads for direct Vite dev and preview access
@@ -30,6 +32,22 @@ exports.uploadImage = asyncHandler(async (req, res) => {
     if (supabase) {
       const fileBuffer = fs.readFileSync(req.file.path);
       const storagePath = `uploads/${req.file.filename}`;
+
+      // Check / auto-create public bucket clinic-media if it does not exist
+      try {
+        const { data: bucket, error: bucketErr } = await supabase.storage.getBucket('clinic-media');
+        if (bucketErr || !bucket) {
+          await supabase.storage.createBucket('clinic-media', {
+            public: true,
+            fileSizeLimit: 10485760, // 10MB
+          });
+          logger.info("Auto-created public Supabase Storage bucket: clinic-media");
+        } else if (!bucket.public) {
+          await supabase.storage.updateBucket('clinic-media', { public: true });
+        }
+      } catch (bErr) {
+        // Bucket may already exist or handled by RLS
+      }
 
       const { data, error: uploadErr } = await supabase.storage
         .from('clinic-media')

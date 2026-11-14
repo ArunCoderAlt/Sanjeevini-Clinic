@@ -12,6 +12,7 @@ import {
   deleteTreatment,
 } from '../../services/treatmentService';
 import { uploadImage } from '../../services/uploadService';
+import { getImageUrl } from '../../utils/helpers';
 
 const categories = [
   'Gastrointestinal',
@@ -167,7 +168,7 @@ const Treatments = () => {
       render: (val, row) => (
         <div className="w-10 h-10 rounded overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
           {val ? (
-            <img src={val} alt={row.name} className="w-full h-full object-cover" />
+            <img src={getImageUrl(val)} alt={row.name} className="w-full h-full object-cover" />
           ) : (
             <span className="text-xs text-gray-400 font-bold">N/A</span>
           )}
@@ -306,7 +307,7 @@ const Treatments = () => {
             <div className="sm:col-span-2">
               <ImageUploader
                 label="Treatment Image"
-                currentImage={formData.image}
+                currentImage={getImageUrl(formData.image)}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
                     setSelectedFile(fileOrUrl);

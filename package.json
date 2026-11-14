@@ -11,6 +11,7 @@
     "build": "npm --prefix client install && npm --prefix client run build",
     "vercel-build": "npm --prefix client install && npm --prefix client run build",
     "seed": "cd server && npm run seed",
+    "init:storage": "cd server && npm run init:storage",
     "start": "cd server && npm start"
   },
   "devDependencies": {

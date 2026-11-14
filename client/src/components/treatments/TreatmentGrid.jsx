@@ -5,10 +5,10 @@ import { getTreatments } from '../../services/treatmentService';
 // Comprehensive clinic treatments catalog
 const defaultTreatments = [
   { id: 'gastritis', slug: 'gastrointestinal', name: 'Gastrointestinal Treatments - வயிறு / குடல் சார்ந்த நோய்கள்', category: 'Gastrointestinal', icon: '🌿', desc: 'Holistic treatments for Gastrointestinal conditions.', image: '/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png' },
-  { id: 'dermatology', slug: 'dermatology', name: 'Dermatology Treatments - தோல் நோய்கள்', category: 'Dermatology', icon: '✨', desc: 'Holistic treatments for Dermatology conditions.' },
+  { id: 'dermatology', slug: 'dermatology', name: 'Dermatology Treatments - தோல் நோய்கள்', category: 'Dermatology', icon: '✨', desc: 'Holistic treatments for Dermatology conditions.', image: '/uploads/dermatology-treatment-1794426000000.png' },
   { id: 'womens-health', slug: 'womens-health', name: 'Women\'s Health Treatments', category: 'Women\'s Health', icon: '🌸', desc: 'Holistic treatments for Women\'s Health conditions.' },
   { id: 'kidney', slug: 'kidney', name: 'Kidney Treatments', category: 'Kidney', icon: '💧', desc: 'Holistic treatments for Kidney conditions.' },
-  { id: 'musculoskeletal', slug: 'musculoskeletal', name: 'Musculoskeletal Treatments', category: 'Musculoskeletal', icon: '🦴', desc: 'Holistic treatments for Musculoskeletal conditions.' },
+  { id: 'musculoskeletal', slug: 'musculoskeletal', name: 'Musculoskeletal Treatments', category: 'Musculoskeletal', icon: '🦴', desc: 'Holistic treatments for Musculoskeletal conditions.', image: '/uploads/musculoskeletal-treatment-1794426000000.png' },
   { id: 'pediatrics', slug: 'pediatrics', name: 'Pediatrics Treatments', category: 'Pediatrics', icon: '👶', desc: 'Holistic treatments for Pediatrics conditions.' },
   { id: 'respiratory', slug: 'respiratory', name: 'Respiratory Treatments', category: 'Respiratory', icon: '🫁', desc: 'Holistic treatments for Respiratory conditions.' },
   { id: 'neurology', slug: 'neurology', name: 'Neurology Treatments', category: 'Neurology', icon: '🧠', desc: 'Holistic treatments for Neurology conditions.' },

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon --config nodemon.json server.js",
+    "init:storage": "node scripts/initBucket.js",
     "seed": "node seed/seedAdmin.js && node seed/seedDoctors.js && node seed/seedServices.js && node seed/seedTreatments.js"
   },
   "dependencies": {

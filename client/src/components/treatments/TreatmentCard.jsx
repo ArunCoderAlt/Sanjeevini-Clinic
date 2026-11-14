@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { getImageUrl } from '../../utils/helpers';
 
 const isMockImage = (img) => {
   if (!img || typeof img !== 'string') return true;
+  // Authentically uploaded files and Supabase Storage URLs are never mock images
+  if (img.startsWith('/uploads/') || img.includes('supabase.co') || img.startsWith('data:') || img.startsWith('blob:')) {
+    return false;
+  }
   const lower = img.toLowerCase();
   return (
     lower.includes('unsplash.com') ||
-    lower.includes('digestive.jpg') ||
-    lower.includes('skin.jpg') ||
-    lower.includes('herbal.jpg') ||
     lower.includes('treatment-5f825.jpg') ||
     lower.includes('placeholder')
   );
 };
 
 const TreatmentCard = ({ treatment }) => {
+  const [imgError, setImgError] = useState(false);
   const hasRealImage = !isMockImage(treatment.image);
-  const imgSrc = hasRealImage ? treatment.image : null;
+  const imgSrc = hasRealImage ? getImageUrl(treatment.image) : null;
 
   // Sanitize any mock artifacts from title or description
   const cleanTitle = (treatment.name || '').replace(/\.jl\s*fine/gi, '').trim();
@@ -37,16 +40,14 @@ const TreatmentCard = ({ treatment }) => {
         to={`/treatments/${treatment.slug || treatment.id}`}
         className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200/80 hover:border-[#144979]/40 h-full flex flex-col justify-between group overflow-hidden"
       >
-        {imgSrc && (
+        {imgSrc && !imgError && (
           <div className="aspect-[16/10] overflow-hidden relative bg-slate-100">
             <img
               src={imgSrc}
               alt={`${cleanTitle} — ${treatment.category}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
-              onError={(e) => {
-                e.currentTarget.parentElement.style.display = 'none';
-              }}
+              onError={() => setImgError(true)}
             />
           </div>
         )}

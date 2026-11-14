@@ -1,6 +1,6 @@
 const env = require('./environment');
 const logger = require('../utils/logger');
-const { testSupabaseConnection } = require('./supabase');
+const { testSupabaseConnection, ensureStorageBucket } = require('./supabase');
 
 const connectDB = async () => {
   try {
@@ -14,6 +14,8 @@ const connectDB = async () => {
     const { connected, error } = await testSupabaseConnection();
     if (connected) {
       logger.info(`✅ Supabase Database Connected: ${env.supabaseUrl}`);
+      // Ensure the clinic-media public storage bucket is ready
+      ensureStorageBucket();
     } else {
       logger.warn(`⚠️ Supabase connection test returned an error: ${error}`);
       logger.warn('Ensure you have executed supabase/schema.sql in your Supabase project.');

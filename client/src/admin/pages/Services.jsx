@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getServices, createService, updateService, deleteService } from '../../services/serviceService';
 import { uploadImage } from '../../services/uploadService';
+import { getImageUrl } from '../../utils/helpers';
 
 const initialServiceForm = {
   title: '',
@@ -143,7 +144,7 @@ const Services = () => {
       render: (val, row) => (
         <div className="w-12 h-9 rounded overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
           {val ? (
-            <img src={val} alt={row.title} className="w-full h-full object-cover" />
+            <img src={getImageUrl(val)} alt={row.title} className="w-full h-full object-cover" />
           ) : (
             <span className="text-xs text-gray-400 font-bold">N/A</span>
           )}
@@ -252,7 +253,7 @@ const Services = () => {
             <div className="sm:col-span-2">
               <ImageUploader
                 label="Service Image"
-                currentImage={formData.image}
+                currentImage={getImageUrl(formData.image)}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
                     setSelectedFile(fileOrUrl);

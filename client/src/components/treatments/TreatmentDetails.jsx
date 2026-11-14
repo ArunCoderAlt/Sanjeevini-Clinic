@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Activity, Stethoscope, Sparkles } from 'lucide-react';
+import { getImageUrl } from '../../utils/helpers';
 
 const isMockImage = (img) => {
   if (!img || typeof img !== 'string') return true;
+  // Authentically uploaded files and Supabase Storage URLs are never mock images
+  if (img.startsWith('/uploads/') || img.includes('supabase.co') || img.startsWith('data:') || img.startsWith('blob:')) {
+    return false;
+  }
   const lower = img.toLowerCase();
   return (
     lower.includes('unsplash.com') ||
-    lower.includes('digestive.jpg') ||
-    lower.includes('skin.jpg') ||
-    lower.includes('herbal.jpg') ||
     lower.includes('treatment-5f825.jpg') ||
     lower.includes('placeholder')
   );
 };
 
 const TreatmentDetails = ({ treatment }) => {
+  const [imgError, setImgError] = useState(false);
   if (!treatment) return null;
 
   const hasRealImage = !isMockImage(treatment.image);
-  const displayImage = hasRealImage ? treatment.image : null;
+  const displayImage = hasRealImage ? getImageUrl(treatment.image) : null;
   const hasSymptoms = Array.isArray(treatment.symptoms) && treatment.symptoms.length > 0;
   const hasApproaches = Array.isArray(treatment.approaches) && treatment.approaches.length > 0;
 
@@ -29,13 +32,14 @@ const TreatmentDetails = ({ treatment }) => {
 
   return (
     <div className="bg-white rounded-3xl shadow-sm p-5 sm:p-8 md:p-12 max-w-4xl mx-auto border border-slate-200/80">
-      {displayImage && (
-        <div className="aspect-[16/10] sm:aspect-[21/9] rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-md">
+      {displayImage && !imgError && (
+        <div className="aspect-[16/10] sm:aspect-[21/9] rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 shadow-md bg-slate-100">
           <img
             src={displayImage}
             alt={`${cleanName} illustration`}
             className="w-full h-full object-cover"
             loading="lazy"
+            onError={() => setImgError(true)}
           />
         </div>
       )}

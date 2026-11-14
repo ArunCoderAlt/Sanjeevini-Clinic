@@ -64,8 +64,37 @@ const testSupabaseConnection = async () => {
   }
 };
 
+const ensureStorageBucket = async () => {
+  const url = env.supabaseUrl;
+  if (!url || !env.supabaseKey || url.includes('your-project-id.supabase.co')) {
+    return;
+  }
+
+  try {
+    const client = getSupabase();
+    if (!client) return;
+
+    const { data: bucket, error: bucketErr } = await client.storage.getBucket('clinic-media');
+    if (bucketErr || !bucket) {
+      const { error: createErr } = await client.storage.createBucket('clinic-media', {
+        public: true,
+        fileSizeLimit: 10485760, // 10MB
+      });
+      if (!createErr) {
+        logger.info("✅ Supabase Storage bucket 'clinic-media' initialized (public).");
+      }
+    } else if (!bucket.public) {
+      await client.storage.updateBucket('clinic-media', { public: true });
+      logger.info("✅ Supabase Storage bucket 'clinic-media' updated to public.");
+    }
+  } catch (err) {
+    logger.warn(`Supabase Storage bucket initialization notice: ${err.message}`);
+  }
+};
+
 module.exports = {
   supabase,
   getSupabase,
   testSupabaseConnection,
+  ensureStorageBucket,
 };

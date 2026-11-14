@@ -85,10 +85,10 @@ const fallbackServices = [
 
 const treatmentCategories = [
   { name: 'Gastrointestinal Treatments - வயிறு / குடல் சார்ந்த நோய்கள்', cat: 'Gastrointestinal', desc: 'Holistic healing for ulcers, GERD, IBS, and chronic indigestion using herbal formulations and gut-reset diets.', image: '/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png' },
-  { name: 'Dermatology Treatments - தோல் நோய்கள்', cat: 'Dermatology', desc: 'Natural Siddha and Ayurvedic solutions for psoriasis, eczema, acne, and vitiligo with pure plant extracts.' },
+  { name: 'Dermatology Treatments - தோல் நோய்கள்', cat: 'Dermatology', desc: 'Natural Siddha and Ayurvedic solutions for psoriasis, eczema, acne, and vitiligo with pure plant extracts.', image: '/uploads/dermatology-treatment-1794426000000.png' },
   { name: "Women's Health Treatments", cat: "Women's Health", desc: 'Supportive care for PCOD, hormonal imbalances, fertility optimization, and menopause.' },
   { name: 'Kidney & Urinary Treatments', cat: 'Kidney', desc: 'Therapeutic care for kidney stones, urinary tract infections, and renal wellness.' },
-  { name: 'Musculoskeletal Treatments', cat: 'Musculoskeletal', desc: 'Varmam therapy and herbal oils for arthritis, sciatica, spondylosis, and frozen shoulder.' },
+  { name: 'Musculoskeletal Treatments', cat: 'Musculoskeletal', desc: 'Varmam therapy and herbal oils for arthritis, sciatica, spondylosis, and frozen shoulder.', image: '/uploads/musculoskeletal-treatment-1794426000000.png' },
   { name: 'Pediatrics Treatments', cat: 'Pediatrics', desc: 'Gentle, natural formulations to bolster immunity and growth for infants and children.' },
   { name: 'Respiratory Treatments', cat: 'Respiratory', desc: 'Relief from chronic sinusitis, asthma, bronchitis, and allergies through pranayama and herbal remedies.' },
   { name: 'Neurology Treatments', cat: 'Neurology', desc: 'Vital point Varmam therapy and neural rejuvenation for migraine, neuropathy, and paralysis rehabilitation.' },

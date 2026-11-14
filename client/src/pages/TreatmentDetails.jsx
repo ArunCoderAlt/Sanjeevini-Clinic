@@ -33,6 +33,7 @@ const fallbackTreatments = {
   'psoriasis': {
     name: 'Psoriasis & Eczema Care',
     category: 'Dermatology',
+    image: '/uploads/dermatology-treatment-1794426000000.png',
     symptoms: ['Dry, itchy, red patches on skin', 'Silvery scales and peeling', 'Skin inflammation and irritation', 'Cracked skin prone to bleeding'],
     approaches: ['Deep cellular blood purification', 'Traditional medicated herbal oils', 'Pitta-Raktha balancing herbal regimens', 'Strict natural dietary protocol']
   },
@@ -45,6 +46,7 @@ const fallbackTreatments = {
   'arthritis': {
     name: 'Arthritis & Joint Pain Management',
     category: 'Musculoskeletal',
+    image: '/uploads/musculoskeletal-treatment-1794426000000.png',
     symptoms: ['Joint stiffness, particularly in the morning', 'Chronic pain in knees, hips, or back', 'Swelling and reduced flexibility', 'Difficulty walking or bending'],
     approaches: ['Traditional Varmam vital-point therapy', 'Thokkanam medicated oil massage', 'Cartilage-strengthening herbal decoctions', 'Gentle rehabilitative movement']
   },
