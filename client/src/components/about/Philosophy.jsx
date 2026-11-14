@@ -12,6 +12,8 @@ const Philosophy = () => {
               <img 
                 src="/images/about/samc-philosophy.jpg" 
                 alt="Sanjeevini SAMC Philosophy Emblem" 
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto max-h-[520px] object-cover mx-auto" 
               />
             </div>
