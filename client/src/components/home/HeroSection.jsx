@@ -8,9 +8,41 @@ const HeroSection = () => {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    // Slower, calm, cinematic playback speed (0.7x)
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.7;
+    const video = videoRef.current;
+    if (video) {
+      // Modern browsers require muted=true explicitly set on the DOM property for autoplay
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playbackRate = 0.7;
+
+      const attemptPlay = () => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('Hero video autoplay blocked or pending interaction:', err);
+            // Fallback: unlock on first touch, click, or scroll
+            const unlockAndPlay = () => {
+              if (video) {
+                video.muted = true;
+                video.play().catch(() => {});
+              }
+              window.removeEventListener('click', unlockAndPlay);
+              window.removeEventListener('touchstart', unlockAndPlay);
+              window.removeEventListener('scroll', unlockAndPlay);
+            };
+            window.addEventListener('click', unlockAndPlay, { once: true, passive: true });
+            window.addEventListener('touchstart', unlockAndPlay, { once: true, passive: true });
+            window.addEventListener('scroll', unlockAndPlay, { once: true, passive: true });
+          });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        attemptPlay();
+      } else {
+        video.addEventListener('loadeddata', attemptPlay, { once: true });
+        video.addEventListener('canplay', attemptPlay, { once: true });
+      }
     }
   }, []);
 
@@ -52,14 +84,8 @@ const HeroSection = () => {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           poster="/images/hero/slide-1.png"
-          onLoadedMetadata={() => {
-            if (videoRef.current) videoRef.current.playbackRate = 0.7;
-          }}
-          onCanPlay={() => {
-            if (videoRef.current) videoRef.current.playbackRate = 0.7;
-          }}
           className="w-full h-full object-cover object-center"
         >
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
