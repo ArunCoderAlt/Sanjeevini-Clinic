@@ -6,8 +6,7 @@ export const navLinks = [
   { name: 'Treatments', path: '/treatments' },
   { name: 'Gallery', path: '/gallery' },
   { name: 'Swarna Bindu', path: '/swarna-bindu' },
-  { name: 'Testimonials', path: '/testimonials' },
-  { name: 'Contact', path: '/contact' }
+  { name: 'Testimonials', path: '/testimonials' }
 ];
 
 export const footerLinks = [

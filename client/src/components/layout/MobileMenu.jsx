@@ -58,7 +58,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
           className="pt-6 mt-6 border-t border-gray-100"
         >
           <Button 
-            to="/contact#contact-form" 
+            to="/contact" 
             onClick={(e) => {
               onClose();
               if (currentPath === '/contact') {

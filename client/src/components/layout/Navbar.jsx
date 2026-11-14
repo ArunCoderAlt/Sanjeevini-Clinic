@@ -69,7 +69,7 @@ export default function Navbar() {
               ))}
             </div>
             <Button 
-              to="/contact#contact-form" 
+              to="/contact" 
               onClick={handleContactClick} 
               variant="primary" 
               size="sm"

@@ -37,12 +37,12 @@ const TreatmentsPreview = () => {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
             >
-              <Link to={`/treatments?category=${cat.name}`} className="block bg-sage/30 hover:bg-sage p-6 rounded-2xl transition-colors group">
+              <Link to={`/treatments?category=${cat.name}`} className="block bg-white hover:bg-primary-50/50 p-6 rounded-2xl border border-slate-200/80 hover:border-primary-500/40 shadow-xs hover:shadow-md transition-all duration-300 group">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-3xl">{cat.icon}</span>
-                  <span className="text-sm font-medium text-primary-600 bg-white px-3 py-1 rounded-full">{cat.count} Conditions</span>
+                  <span className="text-sm font-medium text-primary-700 bg-primary-50 px-3 py-1 rounded-full border border-primary-100">{cat.count} Conditions</span>
                 </div>
-                <h3 className="text-xl font-serif text-primary-700 group-hover:text-primary-600">{cat.name} Care</h3>
+                <h3 className="text-xl font-serif text-primary-700 group-hover:text-primary-600 transition-colors">{cat.name} Care</h3>
               </Link>
             </motion.div>
           ))}
