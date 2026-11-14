@@ -116,8 +116,24 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/bot', botRoutes);
 app.use('/api/swarna-bindu', swarnaBinduRoutes);
 
-// Static uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+// Static uploads folder with aggressive CDN and browser caching (1 year immutable)
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'public/uploads'), {
+    maxAge: '365d',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+      // Set CDN & browser caching headers for images, videos, audio, and documents
+      if (/\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (/\.(mp4|webm|mov|mkv)$/i.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('Accept-Ranges', 'bytes');
+      }
+    },
+  })
+);
 
 // Error Handling Middleware
 app.use(notFound);

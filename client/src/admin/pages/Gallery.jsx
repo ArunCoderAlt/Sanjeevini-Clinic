@@ -11,6 +11,7 @@ import {
   deleteGalleryItem,
 } from '../../services/galleryService';
 import { uploadImage } from '../../services/uploadService';
+import { getImageUrl } from '../../utils/helpers';
 
 const categories = ['clinic', 'treatment', 'team', 'event'];
 
@@ -76,7 +77,7 @@ const Gallery = () => {
       let finalUrl = imageUrlInput;
       if (selectedFile instanceof File) {
         toast.loading('Uploading image...', { id: 'gallery-upload-toast' });
-        finalUrl = await uploadImage(selectedFile);
+        finalUrl = await uploadImage(selectedFile, 'gallery');
         toast.dismiss('gallery-upload-toast');
       }
 
@@ -281,7 +282,7 @@ const Gallery = () => {
             >
               <div className="relative h-48 bg-gray-100">
                 <img
-                  src={img.url}
+                  src={getImageUrl(img.url)}
                   alt={img.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {

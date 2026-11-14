@@ -62,7 +62,7 @@ const VideoGallery = () => {
             className="bg-white rounded-2xl overflow-hidden shadow-sm group cursor-pointer border border-sage hover:border-primary-600 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary-600"
           >
             <div className="relative aspect-video bg-dark overflow-hidden">
-              <img src={video.thumb} alt={video.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-300 group-hover:scale-105" />
+              <img src={video.thumb} alt={video.title} loading="lazy" decoding="async" className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-300 group-hover:scale-105" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center text-primary-700 shadow-lg group-hover:scale-110 group-hover:bg-primary-600 group-hover:text-white transition-all">
                   <Play className="w-6 h-6 ml-1" fill="currentColor" />

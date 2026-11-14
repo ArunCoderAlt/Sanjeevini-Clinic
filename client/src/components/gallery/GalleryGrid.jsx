@@ -2,21 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ImageOff } from 'lucide-react';
 import { getGallery } from '../../services/galleryService';
+import { getImageUrl } from '../../utils/helpers';
 
 const isMockImage = (url) => {
   if (!url || typeof url !== 'string') return true;
+  // Authentic uploads, Supabase CDN, and ImageKit CDN images are never mock images
+  if (
+    url.includes('imagekit.io') ||
+    url.includes('ik.imagekit.io') ||
+    url.startsWith('/uploads/') ||
+    url.includes('supabase.co') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return false;
+  }
   const lower = url.toLowerCase();
   return (
     lower.includes('unsplash.com') ||
-    lower.includes('placeholder') ||
-    lower.includes('consultation.jpg') ||
-    lower.includes('varmam.jpg') ||
-    lower.includes('thokkanam.jpg') ||
-    lower.includes('herbs.jpg') ||
-    lower.includes('digestive.jpg') ||
-    lower.includes('skin.jpg') ||
-    lower.includes('clinic-front.jpg') ||
-    lower.includes('front-image.jpg')
+    lower.includes('placeholder')
   );
 };
 
@@ -48,7 +52,7 @@ const GalleryGrid = ({ activeTab }) => {
             .filter((item) => item.image && !isMockImage(item.image))
             .map((item) => ({
               id: item._id || item.id,
-              src: item.image,
+              src: getImageUrl(item.image),
               category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
               alt: item.title || item.description || 'Clinic photo'
             }));
@@ -111,6 +115,7 @@ const GalleryGrid = ({ activeTab }) => {
             alt={image.alt || 'Clinic facility'}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-300 flex flex-col justify-end p-4 sm:p-5">
             <span className="inline-block px-2 sm:px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-1 w-fit">

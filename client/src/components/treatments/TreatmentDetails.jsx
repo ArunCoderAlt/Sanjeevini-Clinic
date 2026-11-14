@@ -39,6 +39,7 @@ const TreatmentDetails = ({ treatment }) => {
             alt={`${cleanName} illustration`}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
             onError={() => setImgError(true)}
           />
         </div>

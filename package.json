@@ -12,6 +12,7 @@
     "vercel-build": "npm --prefix client install && npm --prefix client run build",
     "seed": "cd server && npm run seed",
     "init:storage": "cd server && npm run init:storage",
+    "test:imagekit": "cd server && npm run test:imagekit",
     "start": "cd server && npm start"
   },
   "devDependencies": {

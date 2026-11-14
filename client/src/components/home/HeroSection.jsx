@@ -52,7 +52,7 @@ const HeroSection = () => {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/images/hero/slide-1.png"
           onLoadedMetadata={() => {
             if (videoRef.current) videoRef.current.playbackRate = 0.7;
