@@ -6,11 +6,13 @@ import TestimonialCard from '../components/testimonials/TestimonialCard';
 import TestimonialForm from '../components/testimonials/TestimonialForm';
 import Loading from '../components/common/Loading';
 import { getTestimonials } from '../services/testimonialService';
+import { useAppContext } from '../context/AppContext';
 
 const TestimonialsPage = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     setLoading(true);
@@ -23,7 +25,7 @@ const TestimonialsPage = () => {
         setError('Unable to load testimonials.');
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dataVersion]);
 
   return (
     <PageTransition>

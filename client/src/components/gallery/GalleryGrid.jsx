@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ImageOff } from 'lucide-react';
 import { getGallery } from '../../services/galleryService';
 import { getImageUrl } from '../../utils/helpers';
+import { useAppContext } from '../../context/AppContext';
 
 const isMockImage = (url) => {
   if (!url || typeof url !== 'string') return true;
@@ -39,6 +40,7 @@ const authenticDefaultGallery = [
 const GalleryGrid = ({ activeTab }) => {
   const [images, setImages] = useState(authenticDefaultGallery);
   const [loading, setLoading] = useState(true);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     setLoading(true);
@@ -72,7 +74,7 @@ const GalleryGrid = ({ activeTab }) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [activeTab]);
+  }, [activeTab, dataVersion]);
 
   const filteredImages = images.filter(
     (img) => activeTab === 'All' || img.category.toLowerCase() === activeTab.toLowerCase()

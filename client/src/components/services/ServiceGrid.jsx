@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ServiceCard from './ServiceCard';
 import { getServices } from '../../services/serviceService';
+import { useAppContext } from '../../context/AppContext';
 import Loading from '../common/Loading';
 
 const defaultServices = [
@@ -12,6 +13,7 @@ const defaultServices = [
 const ServiceGrid = () => {
   const [services, setServices] = useState(defaultServices);
   const [loading, setLoading] = useState(true);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     getServices()
@@ -37,7 +39,7 @@ const ServiceGrid = () => {
         // Fallback on error
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dataVersion]);
 
   if (loading) return <Loading />;
 

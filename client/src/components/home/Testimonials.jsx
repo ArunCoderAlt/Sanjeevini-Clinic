@@ -9,6 +9,7 @@ import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
 import { getTestimonials } from '../../services/testimonialService';
+import { useAppContext } from '../../context/AppContext';
 
 const fallbackTestimonials = [
   { name: 'Karthik R.', text: 'The Varmam therapy worked wonders for my chronic back pain. Dr. Thiagarajan is truly exceptional.', rating: 5 },
@@ -18,6 +19,7 @@ const fallbackTestimonials = [
 
 const Testimonials = () => {
   const [items, setItems] = useState(fallbackTestimonials);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     getTestimonials()
@@ -38,7 +40,7 @@ const Testimonials = () => {
       .catch(() => {
         // Fallback on error
       });
-  }, []);
+  }, [dataVersion]);
 
   return (
     <section className="py-24 bg-dark-section">

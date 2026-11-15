@@ -4,6 +4,7 @@ import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
 import { getDoctors } from '../../services/doctorService';
+import { useAppContext } from '../../context/AppContext';
 
 const defaultDoctors = [
   {
@@ -26,6 +27,7 @@ const defaultDoctors = [
 
 const DoctorsPreview = () => {
   const [team, setTeam] = useState(defaultDoctors);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     getDoctors()
@@ -56,7 +58,7 @@ const DoctorsPreview = () => {
       .catch(() => {
         // Fallback on error
       });
-  }, []);
+  }, [dataVersion]);
 
   return (
     <section className="py-24 bg-dark-section">

@@ -14,11 +14,13 @@ import Container from '../components/common/Container';
 import PageTransition from '../components/common/PageTransition';
 import { defaultPushyaSchedule } from '../data/swarnaBinduData';
 import { getSwarnaBinduSchedule } from '../services/swarnaBinduService';
+import { useAppContext } from '../context/AppContext';
 
 const SwarnaBindu = () => {
   const [schedule, setSchedule] = useState(defaultPushyaSchedule);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'completed'
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     getSwarnaBinduSchedule()
@@ -32,7 +34,7 @@ const SwarnaBindu = () => {
         console.warn('Loading fallback Swarna Bindu schedule:', err);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dataVersion]);
 
   const filteredSchedule = schedule.filter((item) => {
     if (filter === 'upcoming') {

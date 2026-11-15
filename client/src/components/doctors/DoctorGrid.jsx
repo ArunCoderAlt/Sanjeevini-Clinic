@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DoctorCard from './DoctorCard';
 import { getDoctors } from '../../services/doctorService';
+import { useAppContext } from '../../context/AppContext';
 import Loading from '../common/Loading';
 
 const defaultDoctors = [
@@ -25,6 +26,7 @@ const defaultDoctors = [
 const DoctorGrid = () => {
   const [doctors, setDoctors] = useState(defaultDoctors);
   const [loading, setLoading] = useState(true);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     getDoctors()
@@ -52,7 +54,7 @@ const DoctorGrid = () => {
         // Keep default doctors on API failure
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dataVersion]);
 
   if (loading) return <Loading />;
 

@@ -22,6 +22,7 @@ import {
 import Container from '../common/Container';
 import { clinicInfo } from '../../data/clinicInfo';
 import { getReels } from '../../services/reelService';
+import { useAppContext } from '../../context/AppContext';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -397,6 +398,7 @@ const ReelLightboxModal = ({ reel, onClose }) => {
 const InstagramSection = () => {
   const [reels, setReels] = useState(defaultClinicReels);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
+  const { dataVersion } = useAppContext();
 
   useEffect(() => {
     let isMounted = true;
@@ -417,7 +419,7 @@ const InstagramSection = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [dataVersion]);
 
   return (
     <section
