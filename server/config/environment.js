@@ -1,4 +1,9 @@
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Load server/.env first, then fallback to current working directory .env
+dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config();
 
 module.exports = {
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -11,7 +16,7 @@ module.exports = {
   emailUser: process.env.EMAIL_USER || 'sanjeevinisiddha@gmail.com',
   emailPass: process.env.EMAIL_PASS || '',
   groqApiKey: process.env.GROQ_API_KEY || '',
-  groqModel: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',
+  groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   imagekitPublicKey: process.env.IMAGEKIT_PUBLIC_KEY || '',
   imagekitPrivateKey: process.env.IMAGEKIT_PRIVATE_KEY || '',
   imagekitUrlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || '',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Calendar, 
   Clock, 
@@ -8,36 +8,17 @@ import {
   ShieldCheck, 
   Sparkles, 
   Baby, 
-  CheckCircle2, 
-  X,
-  ChevronRight
+  CheckCircle2
 } from 'lucide-react';
 import Container from '../components/common/Container';
-import Button from '../components/common/Button';
 import PageTransition from '../components/common/PageTransition';
 import { defaultPushyaSchedule } from '../data/swarnaBinduData';
 import { getSwarnaBinduSchedule } from '../services/swarnaBinduService';
-import { clinicInfo } from '../data/clinicInfo';
-import toast from 'react-hot-toast';
-import api from '../services/api';
 
 const SwarnaBindu = () => {
   const [schedule, setSchedule] = useState(defaultPushyaSchedule);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'completed'
-  const [regModalOpen, setRegModalOpen] = useState(false);
-  const [selectedCamp, setSelectedCamp] = useState(null);
-
-  // Pre-registration Form State
-  const [regForm, setRegForm] = useState({
-    parentName: '',
-    childName: '',
-    childAge: '',
-    phone: '',
-    campDate: 'Saturday, 28 November 2026',
-    notes: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     getSwarnaBinduSchedule()
@@ -63,65 +44,11 @@ const SwarnaBindu = () => {
     return true;
   });
 
-  // Next Camp highlight
-  const nextCamp = schedule.find((s) => s.status === 'Next Camp') || schedule.find((s) => s.status === 'Upcoming');
-
-  const handleOpenRegister = (camp = null) => {
-    if (camp) {
-      setSelectedCamp(camp);
-      setRegForm((prev) => ({
-        ...prev,
-        campDate: `${camp.date} (${camp.day} - ${camp.month})`
-      }));
-    } else if (nextCamp) {
-      setSelectedCamp(nextCamp);
-      setRegForm((prev) => ({
-        ...prev,
-        campDate: `${nextCamp.date} (${nextCamp.day} - ${nextCamp.month})`
-      }));
-    }
-    setRegModalOpen(true);
-  };
-
-  const handleRegSubmit = async (e) => {
-    e.preventDefault();
-    if (!regForm.parentName || !regForm.phone || !regForm.childName) {
-      toast.error('Please fill in parent name, child name, and contact phone.');
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      await api.post('/appointments', {
-        name: `${regForm.parentName} (Child: ${regForm.childName}, Age: ${regForm.childAge} yrs)`,
-        phone: regForm.phone,
-        service: 'Swarna Bindu Prashana Camp',
-        preferredDate: regForm.campDate,
-        preferredTime: 'Evening (5:00 PM - 9:30 PM)',
-        message: `Swarna Bindu Camp Registration for ${regForm.childName} (${regForm.childAge} yrs). Notes: ${regForm.notes || 'None'}`
-      });
-      toast.success('Registration successful! Our clinic team will confirm your slot via call / WhatsApp.');
-      setRegModalOpen(false);
-      setRegForm({
-        parentName: '',
-        childName: '',
-        childAge: '',
-        phone: '',
-        campDate: 'Saturday, 28 November 2026',
-        notes: ''
-      });
-    } catch (err) {
-      toast.success('Registration noted! We will contact you at ' + regForm.phone);
-      setRegModalOpen(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <PageTransition>
       <Helmet>
-        <title>Swarna Bindu Prashana Schedule 2026 | Sanjeevini Medical Centre</title>
-        <meta name="description" content="Official Pushya Nakshatra Swarna Bindu Prashana schedule and camp dates at Sanjeevini Siddha & Ayurveda Medical Centre, Karaikal." />
+        <title>Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி) Schedule 2026 | Sanjeevini Medical Centre</title>
+        <meta name="description" content="Official Pushya Nakshatra Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி) schedule and camp dates at Sanjeevini Siddha & Ayurveda Medical Centre, Karaikal." />
       </Helmet>
 
       {/* =========================================================================
@@ -147,10 +74,20 @@ const SwarnaBindu = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight mb-5"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight mb-3"
           >
-            Swarna Bindu <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">Prashana</span>
+            Swarna Bindu <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">Drops</span>
           </motion.h1>
+
+          {/* Tamil Title: அமிர்த கனக சஞ்சீவி */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-lg sm:text-xl md:text-2xl font-bold tracking-wide mb-6 shadow-sm"
+          >
+            <span>அமிர்த கனக சஞ்சீவி</span>
+          </motion.div>
 
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
@@ -228,7 +165,7 @@ const SwarnaBindu = () => {
                   Pushya Nakshatra Schedule
                 </h2>
                 <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-xl">
-                  Monthly camp schedule for Swarna Bindu Prashana administration at Sanjeevini Medical Centre.
+                  Monthly camp schedule for Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி) administration at Sanjeevini Medical Centre.
                 </p>
               </div>
 
@@ -284,9 +221,8 @@ const SwarnaBindu = () => {
                       <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Camp Date</th>
                       <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Day</th>
                       <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Star / Nakshatra</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Camp Timings</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Particulars / Status</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider text-right">Action</th>
+                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Timings</th>
+                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
@@ -363,21 +299,6 @@ const SwarnaBindu = () => {
                               )}
                             </div>
                           </td>
-
-                          {/* Action */}
-                          <td className="py-4 px-6 text-right">
-                            {isCompleted ? (
-                              <span className="text-xs text-slate-400 italic">Concluded</span>
-                            ) : (
-                              <button
-                                onClick={() => handleOpenRegister(row)}
-                                className="inline-flex items-center gap-1 text-xs font-bold text-[#144979] hover:text-[#0C2B4B] bg-[#144979]/10 hover:bg-[#144979]/20 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                              >
-                                <span>Register</span>
-                                <ChevronRight className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-                          </td>
                         </tr>
                       );
                     })}
@@ -394,139 +315,6 @@ const SwarnaBindu = () => {
           </div>
         </Container>
       </section>
-
-      {/* =========================================================================
-          3. MODAL: Fast Pre-Registration for Selected Camp
-          ========================================================================= */}
-      <AnimatePresence>
-        {regModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative max-w-lg w-full bg-white rounded-2xl overflow-hidden shadow-2xl p-6 sm:p-8"
-            >
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-                <div>
-                  <h3 className="text-xl font-heading font-bold text-slate-900">
-                    Register for Swarna Bindu Camp
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Pushya Nakshatra Monthly Child Immunisation
-                  </p>
-                </div>
-                <button
-                  onClick={() => setRegModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-800"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <form onSubmit={handleRegSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Parent / Guardian Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. S. Meenakshi"
-                    value={regForm.parentName}
-                    onChange={(e) => setRegForm({ ...regForm, parentName: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#144979]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Child's Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Aravind"
-                      value={regForm.childName}
-                      onChange={(e) => setRegForm({ ...regForm, childName: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#144979]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Child's Age *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 4 Years"
-                      value={regForm.childAge}
-                      onChange={(e) => setRegForm({ ...regForm, childAge: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#144979]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Contact Phone Number (WhatsApp) *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="e.g. +91 98430 66362"
-                    value={regForm.phone}
-                    onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#144979]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Camp Date Selection
-                  </label>
-                  <input
-                    type="text"
-                    readOnly
-                    value={regForm.campDate}
-                    className="w-full px-3.5 py-2.5 rounded-lg text-sm bg-slate-100 border border-slate-300 text-slate-700 cursor-not-allowed"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Health Notes / Symptoms (Optional)
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="Frequent colds, low appetite, asthma, etc."
-                    value={regForm.notes}
-                    onChange={(e) => setRegForm({ ...regForm, notes: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-lg text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#144979]"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    variant="primary"
-                    className="w-full py-3 rounded-xl font-bold bg-[#144979] text-white shadow-md hover:shadow-lg"
-                  >
-                    {isSubmitting ? 'Registering...' : 'Confirm Camp Pre-Registration'}
-                  </Button>
-                </div>
-
-                <p className="text-[11px] text-center text-slate-500 pt-1">
-                  Or call directly for priority appointment: <a href="tel:+919843066362" className="text-[#144979] font-bold">+91 98430 66362</a>
-                </p>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </PageTransition>
   );
 };

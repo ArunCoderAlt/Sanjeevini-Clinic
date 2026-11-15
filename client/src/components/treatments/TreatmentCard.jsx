@@ -74,7 +74,7 @@ const TreatmentCard = ({ treatment }) => {
               </div>
             )}
 
-            <h3 className="text-lg sm:text-xl font-serif text-[#0C2B4B] font-bold mb-2 sm:mb-3 group-hover:text-[#144979] transition-colors leading-snug">
+            <h3 className="text-base sm:text-lg font-serif text-[#0C2B4B] font-bold mb-2 group-hover:text-[#144979] transition-colors leading-snug">
               {cleanTitle}
             </h3>
 

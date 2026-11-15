@@ -1,20 +1,21 @@
 import React from 'react';
-import { Award, Users, Heart, Shield } from 'lucide-react';
+import { Award, Users, Heart, Shield, Sparkles } from 'lucide-react';
 import Container from '../common/Container';
 import CountUp from '../common/CountUp';
 
 const stats = [
   { icon: Award, label: 'Years of Excellence', value: '21+' },
   { icon: Users, label: 'Patients Treated Monthly', value: '500+' },
-  { icon: Heart, label: 'Therapies Performed', value: '5,000+' },
-  { icon: Shield, label: 'Organic Herbs Used', value: '250+' }
+  { icon: Heart, label: 'Therapies Performed', value: '500+' },
+  { icon: Shield, label: 'Organic Herbs Used', value: '250+' },
+  { icon: Sparkles, label: 'Traditional Systems', value: '2' }
 ];
 
 const Experience = () => {
   return (
     <section className="py-24 bg-gradient-to-r from-[#144979] via-[#0C294A] to-[#071A2F] text-white shadow-inner">
       <Container>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (

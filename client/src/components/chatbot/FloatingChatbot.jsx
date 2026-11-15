@@ -18,20 +18,34 @@ import {
 import { sendChatMessage } from '../../services/botService';
 import { toast } from 'react-hot-toast';
 
-const SUGGESTED_PROMPTS = [
-  "What are your clinic consultation hours?",
-  "What is Varmam therapy?",
-  "Which doctors are available?",
-  "Where is the clinic located in Karaikal?"
-];
+const SUGGESTED_PROMPTS = {
+  en: [
+    "What are your clinic consultation hours?",
+    "What is Varmam therapy?",
+    "Which doctors are available?",
+    "Where is the clinic located in Karaikal?"
+  ],
+  ta: [
+    "மருத்துவமனை ஆலோசனை நேரம் என்ன?",
+    "வர்மம் சிகிச்சை என்றால் என்ன?",
+    "எந்த மருத்துவர்கள் உள்ளனர்?",
+    "மருத்துவமனை எங்கு அமைந்துள்ளது?"
+  ]
+};
+
+const WELCOME_MESSAGES = {
+  en: `Namaste! 🙏 Welcome to **Sanjeevini Siddha & Ayurveda Medical Centre**.\n\nI am your AI healthcare assistant. I answer questions in both **English and தமிழ் (Tamil)** based on our official clinic documents.\n\nHow can I help you today? You can type below, tap a suggested topic, or tap the microphone to speak!`,
+  ta: `வணக்கம்! 🙏 **சஞ்சீவினி சித்த & ஆயுர்வேத மருத்துவ மையத்திற்கு** தங்களை அன்புடன் வரவேற்கிறோம்.\n\nநான் உங்கள் AI மருத்துவ உதவியாளர். நமது மருத்துவமனை ஆவணங்களின்படி உங்கள் சந்தேகங்களுக்கு **தமிழ் மற்றும் ஆங்கிலத்தில்** பதிலளிக்கிறேன்.\n\nதங்களுக்கு இன்று எவ்வாறு உதவலாம்? கீழே தட்டச்சு செய்யவும் அல்லது மைக்ரோஃபோன் மூலம் பேசவும்!`
+};
 
 export default function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState('en'); // 'en' | 'ta'
   const [messages, setMessages] = useState([
     {
       id: 'welcome-1',
       role: 'assistant',
-      content: `Namaste! 🙏 Welcome to **Sanjeevini Siddha & Ayurveda Medical Centre**.\n\nI am your AI healthcare assistant. I answer patient questions **strictly based on our official clinic documents and guides**.\n\nHow can I help you today? You can type below, choose a quick topic, or tap the microphone to speak!`,
+      content: WELCOME_MESSAGES.en,
       sources: [{ document: 'Clinic Guide PDF' }],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
@@ -45,6 +59,27 @@ export default function FloatingChatbot() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Switch language and update speech recognition & welcome greeting if only greeting exists
+  const handleLanguageChange = (lang) => {
+    setCurrentLang(lang);
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = lang === 'ta' ? 'ta-IN' : 'en-IN';
+    }
+    // If conversation only contains initial greeting, update it to chosen language
+    if (messages.length === 1 && messages[0].id.startsWith('welcome-')) {
+      setMessages([
+        {
+          id: `welcome-${Date.now()}`,
+          role: 'assistant',
+          content: WELCOME_MESSAGES[lang] || WELCOME_MESSAGES.en,
+          sources: [{ document: lang === 'ta' ? 'மருத்துவமனை வழிகாட்டி' : 'Clinic Guide PDF' }],
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    }
+    toast.success(lang === 'ta' ? 'தமிழ் மொழி தேர்ந்தெடுக்கப்பட்டது' : 'Language set to English');
+  };
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
@@ -113,7 +148,7 @@ export default function FloatingChatbot() {
     };
   }, []);
 
-  // Toggle voice input recording
+  // Toggle voice input recording with dynamic Tamil / English speech model
   const toggleListening = () => {
     if (!recognitionRef.current) {
       toast.error('Voice input is not supported in this browser. Please use Chrome or Edge.');
@@ -129,6 +164,7 @@ export default function FloatingChatbot() {
       setIsListening(false);
     } else {
       try {
+        recognitionRef.current.lang = currentLang === 'ta' ? 'ta-IN' : 'en-IN';
         recognitionRef.current.start();
       } catch (err) {
         toast.error('Could not start microphone. Check permissions.');
@@ -136,7 +172,7 @@ export default function FloatingChatbot() {
     }
   };
 
-  // Text-to-speech speaker toggle
+  // Text-to-speech speaker toggle with Tamil & English auto-voice selection
   const toggleSpeech = (msgId, text) => {
     if (!('speechSynthesis' in window)) {
       toast.error('Speech synthesis not supported in this browser.');
@@ -156,6 +192,21 @@ export default function FloatingChatbot() {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
+    // Detect language: if contains Tamil Unicode range, use ta-IN
+    const hasTamil = /[\u0B80-\u0BFF]/.test(cleanSpeechText);
+    utterance.lang = hasTamil ? 'ta-IN' : 'en-IN';
+
+    // Try to find native language voice from available browser speech voices
+    try {
+      const voices = window.speechSynthesis.getVoices() || [];
+      const matchVoice = voices.find(v => hasTamil ? v.lang.startsWith('ta') : v.lang.startsWith('en'));
+      if (matchVoice) {
+        utterance.voice = matchVoice;
+      }
+    } catch {
+      // Ignored fallback
+    }
+
     utterance.onend = () => setSpeakingMessageId(null);
     utterance.onerror = () => setSpeakingMessageId(null);
 
@@ -163,7 +214,7 @@ export default function FloatingChatbot() {
     window.speechSynthesis.speak(utterance);
   };
 
-  // Send query to backend
+  // Send query to backend (auto-detects language)
   const handleSend = async (textToSend) => {
     const query = (textToSend || input).trim();
     if (!query || loading) return;
@@ -171,6 +222,15 @@ export default function FloatingChatbot() {
     if (isListening && recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
+    }
+
+    // Auto-detect Tamil script and switch language state seamlessly
+    const isTamilInput = /[\u0B80-\u0BFF]/.test(query);
+    if (isTamilInput && currentLang !== 'ta') {
+      setCurrentLang('ta');
+      if (recognitionRef.current) {
+        recognitionRef.current.lang = 'ta-IN';
+      }
     }
 
     const userMessage = {
@@ -197,10 +257,14 @@ export default function FloatingChatbot() {
       const res = await sendChatMessage(query, historyPayload);
       const data = res?.data?.data || {};
 
+      const defaultFallbackReply = isTamilInput || currentLang === 'ta'
+        ? 'தங்கள் கேள்விக்கு நன்றி. துல்லியமான மருத்துவ ஆலோசனைக்கு எங்கள் மருத்துவமனையை +91 98430 66362 என்ற எண்ணில் நேரடியாக தொடர்பு கொள்ளவும்.'
+        : 'Thank you for your question. Please contact our clinic directly at +91 98430 66362 for personalized guidance.';
+
       const assistantMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.reply || 'Thank you for your question. Please contact our clinic directly at +91 98430 66362 for personalized guidance.',
+        content: data.reply || defaultFallbackReply,
         sources: data.sources || [],
         modelUsed: data.modelUsed,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -211,12 +275,16 @@ export default function FloatingChatbot() {
       const errorText = err?.response?.data?.message || 'Could not connect to the assistant. Please try again.';
       toast.error(errorText);
 
+      const errorFallbackMsg = isTamilInput || currentLang === 'ta'
+        ? 'மன்னிக்கவும், தகவலைப் பெறுவதில் தற்போது ஒரு சிக்கல் ஏற்பட்டது. தயவுசெய்து எங்களை **+91 98430 66362** என்ற எண்ணில் அழைக்கவும் அல்லது வாட்ஸ்அப்பில் தொடர்பு கொள்ளவும்.'
+        : 'Sorry, I encountered an issue retrieving that answer right now. Please call our clinic at **+91 98430 66362** or message us on WhatsApp.';
+
       setMessages(prev => [
         ...prev,
         {
           id: `assistant-err-${Date.now()}`,
           role: 'assistant',
-          content: 'Sorry, I encountered an issue retrieving that answer right now. Please call our clinic at **+91 98430 66362** or message us on WhatsApp.',
+          content: errorFallbackMsg,
           sources: [],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
@@ -234,42 +302,56 @@ export default function FloatingChatbot() {
       {
         id: `welcome-${Date.now()}`,
         role: 'assistant',
-        content: `Namaste! 🙏 Conversation reset.\n\nI answer patient questions **strictly based on our official clinic documents and guides**.\n\nWhat would you like to know?`,
-        sources: [{ document: 'Clinic Guide PDF' }],
+        content: WELCOME_MESSAGES[currentLang] || WELCOME_MESSAGES.en,
+        sources: [{ document: currentLang === 'ta' ? 'மருத்துவமனை வழிகாட்டி' : 'Clinic Guide PDF' }],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
     setInput('');
   };
 
-  // Format markdown bold text and bullet points simply
-  const renderFormattedText = (content) => {
+  // Format markdown bold text and bullet points cleanly
+  const renderFormattedText = (content, isAssistant = true) => {
     const lines = content.split('\n');
     return lines.map((line, idx) => {
+      const cleanLine = line.trim();
+
+      if (!cleanLine) {
+        return <div key={idx} className="h-1.5" />;
+      }
+
+      // Check if line is a bullet or numbered list item
+      const isBullet = cleanLine.startsWith('- ') || cleanLine.startsWith('* ') || /^\d+[\.\)]\s/.test(cleanLine);
+      const textToFormat = isBullet 
+        ? cleanLine.replace(/^[-*]\s+|\d+[\.\)]\s+/, '') 
+        : cleanLine;
+
       // Process bold markers (**text**)
-      const parts = line.split(/(\*\*.*?\*\*)/g);
+      const parts = textToFormat.split(/(\*\*.*?\*\*)/g);
       const formattedParts = parts.map((part, pIdx) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={pIdx} className="font-semibold text-primary-800">{part.slice(2, -2)}</strong>;
+          return (
+            <strong 
+              key={pIdx} 
+              className={isAssistant ? "font-semibold text-primary-900" : "font-bold text-white"}
+            >
+              {part.slice(2, -2)}
+            </strong>
+          );
         }
         return part;
       });
 
-      // Bullet list item
-      if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+      if (isBullet) {
         return (
-          <li key={idx} className="ml-4 list-disc text-sm my-1">
+          <li key={idx} className="ml-4 list-disc text-xs sm:text-sm my-1 leading-relaxed">
             {formattedParts}
           </li>
         );
       }
 
-      if (!line.trim()) {
-        return <div key={idx} className="h-2" />;
-      }
-
       return (
-        <p key={idx} className="text-sm leading-relaxed mb-1">
+        <p key={idx} className="text-xs sm:text-sm leading-relaxed mb-1.5 last:mb-0">
           {formattedParts}
         </p>
       );
@@ -278,108 +360,150 @@ export default function FloatingChatbot() {
 
   return (
     <>
-      {/* Floating Launcher Button */}
-      <div className="fixed bottom-36 right-6 z-40 flex items-center">
-        {/* Initial Greeting Tooltip */}
-        <AnimatePresence>
-          {showTooltip && !isOpen && (
-            <motion.div
-              initial={{ opacity: 0, x: 20, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="mr-3 hidden sm:flex items-center bg-white text-gray-800 px-4 py-2.5 rounded-2xl shadow-xl border border-sage/60 cursor-pointer text-xs font-medium"
-              onClick={() => setIsOpen(true)}
-            >
-              <Sparkles className="w-4 h-4 text-gold mr-2 shrink-0 animate-spin-slow" />
-              <span>Ask Sanjeevini AI</span>
-              <button 
-                onClick={(e) => { e.stopPropagation(); setShowTooltip(false); }}
-                className="ml-2 text-gray-400 hover:text-gray-600"
+      {/* Floating Launcher Button (visible only when chat is closed) */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-36 right-6 z-40 flex items-center"
+          >
+            {/* Initial Greeting Tooltip */}
+            {showTooltip && (
+              <motion.div
+                initial={{ opacity: 0, x: 20, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="mr-3 hidden sm:flex items-center bg-white text-gray-800 px-4 py-2.5 rounded-2xl shadow-xl border border-sage/60 cursor-pointer text-xs font-medium"
+                onClick={() => setIsOpen(true)}
               >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <Sparkles className="w-4 h-4 text-gold mr-2 shrink-0 animate-spin-slow" />
+                <span>Ask Sanjeevini AI</span>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setShowTooltip(false); }}
+                  className="ml-2 text-gray-400 hover:text-gray-600 p-0.5"
+                  aria-label="Dismiss tooltip"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </motion.div>
+            )}
 
-        {/* The Action Button */}
-        <motion.button
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white p-4 rounded-full shadow-2xl hover:shadow-primary/40 transition-all flex items-center justify-center border-2 border-gold/40 group"
-          aria-label="Open AI Assistant"
-          title="Chat with Sanjeevini AI"
-        >
-          {/* Subtle pulse aura */}
-          <span className="absolute -inset-1 rounded-full bg-primary-500/20 animate-ping opacity-75 pointer-events-none" />
-          
-          <Bot className="w-6 h-6 text-gold transition-transform group-hover:rotate-12" />
+            {/* The Action Button */}
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => setIsOpen(true)}
+              className="relative bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white p-4 rounded-full shadow-2xl hover:shadow-primary/40 transition-all flex items-center justify-center border-2 border-gold/40 group cursor-pointer"
+              aria-label="Open AI Assistant"
+              title="Chat with Sanjeevini AI"
+            >
+              {/* Subtle pulse aura */}
+              <span className="absolute -inset-1 rounded-full bg-primary-500/20 animate-ping opacity-75 pointer-events-none" />
+              
+              <Bot className="w-6 h-6 text-gold transition-transform group-hover:rotate-12" />
 
-          {/* Active online green dot */}
-          <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#38BDF8] border-2 border-white rounded-full shadow" />
-        </motion.button>
-      </div>
+              {/* Active online dot */}
+              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#38BDF8] border-2 border-white rounded-full shadow" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            initial={{ opacity: 0, y: 25, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-            className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[410px] h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body"
+            exit={{ opacity: 0, y: 25, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 290 }}
+            className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[420px] h-[590px] max-h-[calc(100vh-32px)] bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white p-4 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0">
+            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-4 py-3.5 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0">
               <div className="flex items-center space-x-3">
-                <div className="relative w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner">
+                <div className="relative w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner shrink-0">
                   <Bot className="w-5 h-5 text-gold" />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border border-dark rounded-full" />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border border-[#07192C] rounded-full" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-base text-white flex items-center gap-1.5">
-                    Sanjeevini AI
-                    <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/30">
+                  <h3 className="font-serif font-bold text-sm sm:text-base text-white flex items-center gap-1.5 leading-snug">
+                    <span>Sanjeevini AI</span>
+                    <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/30 shrink-0">
                       RAG Verified
                     </span>
                   </h3>
-                  <p className="text-[11px] text-gray-300 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse" />
+                  <p className="text-[11px] text-gray-300 flex items-center gap-1 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse shrink-0" />
                     Strictly grounded in clinic PDFs
                   </p>
                 </div>
               </div>
 
-              {/* Header Controls */}
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={handleResetChat}
-                  title="Clear conversation"
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  title="Minimize"
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <Minimize2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  title="Close"
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              {/* Header Right: Language Toggle & Window Controls */}
+              <div className="flex items-center space-x-2 shrink-0">
+                {/* Language Switcher Pill */}
+                <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-gold/30">
+                  <button
+                    type="button"
+                    onClick={() => handleLanguageChange('en')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                      currentLang === 'en'
+                        ? 'bg-gold text-[#07192C] shadow-xs'
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                    title="Switch to English"
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleLanguageChange('ta')}
+                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                      currentLang === 'ta'
+                        ? 'bg-gold text-[#07192C] shadow-xs'
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                    title="தமிழுக்கு மாற்றவும் (Switch to Tamil)"
+                  >
+                    தமிழ்
+                  </button>
+                </div>
+
+                {/* Window Action Controls */}
+                <div className="flex items-center space-x-0.5 border-l border-white/20 pl-1">
+                  <button
+                    onClick={handleResetChat}
+                    title={currentLang === 'ta' ? 'உரையாடலை மீட்டமை' : 'Clear conversation'}
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Restart chat"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    title={currentLang === 'ta' ? 'குறைக்கவும்' : 'Minimize'}
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Minimize chat"
+                  >
+                    <Minimize2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    title={currentLang === 'ta' ? 'மூடவும்' : 'Close'}
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Close chat"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Conversation Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-cream/30">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-cream/30">
               {messages.map((msg) => {
                 const isAssistant = msg.role === 'assistant';
                 const isSpeaking = speakingMessageId === msg.id;
@@ -387,12 +511,12 @@ export default function FloatingChatbot() {
                 return (
                   <motion.div
                     key={msg.id}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex flex-col ${isAssistant ? 'items-start' : 'items-end'}`}
                   >
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${
+                      className={`max-w-[88%] rounded-2xl px-4 py-3 shadow-sm ${
                         isAssistant
                           ? 'bg-white text-gray-800 border border-sage/60 rounded-tl-sm'
                           : 'bg-primary text-white rounded-tr-sm'
@@ -400,33 +524,35 @@ export default function FloatingChatbot() {
                     >
                       {/* Message Content */}
                       <div className="break-words">
-                        {renderFormattedText(msg.content)}
+                        {renderFormattedText(msg.content, isAssistant)}
                       </div>
 
-                      {/* Source attribution pill */}
+                      {/* Source attribution pills */}
                       {isAssistant && msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1 items-center text-[10px] text-gray-500">
+                        <div className="mt-2.5 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5 items-center text-[10px] text-gray-500">
                           <FileText className="w-3 h-3 text-gold shrink-0" />
-                          <span>Sources:</span>
+                          <span className="font-semibold text-gray-600">Sources:</span>
                           {msg.sources.map((s, idx) => (
                             <span 
                               key={idx} 
-                              className="px-1.5 py-0.5 rounded bg-sage/30 text-primary-800 font-medium"
+                              className="px-2 py-0.5 rounded-md bg-sage/30 text-primary-900 font-medium border border-sage/40"
                             >
-                              {s.document || 'Clinic Guide'}
+                              {s.document}{s.section && s.section !== 'Chunk #1' ? ` (${s.section})` : ''}
                             </span>
                           ))}
                         </div>
                       )}
 
                       {/* Footer Actions: Timestamp & Text-to-Speech */}
-                      <div className={`flex items-center justify-between mt-1 text-[10px] ${isAssistant ? 'text-gray-400' : 'text-gray-200'}`}>
+                      <div className={`flex items-center justify-between mt-2 pt-1 text-[10px] gap-2 ${
+                        isAssistant ? 'text-gray-400 border-t border-gray-50' : 'text-gray-200'
+                      }`}>
                         <span>{msg.timestamp}</span>
                         {isAssistant && (
                           <button
                             onClick={() => toggleSpeech(msg.id, msg.content)}
                             title={isSpeaking ? 'Stop reading' : 'Listen to answer'}
-                            className="ml-2 hover:text-primary transition-colors flex items-center gap-0.5"
+                            className="hover:text-primary transition-colors flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-gray-100/70"
                           >
                             {isSpeaking ? (
                               <>
@@ -434,7 +560,10 @@ export default function FloatingChatbot() {
                                 <span className="text-red-500 font-medium">Stop</span>
                               </>
                             ) : (
-                              <Volume2 className="w-3.5 h-3.5 text-gray-500 hover:text-primary" />
+                              <>
+                                <Volume2 className="w-3.5 h-3.5 text-gray-500 hover:text-primary" />
+                                <span className="text-gray-500 hover:text-primary font-medium">Listen</span>
+                              </>
                             )}
                           </button>
                         )}
@@ -447,13 +576,15 @@ export default function FloatingChatbot() {
               {/* Typing Indicator */}
               {loading && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center space-x-2 bg-white px-4 py-3 rounded-2xl border border-sage/60 max-w-[70%] shadow-sm"
+                  className="flex items-center space-x-2 bg-white px-4 py-3 rounded-2xl border border-sage/60 max-w-[78%] shadow-sm"
                 >
-                  <Bot className="w-4 h-4 text-primary animate-bounce" />
-                  <span className="text-xs text-gray-500">Searching clinic documents & reasoning...</span>
-                  <div className="flex space-x-1">
+                  <Bot className="w-4 h-4 text-primary animate-bounce shrink-0" />
+                  <span className="text-xs text-gray-500">
+                    {currentLang === 'ta' ? 'ஆவணங்களில் தேடி பதிலளிக்கிறோம்...' : 'Searching documents & reasoning...'}
+                  </span>
+                  <div className="flex space-x-1 shrink-0">
                     <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
                     <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse delay-150" />
                     <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse delay-300" />
@@ -466,12 +597,15 @@ export default function FloatingChatbot() {
 
             {/* Quick Prompt Suggestions */}
             {messages.length <= 3 && !loading && (
-              <div className="px-3 py-2 bg-white border-t border-gray-100 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-                {SUGGESTED_PROMPTS.map((prompt, idx) => (
+              <div className="px-3 py-2 bg-[#FAF8F5] border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider shrink-0 pl-1">
+                  {currentLang === 'ta' ? 'கேள்வி:' : 'Ask:'}
+                </span>
+                {(SUGGESTED_PROMPTS[currentLang] || SUGGESTED_PROMPTS.en).map((prompt, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(prompt)}
-                    className="whitespace-nowrap px-2.5 py-1 rounded-full text-xs bg-sage/40 hover:bg-sage text-primary font-medium border border-primary/20 transition-all shrink-0 hover:scale-[1.02] flex items-center"
+                    className="whitespace-nowrap px-2.5 py-1 rounded-full text-xs bg-white hover:bg-sage/40 text-primary font-medium border border-primary/20 transition-all shrink-0 hover:scale-[1.02] flex items-center shadow-xs"
                   >
                     <span>{prompt}</span>
                     <ChevronRight className="w-3 h-3 ml-1 text-gold" />
@@ -491,13 +625,15 @@ export default function FloatingChatbot() {
                 >
                   <div className="flex items-center space-x-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping" />
-                    <span className="font-medium">Listening to your voice... Speak clearly</span>
+                    <span className="font-medium">
+                      {currentLang === 'ta' ? 'உங்கள் குரலைக் கேட்கிறது... தெளிவாகப் பேசவும்' : 'Listening to your voice... Speak clearly'}
+                    </span>
                   </div>
                   <button
                     onClick={toggleListening}
                     className="text-[11px] underline font-semibold text-red-700 hover:text-red-900"
                   >
-                    Done Speaking
+                    {currentLang === 'ta' ? 'முடிந்தது' : 'Done Speaking'}
                   </button>
                 </motion.div>
               )}
@@ -516,12 +652,13 @@ export default function FloatingChatbot() {
                 <button
                   type="button"
                   onClick={toggleListening}
-                  title={isListening ? 'Stop recording voice' : 'Click to speak question'}
-                  className={`p-2.5 rounded-xl transition-all flex items-center justify-center shrink-0 ${
+                  title={isListening ? 'Stop recording voice' : (currentLang === 'ta' ? 'குரல் மூலம் கேட்க கிளிக் செய்யவும்' : 'Click to speak question')}
+                  className={`h-10 w-10 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer ${
                     isListening
                       ? 'bg-red-500 text-white animate-pulse shadow-md ring-2 ring-red-400'
-                      : 'bg-cream hover:bg-sage/40 text-primary border border-sage/80'
+                      : 'bg-[#FAF8F5] hover:bg-sage/40 text-primary border border-sage/80'
                   }`}
+                  aria-label="Voice input"
                 >
                   {isListening ? (
                     <MicOff className="w-4 h-4" />
@@ -536,17 +673,22 @@ export default function FloatingChatbot() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isListening ? 'Listening...' : 'Type or speak your question...'}
+                  placeholder={
+                    isListening
+                      ? (currentLang === 'ta' ? 'பேசுங்கள்... கேட்கிறது...' : 'Listening...')
+                      : (currentLang === 'ta' ? 'தமிழில் அல்லது ஆங்கிலத்தில் கேட்கவும்...' : 'Type or speak your question in English or தமிழ்...')
+                  }
                   disabled={loading}
-                  className="flex-1 px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm transition-all"
+                  className="flex-1 h-10 px-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm transition-all"
                 />
 
                 {/* Send Button */}
                 <button
                   type="submit"
                   disabled={!input.trim() || loading}
-                  title="Send message"
-                  className="p-2.5 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center"
+                  title={currentLang === 'ta' ? 'அனுப்பவும்' : 'Send message'}
+                  className="h-10 w-10 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center cursor-pointer"
+                  aria-label="Send message"
                 >
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -558,7 +700,10 @@ export default function FloatingChatbot() {
 
               {/* Strict RAG Medical Disclaimer */}
               <p className="text-[10px] text-gray-400 text-center mt-2">
-                Answers strictly derived from clinic documents. Emergency? Call <a href="tel:+919843066362" className="text-primary font-medium hover:underline">+91 98430 66362</a>
+                {currentLang === 'ta'
+                  ? 'மருத்துவமனை ஆவணங்களின்படி பதில்கள். அவசர உதவிக்கு: '
+                  : 'Answers strictly derived from clinic documents. Emergency? Call '}
+                <a href="tel:+919843066362" className="text-primary font-medium hover:underline">+91 98430 66362</a>
               </p>
             </div>
           </motion.div>

@@ -296,7 +296,7 @@ const SwarnaBinduAdmin = () => {
             Pushya Nakshatra Schedule Particulars
           </h2>
           <p className="text-sm text-slate-500">
-            Manage monthly Swarna Bindu Prashana camp dates, timings, venues, and status shown on the public tab
+            Manage monthly Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி) camp dates, timings, venues, and status shown on the public tab
           </p>
         </div>
 

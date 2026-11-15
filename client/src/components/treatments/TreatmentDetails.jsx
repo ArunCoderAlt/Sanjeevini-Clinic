@@ -56,12 +56,12 @@ const TreatmentDetails = ({ treatment }) => {
         )}
       </div>
 
-      <h1 className="text-3xl md:text-5xl font-serif text-[#0C2B4B] mb-6 leading-tight">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#0C2B4B] font-bold mb-4 sm:mb-5 leading-snug">
         {cleanName}
       </h1>
 
       {cleanDesc && (
-        <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+        <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8">
           {cleanDesc}
         </p>
       )}

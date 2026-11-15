@@ -5,7 +5,7 @@ const clinicSeedKnowledge = require('../data/clinicSeedKnowledge');
 
 const BUCKET_NAME = 'rag-documents';
 
-// Stop words to filter out during keyword scoring
+// Stop words to filter out during keyword scoring (English)
 const STOP_WORDS = new Set([
   'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t',
   'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by',
@@ -24,12 +24,83 @@ const STOP_WORDS = new Set([
   'would', 'wouldn\'t', 'you', 'you\'d', 'you\'ll', 'you\'re', 'you\'ve', 'your', 'yours', 'yourself', 'yourselves'
 ]);
 
+// Tamil stop words & conversational particles
+const TAMIL_STOP_WORDS = new Set([
+  'என்ன', 'எப்படி', 'எங்கு', 'எப்போது', 'எந்த', 'யாரு', 'யார்', 'ஒரு', 'மற்றும்',
+  'இந்த', 'அந்த', 'இருந்து', 'உள்ள', 'செய்ய', 'பற்றி', 'எனக்கு', 'உங்களுக்கு',
+  'வேண்டும்', 'முடியுமா', 'இருக்கு', 'இருக்கும்', 'ஆகுமா', 'கூறும்'
+]);
+
+// Cross-lingual bilingual dictionary for clinic & healthcare queries (Tamil <-> English)
+const BILINGUAL_CLINIC_TERMS = {
+  // Clinic, Doctor, Timings
+  'நேரம்': ['timing', 'timings', 'hours', 'consultation'],
+  'நேரங்கள்': ['timing', 'timings', 'hours', 'consultation'],
+  'மணி': ['pm', 'am', 'hours', 'time'],
+  'மருத்துவர்': ['doctor', 'doctors', 'physician', 'dr', 'thiagarajan', 'subashini'],
+  'மருத்துவர்கள்': ['doctor', 'doctors', 'physicians'],
+  'டாக்டர்': ['doctor', 'dr'],
+  'முகவரி': ['address', 'location', 'karaikal', 'ambedkar'],
+  'இடம்': ['location', 'address', 'karaikal'],
+  'எங்கு': ['location', 'address', 'where'],
+  'காரைக்கால்': ['karaikal'],
+  'போன்': ['phone', 'contact', 'call'],
+  'தொடர்பு': ['contact', 'phone', 'call', 'whatsapp'],
+  'வாட்ஸ்அப்': ['whatsapp'],
+  'முன்பதிவு': ['appointment', 'consultation', 'booking'],
+  'கட்டணம்': ['fee', 'fees', 'cost', 'price', 'charges'],
+  'விலை': ['cost', 'price', 'fee'],
+
+  // Therapies & Diagnostics
+  'வர்மம்': ['varmam', 'vital', 'pressure'],
+  'வர்ம': ['varmam', 'vital'],
+  'தொக்கணாம்': ['thokkanam', 'massage', 'manipulation'],
+  'நாடி': ['nadi', 'pulse', 'diagnosis'],
+  'பரிசோதனை': ['diagnosis', 'examination'],
+  'சுவர்ண': ['swarna', 'bindu', 'drops', 'gold'],
+  'பிந்து': ['bindu', 'prashana', 'drops'],
+  'டிராப்ஸ்': ['drops', 'swarna', 'bindu'],
+  'அமிர்த': ['amirtham', 'swarna', 'bindu', 'drops', 'pediatric'],
+  'கனக': ['kanaka', 'swarna', 'gold', 'bindu', 'drops'],
+  'புஷ்ய': ['pushya', 'nakshatra'],
+  'பஞ்சகர்மா': ['panchakarma'],
+  'பத்தியம்': ['diet', 'pathya', 'food'],
+
+  // Diseases & Conditions
+  'சிகிச்சை': ['treatment', 'treatments', 'therapy', 'therapies', 'care'],
+  'சிகிச்சைகள்': ['treatment', 'treatments', 'therapies'],
+  'மருந்து': ['medicine', 'medicines', 'herbal', 'kashayam', 'choornam', 'thailam'],
+  'மருந்துகள்': ['medicines', 'herbal', 'formulations'],
+  'வலி': ['pain', 'ache', 'arthritis', 'spondylosis', 'sciatica'],
+  'மூட்டு': ['joint', 'arthritis', 'knee'],
+  'முதுகு': ['back', 'lumbar', 'spine', 'disc'],
+  'தோல்': ['skin', 'psoriasis', 'eczema', 'dermatology'],
+  'சொரியாசிஸ்': ['psoriasis'],
+  'ஆஸ்துமா': ['asthma', 'respiratory', 'wheezing', 'sinusitis'],
+  'சளி': ['cold', 'sinus', 'cough', 'respiratory'],
+  'வயிறு': ['stomach', 'ulcer', 'gastric', 'gerd', 'acidity'],
+  'செரிமானம்': ['digestion', 'indigestion'],
+  'பெண்கள்': ['women', 'pcod', 'pcos', 'menstrual', 'hormonal'],
+  'குழந்தைகள்': ['pediatric', 'children', 'infant', 'immunity']
+};
+
 class BotKnowledgeService {
   constructor() {
     this.runtimeDocuments = [];
     this.runtimeChunks = [];
     this.isInitialized = false;
     this._tableNames = null;
+    this._seedExplicitlyDeleted = false;
+
+    // Bind methods to preserve `this` context
+    this.searchRelevantChunks = this.searchRelevantChunks.bind(this);
+    this.addDocument = this.addDocument.bind(this);
+    this.getDocuments = this.getDocuments.bind(this);
+    this.deleteDocument = this.deleteDocument.bind(this);
+    this.toggleDocument = this.toggleDocument.bind(this);
+    this.getStatus = this.getStatus.bind(this);
+    this.restoreSeedDocument = this.restoreSeedDocument.bind(this);
+
     this.indexSeedDocument();
     this.init();
   }
@@ -99,9 +170,10 @@ class BotKnowledgeService {
   async init() {
     try {
       await this.ensureBucketExists();
-      const loadedFromSupabase = await this.loadFromSupabase();
+      await this.loadFromSupabase();
 
-      if (!loadedFromSupabase && this.runtimeDocuments.length === 0) {
+      // ALWAYS ensure clinic has at least the seed document if no docs exist
+      if (this.runtimeDocuments.length === 0 && !this._seedExplicitlyDeleted) {
         this.indexSeedDocument();
       }
 
@@ -134,10 +206,23 @@ class BotKnowledgeService {
         return false;
       }
 
-      this.runtimeDocuments = docs;
+      // Preserve or index seed document
+      let seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
+      if (!seedDoc && !this._seedExplicitlyDeleted) {
+        this.indexSeedDocument();
+        seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
+      }
+      const seedChunks = this.runtimeChunks.filter(c => String(c.document_id).startsWith('seed-'));
 
-      // Load chunks for active documents
+      const mergedDocs = seedDoc && !docs.some(d => d.id === seedDoc.id)
+        ? [...docs, seedDoc]
+        : docs;
+
+      this.runtimeDocuments = mergedDocs;
+
+      // Load chunks for active database documents
       const activeIds = docs.filter(d => d.is_active).map(d => d.id);
+      let loadedChunks = [];
       if (activeIds.length > 0) {
         const { data: chunks, error: chunkErr } = await supabase
           .from(chunkTable)
@@ -145,10 +230,15 @@ class BotKnowledgeService {
           .in('document_id', activeIds);
 
         if (!chunkErr && Array.isArray(chunks)) {
-          this.runtimeChunks = chunks;
+          loadedChunks = chunks;
         }
+      }
+
+      // If seed doc is active, preserve seed chunks alongside loaded chunks
+      if (seedDoc && seedDoc.is_active) {
+        this.runtimeChunks = [...loadedChunks, ...seedChunks];
       } else {
-        this.runtimeChunks = [];
+        this.runtimeChunks = loadedChunks;
       }
 
       return true;
@@ -199,8 +289,9 @@ class BotKnowledgeService {
   }
 
   restoreSeedDocument() {
+    this._seedExplicitlyDeleted = false;
     this.indexSeedDocument();
-    return this.runtimeDocuments.find(d => d.id === 'seed-sanjeevini-guide-01');
+    return this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
   }
 
   /**
@@ -293,7 +384,11 @@ class BotKnowledgeService {
           if (!insertDocErr) {
             // Insert chunks in chunks of 50 to respect payload limits
             for (let i = 0; i < chunkRecords.length; i += 50) {
-              const batch = chunkRecords.slice(i, i + 50);
+              const rawBatch = chunkRecords.slice(i, i + 50);
+              // Handle fallback table if it lacks section_title column
+              const batch = chunkTable === 'bot_knowledge_chunks'
+                ? rawBatch.map(({ section_title, ...rest }) => rest)
+                : rawBatch;
               await supabase.from(chunkTable).insert(batch);
             }
             dbSaved = true;
@@ -333,12 +428,27 @@ class BotKnowledgeService {
           .order('created_at', { ascending: false });
 
         if (!error && Array.isArray(data)) {
-          this.runtimeDocuments = data;
-          return data;
+          // If seed doc was in runtime, preserve it; or if runtime is empty, ensure seed is present
+          let seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
+          if (!seedDoc && !this._seedExplicitlyDeleted) {
+            this.indexSeedDocument();
+            seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
+          }
+
+          const merged = seedDoc && !data.some(d => d.id === seedDoc.id)
+            ? [...data, seedDoc]
+            : data;
+
+          this.runtimeDocuments = merged;
+          return merged;
         }
       }
     } catch (err) {
       logger.warn(`Error reading documents from Supabase: ${err.message}`);
+    }
+
+    if (this.runtimeDocuments.length === 0 && !this._seedExplicitlyDeleted) {
+      this.indexSeedDocument();
     }
 
     return this.runtimeDocuments;
@@ -351,14 +461,21 @@ class BotKnowledgeService {
     if (!id) return { success: false, removed: null };
     const cleanId = decodeURIComponent(String(id).trim());
 
-    // 1. Locate the document to get storage_path
+    // 1. Locate the document to get storage_path and actual db ID
     let targetDoc = this.runtimeDocuments.find(d => 
       String(d.id).trim() === cleanId || 
       String(d.filename).trim() === cleanId ||
       String(d.original_name).trim() === cleanId
     );
 
-    // 2. Remove binary PDF file from Supabase Storage bucket
+    const actualDbId = targetDoc?.id || cleanId;
+    const isSeedDoc = String(actualDbId).startsWith('seed-');
+
+    if (isSeedDoc) {
+      this._seedExplicitlyDeleted = true;
+    }
+
+    // 2. Remove binary PDF file from Supabase Storage bucket (if not seed doc)
     try {
       const supabase = getSupabase();
       if (supabase && targetDoc && targetDoc.storage_path && !targetDoc.storage_path.startsWith('seed://')) {
@@ -369,18 +486,20 @@ class BotKnowledgeService {
       logger.warn(`Could not delete file from Supabase Storage: ${storageDelErr.message}`);
     }
 
-    // 3. Remove from Supabase Database tables
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const { docTable, chunkTable, isReady } = await this.getTableNames();
-        if (isReady) {
-          await supabase.from(chunkTable).delete().eq('document_id', cleanId);
-          await supabase.from(docTable).delete().eq('id', cleanId);
+    // 3. Remove from Supabase Database tables (if not seed doc)
+    if (!isSeedDoc) {
+      try {
+        const supabase = getSupabase();
+        if (supabase) {
+          const { docTable, chunkTable, isReady } = await this.getTableNames();
+          if (isReady) {
+            await supabase.from(chunkTable).delete().eq('document_id', actualDbId);
+            await supabase.from(docTable).delete().eq('id', actualDbId);
+          }
         }
+      } catch (dbDelErr) {
+        logger.warn(`Could not delete document from Supabase table: ${dbDelErr.message}`);
       }
-    } catch (dbDelErr) {
-      logger.warn(`Could not delete document from Supabase table: ${dbDelErr.message}`);
     }
 
     // 4. Update runtime cache
@@ -398,7 +517,7 @@ class BotKnowledgeService {
     }
 
     const removedIdentifiers = new Set(
-      [cleanId, removedDoc?.id, removedDoc?.filename, removedDoc?.original_name]
+      [cleanId, actualDbId, removedDoc?.id, removedDoc?.filename, removedDoc?.original_name]
         .filter(Boolean)
         .map(s => String(s).trim())
     );
@@ -419,75 +538,198 @@ class BotKnowledgeService {
    * Toggle document active state in Supabase
    */
   async toggleDocument(id, isActive) {
-    const doc = this.runtimeDocuments.find(d => d.id === id);
+    const cleanId = decodeURIComponent(String(id).trim());
+    const doc = this.runtimeDocuments.find(d => 
+      String(d.id).trim() === cleanId || 
+      String(d.filename).trim() === cleanId
+    );
     if (!doc) throw new Error('Document not found');
 
     const newStatus = typeof isActive === 'boolean' ? isActive : !doc.is_active;
     doc.is_active = newStatus;
     doc.updated_at = new Date().toISOString();
 
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const { docTable, isReady } = await this.getTableNames();
-        if (isReady) {
-          await supabase.from(docTable).update({ is_active: newStatus }).eq('id', id);
+    // Only update Supabase if not a built-in seed doc
+    if (!String(doc.id).startsWith('seed-')) {
+      try {
+        const supabase = getSupabase();
+        if (supabase) {
+          const { docTable, isReady } = await this.getTableNames();
+          if (isReady) {
+            await supabase.from(docTable).update({ is_active: newStatus }).eq('id', doc.id);
+          }
         }
+      } catch (err) {
+        logger.warn(`Could not update document state in Supabase: ${err.message}`);
       }
-    } catch (err) {
-      logger.warn(`Could not update document state in Supabase: ${err.message}`);
     }
 
     return doc;
   }
 
   /**
-   * Search for top relevant chunks matching user query
-   * Uses BM25-inspired term frequency + phrase matching
+   * Search for top relevant chunks matching user query in English or Tamil
+   * Uses BM25-inspired term frequency + phrase matching + cross-lingual expansion + stemming + bigrams
    */
-  searchRelevantChunks(query, limit = 5) {
+  searchRelevantChunks(query, limit = 8) {
     if (!query || typeof query !== 'string') return [];
 
-    const cleanQuery = query.toLowerCase().replace(/[^\w\s]/g, ' ');
-    const queryTerms = cleanQuery
+    const effectiveLimit = typeof limit === 'number' 
+      ? Math.max(1, limit) 
+      : (limit && typeof limit.topK === 'number' ? Math.max(1, limit.topK) : (parseInt(limit, 10) || 8));
+
+    // Support Unicode letters, marks (combining vowels/virama for Tamil), numbers and whitespace
+    const cleanQuery = query.toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, ' ').trim();
+    const rawTerms = cleanQuery
       .split(/\s+/)
-      .filter(t => t.length > 1 && !STOP_WORDS.has(t));
+      .filter(t => t.length > 1 && !STOP_WORDS.has(t) && !TAMIL_STOP_WORDS.has(t));
+
+    if (rawTerms.length === 0) {
+      // Pure stop-word query — return overview chunks from all active docs
+      const activeDocIds = new Set(
+        this.runtimeDocuments.filter(d => d.is_active).map(d => d.id)
+      );
+      return this.runtimeChunks
+        .filter(c => activeDocIds.has(c.document_id))
+        .slice(0, effectiveLimit)
+        .map(c => ({ ...c, score: 1 }));
+    }
+
+    // Cross-lingual bilingual expansion: if query has Tamil terms, also include English counterparts
+    // and if query has English terms, include Tamil counterparts
+    const expandedTermSet = new Set(rawTerms);
+    for (const term of rawTerms) {
+      if (BILINGUAL_CLINIC_TERMS[term]) {
+        for (const exp of BILINGUAL_CLINIC_TERMS[term]) {
+          expandedTermSet.add(exp);
+        }
+      }
+      // Also check reverse English -> Tamil
+      for (const [tam, engList] of Object.entries(BILINGUAL_CLINIC_TERMS)) {
+        if (engList.includes(term)) {
+          expandedTermSet.add(tam);
+        }
+      }
+    }
+    const queryTerms = [...expandedTermSet];
+
+    // Generate stemmed variants (simple suffix stripping for better recall on English words)
+    const stemTerm = (term) => {
+      if (term.length <= 3) return [term];
+      const variants = [term];
+      // Strip common English suffixes to find root
+      const suffixes = ['tion', 'sion', 'ment', 'ness', 'ous', 'ive', 'ful', 'less', 'able', 'ible', 'ing', 'ings', 'ated', 'ates', 'tion', 'ed', 'er', 'es', 'ly', 's'];
+      for (const suffix of suffixes) {
+        if (term.endsWith(suffix) && term.length - suffix.length >= 3) {
+          variants.push(term.slice(0, -suffix.length));
+        }
+      }
+      // Also add the term with a trailing 's' for singular→plural matching
+      if (!term.endsWith('s')) variants.push(term + 's');
+      return [...new Set(variants)];
+    };
+
+    const stemmedTermSets = queryTerms.map(t => stemTerm(t));
+
+    // Build bigrams from query for phrase proximity scoring
+    const queryBigrams = [];
+    for (let i = 0; i < rawTerms.length - 1; i++) {
+      queryBigrams.push(rawTerms[i] + ' ' + rawTerms[i + 1]);
+    }
 
     // Get active document IDs
     const activeDocIds = new Set(
       this.runtimeDocuments.filter(d => d.is_active).map(d => d.id)
     );
 
+    // Total active chunks count for IDF-like weighting
+    const activeChunks = this.runtimeChunks.filter(c => activeDocIds.has(c.document_id));
+    const totalChunks = activeChunks.length || 1;
+
+    // Pre-compute document frequency for each stem (how many chunks contain it)
+    const docFrequency = {};
+    for (const stemSet of stemmedTermSets) {
+      const key = stemSet[0]; // use original term as the key
+      if (docFrequency[key] !== undefined) continue;
+      let df = 0;
+      for (const chunk of activeChunks) {
+        const contentLower = chunk.content.toLowerCase();
+        if (stemSet.some(variant => contentLower.includes(variant))) {
+          df++;
+        }
+      }
+      docFrequency[key] = df || 1;
+    }
+
     const scoredChunks = [];
 
-    for (const chunk of this.runtimeChunks) {
-      if (!activeDocIds.has(chunk.document_id)) continue;
-
+    for (const chunk of activeChunks) {
       const contentLower = chunk.content.toLowerCase();
+      const contentLength = contentLower.length || 1;
       let score = 0;
+      let matchedTermCount = 0;
 
-      // Exact query match bonus
-      if (contentLower.includes(cleanQuery.trim())) {
-        score += 25;
+      // 1. Exact full-query substring match (strong signal)
+      if (cleanQuery.length > 3 && contentLower.includes(cleanQuery)) {
+        score += 30;
       }
 
-      // Individual term frequency with density
-      for (const term of queryTerms) {
-        const matches = (contentLower.match(new RegExp(`\\b${term}`, 'g')) || []).length;
-        if (matches > 0) {
-          score += matches * 4;
+      // 2. Per-term scoring with IDF weighting and stemmed matching
+      for (let ti = 0; ti < queryTerms.length; ti++) {
+        const originalTerm = queryTerms[ti];
+        const stemSet = stemmedTermSets[ti];
+        const idf = Math.log(1 + totalChunks / docFrequency[originalTerm]);
+
+        let termMatches = 0;
+        for (const variant of stemSet) {
+          // Use a broader match: substring rather than strict word boundary
+          const regex = new RegExp(variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+          const matches = contentLower.match(regex);
+          if (matches) {
+            termMatches += matches.length;
+          }
+        }
+
+        if (termMatches > 0) {
+          matchedTermCount++;
+          // TF-IDF-like scoring: tf * idf, with diminishing returns on high tf
+          const tf = Math.min(termMatches, 10); // cap tf
+          const density = tf / (contentLength / 100); // normalize by chunk length
+          score += (tf * idf * 3) + (density * 2);
         }
       }
 
-      // Check section title bonus if present
-      if (chunk.section_title && cleanQuery.includes(chunk.section_title.toLowerCase())) {
-        score += 15;
+      // 3. Bigram proximity bonus (adjacent query terms found together)
+      for (const bigram of queryBigrams) {
+        if (contentLower.includes(bigram)) {
+          score += 12;
+        }
+      }
+
+      // 4. Term coverage bonus: reward chunks that match more distinct query terms
+      if (queryTerms.length > 1 && matchedTermCount > 0) {
+        const coverageRatio = matchedTermCount / queryTerms.length;
+        score += coverageRatio * 15;
+      }
+
+      // 5. Section title relevance bonus
+      if (chunk.section_title) {
+        const sectionLower = chunk.section_title.toLowerCase();
+        for (const term of queryTerms) {
+          if (sectionLower.includes(term)) {
+            score += 8;
+          }
+        }
+        // Full query in section title is very strong
+        if (sectionLower.includes(cleanQuery)) {
+          score += 20;
+        }
       }
 
       if (score > 0) {
         scoredChunks.push({
           ...chunk,
-          score
+          score: Math.round(score * 100) / 100
         });
       }
     }
@@ -496,30 +738,67 @@ class BotKnowledgeService {
     scoredChunks.sort((a, b) => b.score - a.score);
 
     if (scoredChunks.length > 0) {
-      return scoredChunks.slice(0, limit);
+      // Ensure diversity: don't return only chunks from one document
+      const result = [];
+      const docChunkCount = {};
+      const maxPerDoc = Math.max(Math.ceil(effectiveLimit * 0.7), 3); // at most 70% from one doc
+
+      for (const chunk of scoredChunks) {
+        if (result.length >= effectiveLimit) break;
+        const docCount = docChunkCount[chunk.document_id] || 0;
+        if (docCount < maxPerDoc) {
+          result.push(chunk);
+          docChunkCount[chunk.document_id] = docCount + 1;
+        }
+      }
+
+      // If we didn't fill the limit due to diversity constraints, add remaining top chunks
+      if (result.length < effectiveLimit) {
+        for (const chunk of scoredChunks) {
+          if (result.length >= effectiveLimit) break;
+          if (!result.some(r => r.id === chunk.id)) {
+            result.push(chunk);
+          }
+        }
+      }
+
+      return result;
     }
 
-    // Fallback: return first 3 key overview chunks
-    return this.runtimeChunks
-      .filter(c => activeDocIds.has(c.document_id))
-      .slice(0, 3)
-      .map(c => ({ ...c, score: 1 }));
+    // Fallback: return overview chunks from ALL active docs (not just seed)
+    // Distribute evenly across documents
+    const fallbackChunks = [];
+    const docsArray = this.runtimeDocuments.filter(d => d.is_active);
+    const chunksPerDoc = Math.max(1, Math.ceil(effectiveLimit / (docsArray.length || 1)));
+
+    for (const doc of docsArray) {
+      const docChunks = this.runtimeChunks
+        .filter(c => c.document_id === doc.id)
+        .slice(0, chunksPerDoc);
+      fallbackChunks.push(...docChunks);
+    }
+
+    return fallbackChunks.slice(0, effectiveLimit).map(c => ({ ...c, score: 0.1 }));
   }
 
   /**
    * Get overall knowledge status
    */
   getStatus() {
+    // Only count chunks that belong to known documents
+    const validDocIds = new Set(this.runtimeDocuments.map(d => d.id));
+    const validChunks = this.runtimeChunks.filter(c => validDocIds.has(c.document_id));
+
     const activeDocs = this.runtimeDocuments.filter(d => d.is_active);
     const activeDocIds = new Set(activeDocs.map(d => d.id));
-    const activeChunks = this.runtimeChunks.filter(c => activeDocIds.has(c.document_id));
+    const activeChunks = validChunks.filter(c => activeDocIds.has(c.document_id));
 
     return {
       totalDocuments: this.runtimeDocuments.length,
       activeDocuments: activeDocs.length,
-      totalChunks: this.runtimeChunks.length,
+      totalChunks: validChunks.length,
       activeChunks: activeChunks.length,
-      hasSeedKnowledge: this.runtimeDocuments.some(d => d.id.startsWith('seed-')),
+      hasSeedKnowledge: this.runtimeDocuments.some(d => String(d.id).startsWith('seed-')),
       storage: {
         provider: 'supabase',
         bucket: BUCKET_NAME,

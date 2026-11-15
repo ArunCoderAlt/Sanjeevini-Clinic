@@ -21,8 +21,8 @@ exports.chat = async (req, res, next) => {
 
     const trimmedMessage = message.trim();
 
-    // 1. Retrieve top matching chunks from knowledge base
-    const relevantChunks = botKnowledgeService.searchRelevantChunks(trimmedMessage, 5);
+    // 1. Retrieve top matching chunks from knowledge base (increased limit for better context)
+    const relevantChunks = botKnowledgeService.searchRelevantChunks(trimmedMessage, 8);
 
     // 2. Call Groq with strict PDF grounding and conversation history
     const botResult = await generateBotReply({

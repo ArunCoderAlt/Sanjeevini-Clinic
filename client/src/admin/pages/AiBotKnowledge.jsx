@@ -91,9 +91,11 @@ CREATE TABLE IF NOT EXISTS public.rag_chunks (
 CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc_id ON public.rag_chunks(document_id);`;
 
 const AVAILABLE_GROQ_MODELS = [
-  { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B (Recommended - Ultra Fast, Highly Accurate & Active)' },
-  { id: 'openai/gpt-oss-120b', name: 'OpenAI GPT-OSS 120B (Flagship Advanced Reasoning)' },
-  { id: 'openai/gpt-oss-20b', name: 'OpenAI GPT-OSS 20B (High-Speed Reasoning)' }
+  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile (Recommended - High Accuracy & Clinical Reasoning)' },
+  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant (Ultra-Fast Response Speed)' },
+  { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B (32k Large Context Window)' },
+  { id: 'gemma2-9b-it', name: 'Google Gemma 2 9B IT' },
+  { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B' }
 ];
 
 export default function AiBotKnowledge() {
