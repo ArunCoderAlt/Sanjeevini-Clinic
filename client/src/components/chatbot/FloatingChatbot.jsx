@@ -10,6 +10,7 @@ import {
   VolumeX, 
   RotateCcw, 
   Minimize2, 
+  Maximize2,
   Sparkles, 
   FileText, 
   ChevronRight,
@@ -40,6 +41,7 @@ const WELCOME_MESSAGES = {
 
 export default function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [currentLang, setCurrentLang] = useState('en'); // 'en' | 'ta'
   const [messages, setMessages] = useState([
     {
@@ -419,25 +421,31 @@ export default function FloatingChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 25, scale: 0.95 }}
             transition={{ type: 'spring', damping: 26, stiffness: 290 }}
-            className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[420px] h-[590px] max-h-[calc(100vh-32px)] bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body"
+            className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 transition-all duration-300 bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body ${
+              isExpanded
+                ? 'w-[calc(100vw-32px)] sm:w-[600px] md:w-[640px] h-[720px] max-h-[calc(100vh-32px)]'
+                : 'w-[calc(100vw-32px)] sm:w-[460px] md:w-[480px] h-[620px] max-h-[calc(100vh-32px)]'
+            }`}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-4 py-3.5 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0">
-              <div className="flex items-center space-x-3">
+            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-4 py-3 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0 gap-3">
+              <div className="flex items-center space-x-3 min-w-0">
                 <div className="relative w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner shrink-0">
                   <Bot className="w-5 h-5 text-gold" />
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border border-[#07192C] rounded-full" />
                 </div>
-                <div>
-                  <h3 className="font-serif font-bold text-sm sm:text-base text-white flex items-center gap-1.5 leading-snug">
-                    <span>Sanjeevini AI</span>
-                    <span className="text-[10px] font-sans font-normal px-2 py-0.5 rounded-full bg-gold/20 text-gold border border-gold/30 shrink-0">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-serif font-bold text-base text-white tracking-wide whitespace-nowrap">
+                      Sanjeevini AI
+                    </h3>
+                    <span className="text-[10px] font-sans font-medium px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 shrink-0">
                       RAG Verified
                     </span>
-                  </h3>
-                  <p className="text-[11px] text-gray-300 flex items-center gap-1 mt-0.5">
+                  </div>
+                  <p className="text-[11px] text-gray-300 flex items-center gap-1.5 mt-0.5 truncate">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse shrink-0" />
-                    Strictly grounded in clinic PDFs
+                    <span>Strictly grounded in clinic PDFs</span>
                   </p>
                 </div>
               </div>
@@ -449,7 +457,7 @@ export default function FloatingChatbot() {
                   <button
                     type="button"
                     onClick={() => handleLanguageChange('en')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'en'
                         ? 'bg-gold text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
@@ -461,7 +469,7 @@ export default function FloatingChatbot() {
                   <button
                     type="button"
                     onClick={() => handleLanguageChange('ta')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'ta'
                         ? 'bg-gold text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
@@ -473,7 +481,7 @@ export default function FloatingChatbot() {
                 </div>
 
                 {/* Window Action Controls */}
-                <div className="flex items-center space-x-0.5 border-l border-white/20 pl-1">
+                <div className="flex items-center space-x-1 border-l border-white/20 pl-1.5">
                   <button
                     onClick={handleResetChat}
                     title={currentLang === 'ta' ? 'உரையாடலை மீட்டமை' : 'Clear conversation'}
@@ -483,12 +491,12 @@ export default function FloatingChatbot() {
                     <RotateCcw className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => setIsOpen(false)}
-                    title={currentLang === 'ta' ? 'குறைக்கவும்' : 'Minimize'}
-                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-                    aria-label="Minimize chat"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    title={isExpanded ? 'Restore window size' : 'Expand window size'}
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors hidden sm:block"
+                    aria-label={isExpanded ? 'Restore window size' : 'Expand window size'}
                   >
-                    <Minimize2 className="w-4 h-4" />
+                    {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
@@ -597,18 +605,18 @@ export default function FloatingChatbot() {
 
             {/* Quick Prompt Suggestions */}
             {messages.length <= 3 && !loading && (
-              <div className="px-3 py-2 bg-[#FAF8F5] border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider shrink-0 pl-1">
+              <div className="px-4 py-2.5 bg-[#FAF8F5] border-t border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider shrink-0 pl-0.5">
                   {currentLang === 'ta' ? 'கேள்வி:' : 'Ask:'}
                 </span>
                 {(SUGGESTED_PROMPTS[currentLang] || SUGGESTED_PROMPTS.en).map((prompt, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(prompt)}
-                    className="whitespace-nowrap px-2.5 py-1 rounded-full text-xs bg-white hover:bg-sage/40 text-primary font-medium border border-primary/20 transition-all shrink-0 hover:scale-[1.02] flex items-center shadow-xs"
+                    className="whitespace-nowrap px-3 py-1.5 rounded-full text-xs bg-white hover:bg-sage/40 text-primary font-medium border border-primary/20 transition-all shrink-0 hover:scale-[1.02] flex items-center shadow-xs cursor-pointer"
                   >
                     <span>{prompt}</span>
-                    <ChevronRight className="w-3 h-3 ml-1 text-gold" />
+                    <ChevronRight className="w-3.5 h-3.5 ml-1 text-gold" />
                   </button>
                 ))}
               </div>
@@ -621,7 +629,7 @@ export default function FloatingChatbot() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="bg-red-50 border-t border-red-200 px-4 py-2 flex items-center justify-between text-xs text-red-600 shrink-0"
+                  className="bg-red-50 border-t border-red-200 px-4 py-2.5 flex items-center justify-between text-xs text-red-600 shrink-0"
                 >
                   <div className="flex items-center space-x-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping" />
@@ -631,7 +639,7 @@ export default function FloatingChatbot() {
                   </div>
                   <button
                     onClick={toggleListening}
-                    className="text-[11px] underline font-semibold text-red-700 hover:text-red-900"
+                    className="text-[11px] underline font-semibold text-red-700 hover:text-red-900 cursor-pointer"
                   >
                     {currentLang === 'ta' ? 'முடிந்தது' : 'Done Speaking'}
                   </button>
@@ -640,20 +648,20 @@ export default function FloatingChatbot() {
             </AnimatePresence>
 
             {/* Input Form Bar */}
-            <div className="p-3 bg-white border-t border-gray-200 shrink-0">
+            <div className="p-3.5 bg-white border-t border-gray-200 shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSend();
                 }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2.5"
               >
                 {/* Voice Input Microphone Button */}
                 <button
                   type="button"
                   onClick={toggleListening}
                   title={isListening ? 'Stop recording voice' : (currentLang === 'ta' ? 'குரல் மூலம் கேட்க கிளிக் செய்யவும்' : 'Click to speak question')}
-                  className={`h-10 w-10 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer ${
+                  className={`h-11 w-11 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer ${
                     isListening
                       ? 'bg-red-500 text-white animate-pulse shadow-md ring-2 ring-red-400'
                       : 'bg-[#FAF8F5] hover:bg-sage/40 text-primary border border-sage/80'
@@ -661,9 +669,9 @@ export default function FloatingChatbot() {
                   aria-label="Voice input"
                 >
                   {isListening ? (
-                    <MicOff className="w-4 h-4" />
+                    <MicOff className="w-5 h-5" />
                   ) : (
-                    <Mic className="w-4 h-4 text-primary" />
+                    <Mic className="w-5 h-5 text-primary" />
                   )}
                 </button>
 
@@ -676,10 +684,10 @@ export default function FloatingChatbot() {
                   placeholder={
                     isListening
                       ? (currentLang === 'ta' ? 'பேசுங்கள்... கேட்கிறது...' : 'Listening...')
-                      : (currentLang === 'ta' ? 'தமிழில் அல்லது ஆங்கிலத்தில் கேட்கவும்...' : 'Type or speak your question in English or தமிழ்...')
+                      : (currentLang === 'ta' ? 'கேள்வியை தமிழில் அல்லது ஆங்கிலத்தில் கேட்கவும்...' : 'Ask your health question in English or தமிழ்...')
                   }
                   disabled={loading}
-                  className="flex-1 h-10 px-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm transition-all"
+                  className="flex-1 h-11 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm transition-all"
                 />
 
                 {/* Send Button */}
@@ -687,7 +695,7 @@ export default function FloatingChatbot() {
                   type="submit"
                   disabled={!input.trim() || loading}
                   title={currentLang === 'ta' ? 'அனுப்பவும்' : 'Send message'}
-                  className="h-10 w-10 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center cursor-pointer"
+                  className="h-11 w-11 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center cursor-pointer"
                   aria-label="Send message"
                 >
                   {loading ? (
@@ -699,11 +707,22 @@ export default function FloatingChatbot() {
               </form>
 
               {/* Strict RAG Medical Disclaimer */}
-              <p className="text-[10px] text-gray-400 text-center mt-2">
-                {currentLang === 'ta'
-                  ? 'மருத்துவமனை ஆவணங்களின்படி பதில்கள். அவசர உதவிக்கு: '
-                  : 'Answers strictly derived from clinic documents. Emergency? Call '}
-                <a href="tel:+919843066362" className="text-primary font-medium hover:underline">+91 98430 66362</a>
+              <p className="text-[11px] text-gray-500 text-center mt-2.5 leading-tight">
+                {currentLang === 'ta' ? (
+                  <>
+                    மருத்துவமனை ஆவணங்களின்படி பதில்கள் | அவசர உதவிக்கு:{' '}
+                    <a href="tel:+919843066362" className="text-primary font-bold hover:underline whitespace-nowrap">
+                      +91 98430 66362
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    Answers strictly derived from clinic documents | Emergency:{' '}
+                    <a href="tel:+919843066362" className="text-primary font-bold hover:underline whitespace-nowrap">
+                      +91 98430 66362
+                    </a>
+                  </>
+                )}
               </p>
             </div>
           </motion.div>
