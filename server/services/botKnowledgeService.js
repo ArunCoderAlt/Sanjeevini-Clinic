@@ -84,6 +84,101 @@ const BILINGUAL_CLINIC_TERMS = {
   'குழந்தைகள்': ['pediatric', 'children', 'infant', 'immunity']
 };
 
+/**
+ * Format document record for Supabase insertion depending on target table schema
+ */
+function prepareDocPayload(docTable, docData) {
+  if (docTable === 'rag_documents') {
+    return {
+      id: docData.id,
+      filename: docData.filename,
+      original_name: docData.original_name,
+      file_url: docData.file_url || '',
+      storage_path: docData.storage_path,
+      storage_bucket: docData.storage_bucket || BUCKET_NAME,
+      file_size: docData.file_size || 0,
+      page_count: docData.page_count || 1,
+      chunk_count: docData.chunk_count || 0,
+      is_active: docData.is_active !== undefined ? docData.is_active : true,
+      metadata: docData.metadata || {},
+      created_at: docData.created_at,
+      updated_at: docData.updated_at
+    };
+  }
+
+  // bot_documents fallback schema (requires file_path)
+  return {
+    id: docData.id,
+    filename: docData.filename,
+    original_name: docData.original_name,
+    file_path: docData.storage_path || docData.file_path || '',
+    file_url: docData.file_url || '',
+    storage_path: docData.storage_path || '',
+    storage_bucket: docData.storage_bucket || BUCKET_NAME,
+    file_size: docData.file_size || 0,
+    page_count: docData.page_count || 1,
+    chunk_count: docData.chunk_count || 0,
+    is_active: docData.is_active !== undefined ? docData.is_active : true,
+    created_at: docData.created_at,
+    updated_at: docData.updated_at
+  };
+}
+
+/**
+ * Format chunk records for Supabase insertion depending on target table schema
+ */
+function prepareChunkPayload(chunkTable, chunkData) {
+  if (chunkTable === 'rag_chunks') {
+    return {
+      id: chunkData.id,
+      document_id: chunkData.document_id,
+      chunk_index: chunkData.chunk_index,
+      content: chunkData.content,
+      page_number: chunkData.page_number || 1,
+      section_title: chunkData.section_title || '',
+      metadata: chunkData.metadata || {},
+      created_at: chunkData.created_at
+    };
+  }
+
+  // bot_knowledge_chunks fallback schema (no section_title column)
+  return {
+    id: chunkData.id,
+    document_id: chunkData.document_id,
+    chunk_index: chunkData.chunk_index,
+    content: chunkData.content,
+    page_number: chunkData.page_number || 1,
+    metadata: chunkData.metadata || {},
+    created_at: chunkData.created_at
+  };
+}
+
+/**
+ * Insert into Supabase table with automatic schema mismatch column stripping & retry
+ */
+async function insertWithSchemaRetry(supabase, table, payload) {
+  let items = Array.isArray(payload) ? payload.map(p => ({ ...p })) : [{ ...payload }];
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const { data, error } = await supabase.from(table).insert(items);
+    if (!error) return { data, error: null };
+
+    // PostgREST error: "Could not find the 'xyz' column of 'table' in the schema cache"
+    const colMatch = error.message && error.message.match(/Could not find the '([^']+)' column/);
+    if (colMatch && colMatch[1]) {
+      const badCol = colMatch[1];
+      logger.warn(`Removing unmapped column "${badCol}" from ${table} insert payload and retrying...`);
+      items = items.map(item => {
+        const copy = { ...item };
+        delete copy[badCol];
+        return copy;
+      });
+      continue;
+    }
+    return { data: null, error };
+  }
+  return { data: null, error: new Error(`Failed to insert into ${table} after schema retries`) };
+}
+
 class BotKnowledgeService {
   constructor() {
     this.runtimeDocuments = [];
@@ -171,6 +266,7 @@ class BotKnowledgeService {
     try {
       await this.ensureBucketExists();
       await this.loadFromSupabase();
+      await this.recoverStoragePdfs();
 
       // ALWAYS ensure clinic has at least the seed document if no docs exist
       if (this.runtimeDocuments.length === 0 && !this._seedExplicitlyDeleted) {
@@ -214,9 +310,15 @@ class BotKnowledgeService {
       }
       const seedChunks = this.runtimeChunks.filter(c => String(c.document_id).startsWith('seed-'));
 
-      const mergedDocs = seedDoc && !docs.some(d => d.id === seedDoc.id)
-        ? [...docs, seedDoc]
-        : docs;
+      // Preserve any in-memory runtime custom documents that are not yet in Supabase
+      const runtimeCustomDocs = this.runtimeDocuments.filter(
+        rd => !String(rd.id).startsWith('seed-') && !docs.some(d => d.id === rd.id)
+      );
+
+      const mergedDocs = [...docs, ...runtimeCustomDocs];
+      if (seedDoc && !mergedDocs.some(d => d.id === seedDoc.id)) {
+        mergedDocs.push(seedDoc);
+      }
 
       this.runtimeDocuments = mergedDocs;
 
@@ -230,21 +332,149 @@ class BotKnowledgeService {
           .in('document_id', activeIds);
 
         if (!chunkErr && Array.isArray(chunks)) {
-          loadedChunks = chunks;
+          const docMap = new Map(docs.map(d => [d.id, d]));
+          loadedChunks = chunks.map(c => ({
+            ...c,
+            document_name: c.document_name || c.metadata?.document_name || docMap.get(c.document_id)?.original_name || 'Clinic Document'
+          }));
         }
       }
 
+      // Preserve chunks for runtime custom documents
+      const runtimeCustomDocIds = new Set(runtimeCustomDocs.map(d => d.id));
+      const preservedRuntimeChunks = this.runtimeChunks.filter(c => runtimeCustomDocIds.has(c.document_id));
+
       // If seed doc is active, preserve seed chunks alongside loaded chunks
       if (seedDoc && seedDoc.is_active) {
-        this.runtimeChunks = [...loadedChunks, ...seedChunks];
+        this.runtimeChunks = [...loadedChunks, ...preservedRuntimeChunks, ...seedChunks];
       } else {
-        this.runtimeChunks = loadedChunks;
+        this.runtimeChunks = [...loadedChunks, ...preservedRuntimeChunks];
       }
 
       return true;
     } catch (err) {
       logger.warn(`Could not load RAG documents from Supabase: ${err.message}`);
       return false;
+    }
+  }
+
+  /**
+   * Scan Supabase Storage (rag-documents/pdfs) and auto-index any PDFs that
+   * were uploaded to cloud storage but didn't make it into database tables.
+   */
+  async recoverStoragePdfs() {
+    try {
+      const supabase = getSupabase();
+      if (!supabase) return;
+
+      const { docTable, chunkTable, isReady } = await this.getTableNames();
+      if (!isReady) return;
+
+      const { data: storageFiles, error: listErr } = await supabase.storage
+        .from(BUCKET_NAME)
+        .list('pdfs', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+      if (listErr || !Array.isArray(storageFiles) || storageFiles.length === 0) {
+        return;
+      }
+
+      // Check which storage files are already in runtimeDocuments
+      const existingPaths = new Set(
+        this.runtimeDocuments.map(d => (d.storage_path || '').replace(/^pdfs\//, ''))
+      );
+
+      for (const sFile of storageFiles) {
+        if (!sFile.name || !sFile.name.toLowerCase().endsWith('.pdf')) continue;
+        if (existingPaths.has(sFile.name)) continue;
+
+        const fullStoragePath = `pdfs/${sFile.name}`;
+        logger.info(`Found unindexed PDF in Supabase Storage: "${fullStoragePath}". Auto-recovering...`);
+
+        // Download binary PDF from Supabase Storage
+        const { data: blob, error: dlErr } = await supabase.storage
+          .from(BUCKET_NAME)
+          .download(fullStoragePath);
+
+        if (dlErr || !blob) {
+          logger.warn(`Could not download ${fullStoragePath} for recovery: ${dlErr?.message}`);
+          continue;
+        }
+
+        const arrayBuf = await blob.arrayBuffer();
+        const buffer = Buffer.from(arrayBuf);
+
+        // Parse text & chunks
+        const { parsePdf, chunkText } = require('../utils/pdfParser');
+        const parsed = await parsePdf(buffer);
+
+        if (!parsed.text || parsed.text.trim().length < 20) {
+          logger.warn(`Storage PDF ${sFile.name} has no extractable text. Skipping.`);
+          continue;
+        }
+
+        const chunks = chunkText(parsed.text, 750, 150);
+        if (chunks.length === 0) continue;
+
+        const rawOriginalName = sFile.name.replace(/^\d+_/, '').replace(/_/g, ' ');
+
+        const { data: urlData } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(fullStoragePath);
+        const fileUrl = urlData?.publicUrl || '';
+
+        const docId = randomUUID();
+        const now = new Date().toISOString();
+
+        const docRecord = {
+          id: docId,
+          filename: sFile.name,
+          original_name: rawOriginalName,
+          file_url: fileUrl,
+          storage_path: fullStoragePath,
+          storage_bucket: BUCKET_NAME,
+          file_size: sFile.metadata?.size || buffer.length || 0,
+          page_count: parsed.numPages || 1,
+          chunk_count: chunks.length,
+          is_active: true,
+          metadata: { storageSaved: true, uploadedAt: now, autoRecovered: true },
+          created_at: now,
+          updated_at: now
+        };
+
+        const chunkRecords = chunks.map((c, i) => ({
+          id: randomUUID(),
+          document_id: docId,
+          document_name: rawOriginalName,
+          chunk_index: c.chunkIndex || i + 1,
+          content: c.content,
+          page_number: c.pageNumber || 1,
+          section_title: c.sectionTitle || '',
+          metadata: {
+            document_name: rawOriginalName,
+            file_url: fileUrl,
+            page_number: c.pageNumber || 1
+          },
+          created_at: now
+        }));
+
+        // Insert into Supabase table with schema retry
+        const docPayload = prepareDocPayload(docTable, docRecord);
+        const { error: insErr } = await insertWithSchemaRetry(supabase, docTable, docPayload);
+
+        if (!insErr) {
+          for (let i = 0; i < chunkRecords.length; i += 50) {
+            const batch = chunkRecords.slice(i, i + 50).map(c => prepareChunkPayload(chunkTable, c));
+            await insertWithSchemaRetry(supabase, chunkTable, batch);
+          }
+          logger.info(`Successfully auto-recovered and indexed "${rawOriginalName}" with ${chunks.length} chunks into "${docTable}"!`);
+        }
+
+        this.runtimeDocuments.unshift(docRecord);
+        this.runtimeChunks.push(...chunkRecords);
+        existingPaths.add(sFile.name);
+      }
+    } catch (err) {
+      logger.warn(`Storage PDF recovery check failed: ${err.message}`);
     }
   }
 
@@ -344,7 +574,6 @@ class BotKnowledgeService {
       file_url: fileUrl,
       storage_path: storagePath,
       storage_bucket: BUCKET_NAME,
-      file_path: storagePath, // for backward compatibility
       file_size: fileSize || 0,
       page_count: pageCount || 1,
       chunk_count: chunks.length,
@@ -373,23 +602,21 @@ class BotKnowledgeService {
       created_at: now
     }));
 
-    // 2. Persist in Supabase separate table
+    // 2. Persist in Supabase separate table with schema-aware payload & retry
     let dbSaved = false;
     try {
       const supabase = getSupabase();
       if (supabase) {
         const { docTable, chunkTable, isReady } = await this.getTableNames();
         if (isReady) {
-          const { error: insertDocErr } = await supabase.from(docTable).insert([docRecord]);
+          const docPayload = prepareDocPayload(docTable, docRecord);
+          const { error: insertDocErr } = await insertWithSchemaRetry(supabase, docTable, docPayload);
           if (!insertDocErr) {
-            // Insert chunks in chunks of 50 to respect payload limits
+            // Insert chunks in batches of 50 to respect payload limits
             for (let i = 0; i < chunkRecords.length; i += 50) {
               const rawBatch = chunkRecords.slice(i, i + 50);
-              // Handle fallback table if it lacks section_title column
-              const batch = chunkTable === 'bot_knowledge_chunks'
-                ? rawBatch.map(({ section_title, ...rest }) => rest)
-                : rawBatch;
-              await supabase.from(chunkTable).insert(batch);
+              const batch = rawBatch.map(c => prepareChunkPayload(chunkTable, c));
+              await insertWithSchemaRetry(supabase, chunkTable, batch);
             }
             dbSaved = true;
             logger.info(`Persisted document & chunks to Supabase table "${docTable}"`);
@@ -402,7 +629,8 @@ class BotKnowledgeService {
       logger.warn(`Could not insert into Supabase table: ${dbErr.message}`);
     }
 
-    // Update in-memory runtime cache
+    // Always update in-memory runtime cache
+    this.runtimeDocuments = this.runtimeDocuments.filter(d => d.id !== docRecord.id);
     this.runtimeDocuments.unshift(docRecord);
     this.runtimeChunks.push(...chunkRecords);
 
@@ -415,7 +643,7 @@ class BotKnowledgeService {
   }
 
   /**
-   * Get all knowledge documents (Supabase is the primary source)
+   * Get all knowledge documents (Supabase is the primary source, preserved with runtime cache)
    */
   async getDocuments() {
     try {
@@ -435,9 +663,15 @@ class BotKnowledgeService {
             seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
           }
 
-          const merged = seedDoc && !data.some(d => d.id === seedDoc.id)
-            ? [...data, seedDoc]
-            : data;
+          // Preserve any in-memory custom documents that haven't synced yet
+          const runtimeCustomDocs = this.runtimeDocuments.filter(
+            rd => !String(rd.id).startsWith('seed-') && !data.some(d => d.id === rd.id)
+          );
+
+          const merged = [...data, ...runtimeCustomDocs];
+          if (seedDoc && !merged.some(d => d.id === seedDoc.id)) {
+            merged.push(seedDoc);
+          }
 
           this.runtimeDocuments = merged;
           return merged;

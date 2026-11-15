@@ -421,43 +421,44 @@ export default function FloatingChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 25, scale: 0.95 }}
             transition={{ type: 'spring', damping: 26, stiffness: 290 }}
-            className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 transition-all duration-300 bg-white rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body ${
+            className={`fixed bottom-2 sm:bottom-6 right-2 sm:right-6 left-2 sm:left-auto z-50 transition-all duration-300 bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-sage/80 flex flex-col overflow-hidden font-body ${
               isExpanded
-                ? 'w-[calc(100vw-32px)] sm:w-[600px] md:w-[640px] h-[720px] max-h-[calc(100vh-32px)]'
-                : 'w-[calc(100vw-32px)] sm:w-[460px] md:w-[480px] h-[620px] max-h-[calc(100vh-32px)]'
+                ? 'w-auto sm:w-[600px] md:w-[640px] h-[calc(100dvh-16px)] sm:h-[720px] max-h-[calc(100vh-16px)] sm:max-h-[calc(100vh-32px)]'
+                : 'w-auto sm:w-[460px] md:w-[480px] h-[min(620px,calc(100dvh-16px))] sm:h-[620px]'
             }`}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-4 py-3 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0 gap-3">
-              <div className="flex items-center space-x-3 min-w-0">
-                <div className="relative w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner shrink-0">
-                  <Bot className="w-5 h-5 text-gold" />
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border border-[#07192C] rounded-full" />
+            <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0 gap-3 sm:gap-4">
+              {/* Header Left: Avatar & Identity */}
+              <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 overflow-hidden">
+                <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner shrink-0">
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border-2 border-[#07192C] rounded-full" />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif font-bold text-base text-white tracking-wide whitespace-nowrap">
-                      Sanjeevini AI
-                    </h3>
-                    <span className="text-[10px] font-sans font-medium px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 shrink-0">
+                  <h3 className="font-serif font-bold text-sm sm:text-base text-white tracking-wide truncate">
+                    Sanjeevini AI
+                  </h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-sans font-medium px-1.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse" />
                       RAG Verified
                     </span>
+                    <span className="text-[10px] sm:text-[11px] text-gray-300 truncate hidden xs:inline sm:inline">
+                      • Clinic PDFs
+                    </span>
                   </div>
-                  <p className="text-[11px] text-gray-300 flex items-center gap-1.5 mt-0.5 truncate">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse shrink-0" />
-                    <span>Strictly grounded in clinic PDFs</span>
-                  </p>
                 </div>
               </div>
 
               {/* Header Right: Language Toggle & Window Controls */}
-              <div className="flex items-center space-x-2 shrink-0">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
                 {/* Language Switcher Pill */}
-                <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-gold/30">
+                <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-gold/30 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleLanguageChange('en')}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'en'
                         ? 'bg-gold text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
@@ -469,7 +470,7 @@ export default function FloatingChatbot() {
                   <button
                     type="button"
                     onClick={() => handleLanguageChange('ta')}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'ta'
                         ? 'bg-gold text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
@@ -481,14 +482,14 @@ export default function FloatingChatbot() {
                 </div>
 
                 {/* Window Action Controls */}
-                <div className="flex items-center space-x-1 border-l border-white/20 pl-1.5">
+                <div className="flex items-center space-x-0.5 sm:space-x-1 border-l border-white/20 pl-1 sm:pl-1.5 shrink-0">
                   <button
                     onClick={handleResetChat}
                     title={currentLang === 'ta' ? 'உரையாடலை மீட்டமை' : 'Clear conversation'}
-                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    className="p-1 sm:p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                     aria-label="Restart chat"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
@@ -501,10 +502,10 @@ export default function FloatingChatbot() {
                   <button
                     onClick={() => setIsOpen(false)}
                     title={currentLang === 'ta' ? 'மூடவும்' : 'Close'}
-                    className="p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    className="p-1 sm:p-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                     aria-label="Close chat"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
@@ -648,20 +649,20 @@ export default function FloatingChatbot() {
             </AnimatePresence>
 
             {/* Input Form Bar */}
-            <div className="p-3.5 bg-white border-t border-gray-200 shrink-0">
+            <div className="p-2.5 sm:p-3.5 bg-white border-t border-gray-200 shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSend();
                 }}
-                className="flex items-center gap-2.5"
+                className="flex items-center gap-2 sm:gap-2.5"
               >
                 {/* Voice Input Microphone Button */}
                 <button
                   type="button"
                   onClick={toggleListening}
                   title={isListening ? 'Stop recording voice' : (currentLang === 'ta' ? 'குரல் மூலம் கேட்க கிளிக் செய்யவும்' : 'Click to speak question')}
-                  className={`h-11 w-11 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer ${
+                  className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer ${
                     isListening
                       ? 'bg-red-500 text-white animate-pulse shadow-md ring-2 ring-red-400'
                       : 'bg-[#FAF8F5] hover:bg-sage/40 text-primary border border-sage/80'
@@ -669,9 +670,9 @@ export default function FloatingChatbot() {
                   aria-label="Voice input"
                 >
                   {isListening ? (
-                    <MicOff className="w-5 h-5" />
+                    <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
                   ) : (
-                    <Mic className="w-5 h-5 text-primary" />
+                    <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   )}
                 </button>
 
@@ -684,10 +685,10 @@ export default function FloatingChatbot() {
                   placeholder={
                     isListening
                       ? (currentLang === 'ta' ? 'பேசுங்கள்... கேட்கிறது...' : 'Listening...')
-                      : (currentLang === 'ta' ? 'கேள்வியை தமிழில் அல்லது ஆங்கிலத்தில் கேட்கவும்...' : 'Ask your health question in English or தமிழ்...')
+                      : (currentLang === 'ta' ? 'கேள்வியை தமிழில் அல்லது ஆங்கிலத்தில் கேட்கவும்...' : 'Ask question in English or தமிழ்...')
                   }
                   disabled={loading}
-                  className="flex-1 h-11 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm transition-all"
+                  className="flex-1 min-w-0 h-10 sm:h-11 px-3 sm:px-4 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-xs sm:text-sm transition-all"
                 />
 
                 {/* Send Button */}
@@ -695,7 +696,7 @@ export default function FloatingChatbot() {
                   type="submit"
                   disabled={!input.trim() || loading}
                   title={currentLang === 'ta' ? 'அனுப்பவும்' : 'Send message'}
-                  className="h-11 w-11 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center cursor-pointer"
+                  className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shrink-0 flex items-center justify-center cursor-pointer"
                   aria-label="Send message"
                 >
                   {loading ? (
@@ -707,7 +708,7 @@ export default function FloatingChatbot() {
               </form>
 
               {/* Strict RAG Medical Disclaimer */}
-              <p className="text-[11px] text-gray-500 text-center mt-2.5 leading-tight">
+              <p className="text-[10px] sm:text-[11px] text-gray-500 text-center mt-2 sm:mt-2.5 leading-tight px-1">
                 {currentLang === 'ta' ? (
                   <>
                     மருத்துவமனை ஆவணங்களின்படி பதில்கள் | அவசர உதவிக்கு:{' '}

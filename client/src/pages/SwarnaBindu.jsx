@@ -74,7 +74,7 @@ const SwarnaBindu = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight mb-3"
+            className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight mb-2 sm:mb-3"
           >
             Swarna Bindu <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">Drops</span>
           </motion.h1>
@@ -84,7 +84,7 @@ const SwarnaBindu = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-lg sm:text-xl md:text-2xl font-bold tracking-wide mb-6 shadow-sm"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-sm sm:text-lg md:text-2xl font-bold tracking-wide mb-5 sm:mb-6 shadow-sm"
           >
             <span>அமிர்த கனக சஞ்சீவி</span>
           </motion.div>
@@ -217,12 +217,12 @@ const SwarnaBindu = () => {
                 <table className="w-full text-left text-sm whitespace-nowrap">
                   <thead className="bg-[#0B233D] text-white">
                     <tr>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Month</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Camp Date</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Day</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Star / Nakshatra</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Timings</th>
-                      <th className="py-4 px-6 font-semibold text-xs uppercase tracking-wider">Status</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Month</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Camp Date</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Day</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Star / Nakshatra</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Timings</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
@@ -243,23 +243,23 @@ const SwarnaBindu = () => {
                           }`}
                         >
                           {/* Month */}
-                          <td className="py-4 px-6 font-bold text-[#144979] flex items-center gap-2">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-bold text-[#144979] flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#144979]/30" />
                             <span>{row.month}</span>
                           </td>
 
                           {/* Camp Date */}
-                          <td className="py-4 px-6 font-semibold text-slate-900">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-slate-900">
                             {row.date}
                           </td>
 
                           {/* Day */}
-                          <td className="py-4 px-6 text-slate-600">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-slate-600">
                             {row.day}
                           </td>
 
                           {/* Nakshatra */}
-                          <td className="py-4 px-6">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-200/60">
                               <Sparkles className="w-3 h-3 text-amber-600" />
                               {row.nakshatra}
@@ -267,7 +267,7 @@ const SwarnaBindu = () => {
                           </td>
 
                           {/* Timings */}
-                          <td className="py-4 px-6 font-medium text-slate-700">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-medium text-slate-700">
                             <span className="flex items-center gap-1 text-xs">
                               <Clock className="w-3.5 h-3.5 text-slate-400" />
                               {row.timings}
@@ -275,7 +275,7 @@ const SwarnaBindu = () => {
                           </td>
 
                           {/* Status & Particulars */}
-                          <td className="py-4 px-6">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6">
                             <div className="flex flex-col gap-1 items-start">
                               {isNext ? (
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-950 shadow-xs animate-pulse">
