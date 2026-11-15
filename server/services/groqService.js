@@ -181,8 +181,91 @@ ${contextBlock}
 }
 
 /**
- * Fallback answer when Groq key is not configured or network error occurs
- * Supports both Tamil and English queries seamlessly
+ * Helper: Extract direct Q&A answer from chunks if chunks contain structured Q&A pairs
+ */
+function extractDirectAnswer(query, relevantChunks, isTamil) {
+  if (!query || !relevantChunks || relevantChunks.length === 0) return null;
+
+  const cleanQ = query.toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, ' ').trim();
+  const qWords = cleanQ.split(/\s+/).filter(w => w.length >= 3);
+
+  // Regex matches formats like "Q1. Question? Answer: ...", "Q2... Ans: ...", "கேள்வி 1... பதில்: ..."
+  const qaPattern = /(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])\s*[\.\:\)]?\s*(.*?)\s*(?:Answer|Ans|பதில்)[\:\-]\s*([\s\S]*?)(?=(?:(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])[\.\:\)]|$))/gi;
+
+  const qaPairs = [];
+
+  for (const chunk of relevantChunks) {
+    const text = chunk.content;
+    let match;
+    while ((match = qaPattern.exec(text)) !== null) {
+      const qText = match[1].replace(/--\s*\d+\s*of\s*\d+\s*--/gi, '').trim();
+      let aText = match[2].replace(/--\s*\d+\s*of\s*\d+\s*--/gi, '').trim();
+
+      // Clean trailing page markers or question numbers
+      aText = aText.replace(/--\s*\d+\s*of\s*\d+\s*--/gi, '').trim();
+
+      if (qText.length >= 3 && aText.length >= 5) {
+        qaPairs.push({
+          question: qText,
+          answer: aText,
+          chunk
+        });
+      }
+    }
+  }
+
+  if (qaPairs.length === 0) return null;
+
+  let bestMatch = null;
+  let highestScore = 0;
+
+  for (const pair of qaPairs) {
+    const pairQLower = pair.question.toLowerCase();
+    const pairALower = pair.answer.toLowerCase();
+    let score = 0;
+
+    // Full query substring match in question
+    if (pairQLower.includes(cleanQ) || (cleanQ.length > 8 && pairQLower.length > 8 && cleanQ.includes(pairQLower))) {
+      score += 60;
+    }
+
+    // Word matching
+    let matchedWords = 0;
+    for (const w of qWords) {
+      if (pairQLower.includes(w)) {
+        score += 20;
+        matchedWords++;
+      } else if (pairALower.includes(w)) {
+        score += 5;
+      }
+    }
+
+    // Boost if a significant portion of query words matched
+    if (qWords.length > 0 && matchedWords / qWords.length >= 0.5) {
+      score += 25;
+    }
+
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = pair;
+    }
+  }
+
+  if (bestMatch && highestScore >= 20) {
+    return {
+      question: bestMatch.question,
+      answer: bestMatch.answer,
+      chunk: bestMatch.chunk
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Intelligent answer synthesis when Groq key is not configured, expired, or API fails.
+ * Accurately extracts direct answers from uploaded Q&A PDFs and clinic documents.
+ * Seamlessly supports Tamil and English queries.
  */
 function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   // Check if query is in Tamil script or Tamil keywords
@@ -192,33 +275,18 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   if (!relevantChunks || relevantChunks.length === 0) {
     if (isTamil) {
       return {
-        reply: `வணக்கம்! 🙏 சஞ்சீவினி சித்த & ஆயுர்வேத மருத்துவ மையத்திற்கு தங்களை அன்புடன் வரவேற்கிறோம்.\n\nஎங்கள் மருத்துவமனை திங்கள் முதல் சனி வரை மாலை 5:00 மணி முதல் இரவு 9:30 மணி வரை செயல்படுகிறது (முகவரி: எண் 22, டாக்டர் அம்பேத்கர் வீதி, காரைக்கால் - 609602).\n\nசிகிச்சைகள் மற்றும் முன்பதிவுக்கு எங்களை +91 98430 66362 என்ற எண்ணில் நேரடியாக அழைக்கலாம் அல்லது வாட்ஸ்அப்பில் தொடர்பு கொள்ளலாம்.`,
+        reply: `வணக்கம்! 🙏 சஞ்சீவினி சித்த & ஆயுர்வேத மருத்துவ மையத்திற்கு தங்களை அன்புடன் வரவேற்கிறோம்.\n\nஎங்கள் மருத்துவமனை திங்கள் முதல் சனி வரை மாலை 5:00 மணி முதல் இரவு 9:30 மணி வரை செயல்படுகிறது. முகவரி: எண் 22, டாக்டர் அம்பேத்கர் வீதி, காரைக்கால் - 609602.\n\nசிகிச்சைகள் மற்றும் முன்பதிவுக்கு எங்களை **+91 98430 66362** என்ற எண்ணில் நேரடியாக அழைக்கலாம் அல்லது வாட்ஸ்அப்பில் தொடர்பு கொள்ளலாம்.`,
         modelUsed: 'local-knowledge-fallback',
         sources: []
       };
     }
 
     return {
-      reply: `Namaste! Welcome to Sanjeevini Siddha & Ayurveda Medical Centre.\n\nOur clinic is open Monday to Saturday from 5:00 PM to 9:30 PM at No. 22, Dr. Ambedkar Street, Karaikal.\n\nFor any specific questions or treatments, please call us at +91 98430 66362 or message us on WhatsApp.`,
+      reply: `Namaste! 🙏 Welcome to **Sanjeevini Siddha & Ayurveda Medical Centre**.\n\nOur clinic is open **Monday to Saturday, 5:00 PM – 9:30 PM** (Sunday closed).\n📍 No. 22, Dr. Ambedkar Street, Karaikal – 609602.\n\nFor specific questions or to book a consultation, please call **+91 98430 66362** or message us on WhatsApp.`,
       modelUsed: 'local-knowledge-fallback',
       sources: []
     };
   }
-
-  // Use up to 3 top chunks to construct a comprehensive response
-  const topChunks = relevantChunks.slice(0, 3);
-  const combinedContent = topChunks
-    .map(c => c.content.replace(/^\[.*?\]\n/, '').trim())
-    .join('\n\n');
-
-  // Truncate if too long (keep under 2000 chars for readability)
-  const displayContent = combinedContent.length > 2000 
-    ? combinedContent.slice(0, 2000) + '...' 
-    : combinedContent;
-
-  const adminNotice = apiError 
-    ? `\n\n*(Note: Groq LLM connection notice: ${apiError})*`
-    : `\n\n*(Admin Tip: Add your GROQ_API_KEY in server/.env for enhanced conversational intelligence)*`;
 
   // Deduplicate sources
   const seenSources = new Set();
@@ -234,17 +302,46 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
     }
   }
 
-  if (isTamil) {
+  const greeting = isTamil ? 'வணக்கம்! 🙏' : 'Namaste! 🙏';
+  const intro = isTamil
+    ? 'எங்கள் மருத்துவமனை ஆவணங்களின்படி:'
+    : 'Based on our clinic documents:';
+  const contactLine = isTamil
+    ? 'முன்பதிவு மற்றும் கூடுதல் விவரங்களுக்கு எங்களை **+91 98430 66362** என்ற எண்ணில் அழைக்கலாம் அல்லது WhatsApp-ல் (**9486838368**) தொடர்பு கொள்ளலாம்.'
+    : 'For appointments or further questions, please call us at **+91 98430 66362** or WhatsApp us at **9486838368**.';
+
+  // 1. Try to extract direct structured Q&A answer if user asked a question matching the Q&A bank
+  const directQA = extractDirectAnswer(query, relevantChunks, isTamil);
+  if (directQA) {
+    const specificSource = [{
+      document: directQA.chunk.document_name || 'Clinic Q&A Document',
+      section: directQA.question.slice(0, 60)
+    }];
+
     return {
-      reply: `வணக்கம்! எங்கள் மருத்துவமனை ஆவணங்களின்படி:\n\n${displayContent}\n\nமேலும் விவரங்களுக்கு மருத்துவர்களை +91 98430 66362 என்ற எண்ணில் நேரடியாக அழைக்கலாம் அல்லது திங்கள் - சனி (மாலை 5:00 – இரவு 9:30) நேரில் சந்திக்கலாம்.${adminNotice}`,
-      modelUsed: 'local-knowledge-fallback',
-      sourceCount: relevantChunks.length,
-      sources: uniqueSources
+      reply: `${greeting} ${intro}\n\n${directQA.answer}\n\n${contactLine}`,
+      modelUsed: 'local-knowledge-qa-matched',
+      sourceCount: 1,
+      sources: specificSource
     };
   }
 
+  // 2. Fallback to clean excerpt synthesis from top matching chunks
+  const topChunks = relevantChunks.slice(0, 3);
+  const cleanedSnippets = topChunks.map(c => {
+    let text = c.content
+      .replace(/^\[Section:\s*[^\]]*\]\s*/i, '')
+      .replace(/^\[Source[^\]]*\]\s*/i, '')
+      .replace(/--\s*\d+\s*of\s*\d+\s*--/gi, '')
+      .trim();
+    if (text.length > 500) text = text.slice(0, 500).replace(/\s+\S*$/, '') + '…';
+    return text;
+  });
+
+  const displayContent = cleanedSnippets.join('\n\n');
+
   return {
-    reply: `Namaste! Based on our clinic's documentation:\n\n${displayContent}\n\nFor more details or to consult our doctors, you can call us directly at +91 98430 66362 or visit us Monday to Saturday (5:00 PM – 9:30 PM).${adminNotice}`,
+    reply: `${greeting} ${intro}\n\n${displayContent}\n\n${contactLine}`,
     modelUsed: 'local-knowledge-fallback',
     sourceCount: relevantChunks.length,
     sources: uniqueSources

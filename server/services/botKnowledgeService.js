@@ -24,25 +24,29 @@ const STOP_WORDS = new Set([
   'would', 'wouldn\'t', 'you', 'you\'d', 'you\'ll', 'you\'re', 'you\'ve', 'your', 'yours', 'yourself', 'yourselves'
 ]);
 
-// Tamil stop words & conversational particles
+// Tamil grammatical particles (excluding informative question words like எங்கு, நேரம், முகவரி)
 const TAMIL_STOP_WORDS = new Set([
-  'என்ன', 'எப்படி', 'எங்கு', 'எப்போது', 'எந்த', 'யாரு', 'யார்', 'ஒரு', 'மற்றும்',
-  'இந்த', 'அந்த', 'இருந்து', 'உள்ள', 'செய்ய', 'பற்றி', 'எனக்கு', 'உங்களுக்கு',
-  'வேண்டும்', 'முடியுமா', 'இருக்கு', 'இருக்கும்', 'ஆகுமா', 'கூறும்'
+  'ஒரு', 'மற்றும்', 'இந்த', 'அந்த', 'இருந்து', 'உள்ள', 'செய்ய', 'பற்றி',
+  'எனக்கு', 'உங்களுக்கு', 'வேண்டும்', 'முடியுமா', 'இருக்கு', 'இருக்கும்', 'ஆகுமா', 'கூறும்'
 ]);
 
 // Cross-lingual bilingual dictionary for clinic & healthcare queries (Tamil <-> English)
 const BILINGUAL_CLINIC_TERMS = {
-  // Clinic, Doctor, Timings
+  // Clinic, Hospital, Location, Doctor, Timings
+  'மருத்துவமனை': ['hospital', 'clinic', 'sanjeevini', 'centre', 'center', 'location', 'karaikal'],
+  'மருத்துவ': ['hospital', 'clinic', 'medical', 'medicine'],
+  'ஆஸ்பத்திரி': ['hospital', 'clinic'],
+  'அமைந்துள்ளது': ['located', 'location', 'address', 'situated', 'karaikal'],
+  'எங்கு': ['where', 'location', 'address', 'located', 'situated', 'place', 'karaikal'],
+  'முகவரி': ['address', 'location', 'karaikal', 'ambedkar'],
+  'இடம்': ['location', 'address', 'karaikal', 'situated'],
   'நேரம்': ['timing', 'timings', 'hours', 'consultation'],
   'நேரங்கள்': ['timing', 'timings', 'hours', 'consultation'],
+  'எப்போது': ['timing', 'timings', 'when', 'hours', 'open'],
   'மணி': ['pm', 'am', 'hours', 'time'],
   'மருத்துவர்': ['doctor', 'doctors', 'physician', 'dr', 'thiagarajan', 'subashini'],
   'மருத்துவர்கள்': ['doctor', 'doctors', 'physicians'],
   'டாக்டர்': ['doctor', 'dr'],
-  'முகவரி': ['address', 'location', 'karaikal', 'ambedkar'],
-  'இடம்': ['location', 'address', 'karaikal'],
-  'எங்கு': ['location', 'address', 'where'],
   'காரைக்கால்': ['karaikal'],
   'போன்': ['phone', 'contact', 'call'],
   'தொடர்பு': ['contact', 'phone', 'call', 'whatsapp'],
@@ -195,9 +199,21 @@ class BotKnowledgeService {
     this.toggleDocument = this.toggleDocument.bind(this);
     this.getStatus = this.getStatus.bind(this);
     this.restoreSeedDocument = this.restoreSeedDocument.bind(this);
+    this.ensureInitialized = this.ensureInitialized.bind(this);
 
     this.indexSeedDocument();
-    this.init();
+    this.initPromise = this.init();
+  }
+
+  /**
+   * Wait for initial asynchronous loading of documents & chunks from Supabase
+   */
+  async ensureInitialized() {
+    if (this.isInitialized) return true;
+    if (this.initPromise) {
+      await this.initPromise;
+    }
+    return this.isInitialized;
   }
 
   /**

@@ -21,10 +21,13 @@ exports.chat = async (req, res, next) => {
 
     const trimmedMessage = message.trim();
 
-    // 1. Retrieve top matching chunks from knowledge base (increased limit for better context)
+    // 1. Ensure knowledge base documents & chunks are loaded from Supabase
+    await botKnowledgeService.ensureInitialized();
+
+    // 2. Retrieve top matching chunks from knowledge base
     const relevantChunks = botKnowledgeService.searchRelevantChunks(trimmedMessage, 8);
 
-    // 2. Call Groq with strict PDF grounding and conversation history
+    // 3. Call Groq with strict PDF grounding and conversation history
     const botResult = await generateBotReply({
       userMessage: trimmedMessage,
       relevantChunks,
@@ -52,6 +55,7 @@ exports.chat = async (req, res, next) => {
  */
 exports.getDocuments = async (req, res) => {
   try {
+    await botKnowledgeService.ensureInitialized();
     const docs = await botKnowledgeService.getDocuments();
     return res.status(200).json({
       success: true,
@@ -197,6 +201,7 @@ const groqUsageTracker = require('../services/groqUsageTracker');
  */
 exports.getStatus = async (req, res, next) => {
   try {
+    await botKnowledgeService.ensureInitialized();
     const knowledgeStatus = botKnowledgeService.getStatus();
     const groqStatus = await testGroqConnection();
     const usageSummary = await groqUsageTracker.getUsageSummary();
