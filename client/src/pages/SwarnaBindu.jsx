@@ -220,7 +220,7 @@ const SwarnaBindu = () => {
                   <thead className="bg-[#0B233D] text-white">
                     <tr>
                       <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Month</th>
-                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Camp Date</th>
+                      <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Date</th>
                       <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Day</th>
                       <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Star / Nakshatra</th>
                       <th className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs uppercase tracking-wider">Timings</th>

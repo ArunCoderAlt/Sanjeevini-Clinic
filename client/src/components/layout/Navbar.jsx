@@ -45,7 +45,7 @@ export default function Navbar() {
       )}>
         <Container className="flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 sm:h-12 w-auto object-contain rounded-full shadow-xs" />
+            <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" decoding="async" className="h-11 sm:h-12 w-auto object-contain rounded-full shadow-xs" />
             <div className="flex flex-col">
               <span className="font-heading font-bold text-xl sm:text-2xl text-[#0C2B4B] leading-none">Sanjeevini</span>
               <span className="text-[10px] sm:text-[11px] font-medium text-[#475E75] tracking-wider mt-1">Since 2005</span>

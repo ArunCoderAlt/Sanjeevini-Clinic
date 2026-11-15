@@ -13,7 +13,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-3 text-white">
-              <img src="/images/logo.png?v=4" alt="Sanjeevini Logo" className="w-10 h-10 rounded-full bg-white p-1 object-contain shadow-sm shrink-0" />
+              <img src="/images/logo.png?v=4" alt="Sanjeevini Logo" loading="lazy" decoding="async" className="w-10 h-10 rounded-full bg-white p-1 object-contain shadow-sm shrink-0" />
               <span className="font-heading font-bold text-2xl text-white">Sanjeevini</span>
             </Link>
             <p className="text-sm leading-relaxed text-[#B5CCE0]">

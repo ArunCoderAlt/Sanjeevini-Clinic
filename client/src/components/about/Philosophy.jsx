@@ -15,6 +15,7 @@ const Philosophy = () => {
                 alt="Sanjeevini Siddha & Ayurveda Medical Centre - SAMC Philosophy Emblem" 
                 width="578"
                 height="1024"
+                loading="lazy"
                 decoding="async"
                 className="w-full h-auto object-contain rounded-2xl block mx-auto select-none"
                 style={{ aspectRatio: '578 / 1024' }}

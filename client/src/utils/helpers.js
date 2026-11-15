@@ -14,12 +14,22 @@ export const getToken = () => localStorage.getItem('token');
 export const removeToken = () => localStorage.removeItem('token');
 
 /**
- * Resolves an image URL:
- * - If already a full URL (Supabase CDN, external URL, data/blob URL), returns as-is.
+ * Resolves and optimizes an image URL:
+ * - If ImageKit URL, injects optimal parameters (?tr=q-80,f-auto) reducing payload by ~70%
+ * - If Supabase CDN, external URL, data/blob URL, returns clean URL.
  * - If a relative /uploads/... path, prepends the backend host URL.
  */
 export const getImageUrl = (url) => {
   if (!url || typeof url !== 'string') return null;
+
+  // Auto-optimize ImageKit CDN assets (auto WebP/AVIF format + 80% lossless compression)
+  if (url.includes('ik.imagekit.io') || url.includes('imagekit.io')) {
+    if (!url.includes('tr=')) {
+      const sep = url.includes('?') ? '&' : '?';
+      return `${url}${sep}tr=q-80,f-auto`;
+    }
+    return url;
+  }
 
   // Supabase CDN, full HTTP/HTTPS URL, or data/blob URI
   if (

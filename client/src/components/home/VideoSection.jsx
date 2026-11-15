@@ -145,6 +145,8 @@ const VideoSection = () => {
                         <img 
                           src={video.thumb} 
                           alt={video.title} 
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover opacity-75 group-hover:opacity-65 transition-opacity duration-500" 
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
@@ -221,7 +223,7 @@ const VideoSection = () => {
                 )}
               >
                 <div className="relative w-20 aspect-video rounded-xl overflow-hidden shrink-0 bg-dark">
-                  <img src={v.thumb} alt={v.title} className="w-full h-full object-cover" />
+                  <img src={v.thumb} alt={v.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                     <Play className="w-4 h-4 text-white" fill="currentColor" />
                   </div>

@@ -20,6 +20,8 @@ const AboutPreview = () => {
                 <img 
                   src="/images/about/clinic-building.jpg" 
                   alt="Sanjeevini Siddha & Ayurveda Medical Centre" 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover object-center"
                 />
               </div>

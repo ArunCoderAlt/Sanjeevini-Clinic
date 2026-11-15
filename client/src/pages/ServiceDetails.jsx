@@ -182,7 +182,7 @@ export default function ServiceDetails() {
                 <div className="lg:col-span-2 bg-[#EAF2F8] p-8 md:p-10 flex flex-col gap-6 justify-between border-t lg:border-t-0 lg:border-l border-slate-200/80">
                   {service.image && !isMockImage(service.image) && (
                     <div className="rounded-2xl overflow-hidden shadow-md">
-                      <img src={getImageUrl(service.image)} alt={service.title} className="w-full h-48 object-cover" />
+                      <img src={getImageUrl(service.image)} alt={service.title} loading="lazy" decoding="async" className="w-full h-48 object-cover" />
                     </div>
                   )}
 
