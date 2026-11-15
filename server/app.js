@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const morgan = require('morgan');
 const path = require('path');
 
@@ -69,6 +70,9 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
+// Gzip/deflate compression middleware to compress all responses (60-80% smaller payloads)
+app.use(compression());
 
 // Body parser
 app.use(express.json());

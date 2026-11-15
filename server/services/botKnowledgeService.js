@@ -258,19 +258,34 @@ class BotKnowledgeService {
       const supabase = getSupabase();
       if (!supabase) return false;
 
-      const { data: buckets } = await supabase.storage.listBuckets();
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      
+      // If network is offline or sandboxed, do not attempt to recreate bucket
+      if (listError) {
+        if (listError.message && (listError.message.includes('fetch failed') || listError.message.includes('ENOTFOUND'))) {
+          logger.warn(`Supabase Storage check deferred (network offline or sandboxed). Existing bucket "${BUCKET_NAME}" will be used when online.`);
+          return false;
+        }
+        logger.warn(`Could not list storage buckets: ${listError.message}`);
+        return false;
+      }
+
       const hasBucket = buckets && buckets.some(b => b.name === BUCKET_NAME || b.id === BUCKET_NAME);
 
       if (!hasBucket) {
         const { error } = await supabase.storage.createBucket(BUCKET_NAME, { public: true });
-        if (error && !error.message.includes('already exists')) {
+        if (error && !error.message.includes('already exists') && !error.message.includes('Duplicate')) {
           logger.warn(`Could not create ${BUCKET_NAME} storage bucket: ${error.message}`);
           return false;
         }
       }
       return true;
     } catch (err) {
-      logger.warn(`Error ensuring ${BUCKET_NAME} bucket exists: ${err.message}`);
+      if (err.message && (err.message.includes('fetch failed') || err.message.includes('ENOTFOUND'))) {
+        logger.warn(`Supabase Storage check deferred (network offline or sandboxed). Existing bucket "${BUCKET_NAME}" will be used when online.`);
+      } else {
+        logger.warn(`Error ensuring ${BUCKET_NAME} bucket exists: ${err.message}`);
+      }
       return false;
     }
   }
