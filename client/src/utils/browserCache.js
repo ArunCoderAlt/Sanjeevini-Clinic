@@ -9,6 +9,7 @@
  */
 
 const L1_MEMORY_CACHE = new Map();
+const MAX_L1_ENTRIES = 25; // Capped to avoid JavaScript heap bloat
 const CACHE_PREFIX = 'sanjeevini_cache_';
 const DEFAULT_TTL_MS = 15 * 60 * 1000; // 15 minutes default browser cache
 
@@ -44,6 +45,9 @@ export const getBrowserCache = (key) => {
   const memoryEntry = L1_MEMORY_CACHE.get(normalizedKey);
   if (memoryEntry) {
     if (Date.now() < memoryEntry.expiresAt) {
+      // Refresh LRU recency
+      L1_MEMORY_CACHE.delete(normalizedKey);
+      L1_MEMORY_CACHE.set(normalizedKey, memoryEntry);
       return memoryEntry.data;
     }
     L1_MEMORY_CACHE.delete(normalizedKey);
@@ -59,7 +63,11 @@ export const getBrowserCache = (key) => {
 
     const entry = JSON.parse(raw);
     if (entry && entry.expiresAt && Date.now() < entry.expiresAt) {
-      // Re-populate L1 RAM cache for immediate future reads
+      // Re-populate L1 RAM cache for immediate future reads with LRU eviction
+      if (L1_MEMORY_CACHE.size >= MAX_L1_ENTRIES && !L1_MEMORY_CACHE.has(normalizedKey)) {
+        const oldestKey = L1_MEMORY_CACHE.keys().next().value;
+        if (oldestKey) L1_MEMORY_CACHE.delete(oldestKey);
+      }
       L1_MEMORY_CACHE.set(normalizedKey, {
         data: entry.data,
         expiresAt: entry.expiresAt,
@@ -86,7 +94,11 @@ export const setBrowserCache = (key, data, ttlMs = DEFAULT_TTL_MS) => {
   const normalizedKey = key.startsWith(CACHE_PREFIX) ? key : `${CACHE_PREFIX}${key}`;
   const expiresAt = Date.now() + ttlMs;
 
-  // 1. Save to L1 In-Memory Cache
+  // 1. Save to L1 In-Memory Cache with LRU cap
+  if (L1_MEMORY_CACHE.size >= MAX_L1_ENTRIES && !L1_MEMORY_CACHE.has(normalizedKey)) {
+    const oldestKey = L1_MEMORY_CACHE.keys().next().value;
+    if (oldestKey) L1_MEMORY_CACHE.delete(oldestKey);
+  }
   L1_MEMORY_CACHE.set(normalizedKey, {
     data,
     expiresAt,
@@ -197,7 +209,14 @@ export const pruneExpiredBrowserCache = () => {
   } catch {}
 };
 
-// Auto-prune on startup to keep storage lean
+// Auto-prune on startup and periodically (every 5 mins) to keep memory & storage lean
 if (typeof window !== 'undefined') {
   pruneExpiredBrowserCache();
+  setInterval(() => {
+    const now = Date.now();
+    for (const [k, v] of L1_MEMORY_CACHE.entries()) {
+      if (now >= v.expiresAt) L1_MEMORY_CACHE.delete(k);
+    }
+    pruneExpiredBrowserCache();
+  }, 5 * 60 * 1000);
 }

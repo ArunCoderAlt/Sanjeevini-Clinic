@@ -1,11 +1,13 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Activity, HeartHandshake, ArrowRight } from 'lucide-react';
+import { Leaf, Activity, HeartHandshake, ArrowRight, HeartPulse, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
+import { useServices } from '../../hooks/useQueries';
 
-const services = [
+const defaultServices = [
   { 
     id: 'varmam', 
     slug: 'varmam-therapy', 
@@ -29,7 +31,40 @@ const services = [
   }
 ];
 
+const iconMap = {
+  Leaf,
+  Activity,
+  HeartHandshake,
+  HeartPulse,
+  Sparkles,
+  varmam: Activity,
+  thokkanam: HeartHandshake,
+  wellness: Leaf
+};
+
 const ServicesPreview = () => {
+  const { data: rawServices } = useServices();
+
+  const services = useMemo(() => {
+    if (!rawServices) return defaultServices;
+    if (Array.isArray(rawServices) && rawServices.length === 0) return [];
+
+    const filtered = rawServices.filter(s => s.slug !== 'consultation');
+    if (filtered.length === 0) return [];
+
+    return filtered.slice(0, 3).map((s) => {
+      const def = defaultServices.find(d => d.slug === s.slug) || {};
+      const IconComponent = iconMap[s.icon] || iconMap[s.slug] || def.icon || Activity;
+      return {
+        id: s._id || s.id || def.id,
+        slug: s.slug || def.slug,
+        icon: IconComponent,
+        title: s.title,
+        desc: s.shortDescription || s.description || def.desc
+      };
+    });
+  }, [rawServices]);
+
   return (
     <section className="py-24 bg-cream">
       <Container>
@@ -38,43 +73,49 @@ const ServicesPreview = () => {
           subtitle="Authentic treatments rooted in ancient Indian medicine systems."
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-12 max-w-5xl mx-auto">
-          {services.map((service, idx) => {
-            const Icon = service.icon;
-            return (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full"
-              >
-                <div>
-                  <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
-                    <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
+        {services.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8 max-w-xl mx-auto my-12">
+            <p className="text-slate-600 text-sm">Services are currently being updated. Please contact the clinic for direct consultation and therapy options.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-12 max-w-5xl mx-auto">
+            {services.map((service, idx) => {
+              const Icon = service.icon;
+              return (
+                <motion.div
+                  key={service.slug || service.id || idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full"
+                >
+                  <div>
+                    <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
+                      <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-2xl font-serif text-[#0C2B4B] font-bold mb-3.5 group-hover:text-[#144979] transition-colors">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
+                      {service.desc}
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-serif text-[#0C2B4B] font-bold mb-3.5 group-hover:text-[#144979] transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
-                    {service.desc}
-                  </p>
-                </div>
 
-                <div className="pt-4 border-t border-slate-100 mt-auto">
-                  <Link 
-                    to={`/services/${service.slug}`} 
-                    className="text-[#144979] font-semibold hover:text-[#0C2B4B] transition-colors inline-flex items-center text-sm"
-                  >
-                    <span>Learn More</span>
-                    <ArrowRight className="ml-1.5 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+                  <div className="pt-4 border-t border-slate-100 mt-auto">
+                    <Link 
+                      to={`/services/${service.slug}`} 
+                      className="text-[#144979] font-semibold hover:text-[#0C2B4B] transition-colors inline-flex items-center text-sm"
+                    >
+                      <span>Learn More</span>
+                      <ArrowRight className="ml-1.5 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
         
         <div className="text-center">
           <Button to="/services" variant="outline" className="px-8 py-3.5 rounded-full font-medium shadow-xs">

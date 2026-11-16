@@ -3,6 +3,7 @@ import { getToken, removeToken } from '../utils/helpers';
 import { API_URL } from '../utils/constants';
 import { broadcastDataChange, recordAdminAction, subscribeToDataChanges } from '../utils/realtimeSync';
 import { getBrowserCache, setBrowserCache, invalidateBrowserCache, clearAllBrowserCache } from '../utils/browserCache';
+import { queryClient } from '../queryClient';
 
 // ==============================================================================
 // DUAL-LAYER IN-MEMORY & BROWSER STORAGE CACHE + PROMISE DEDUPLICATOR
@@ -159,6 +160,43 @@ api.interceptors.response.use(
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       // Clear client-side memory cache immediately upon data mutation
       clearClientApiCache();
+
+      // Immediately invalidate matching React Query caches for 0-latency UI updates
+      try {
+        const cleanUrl = url.toLowerCase();
+        if (cleanUrl.includes('/doctors')) {
+          queryClient.invalidateQueries({ queryKey: ['doctors'] });
+          queryClient.invalidateQueries({ queryKey: ['doctor'] });
+          invalidateBrowserCache('doctors');
+        } else if (cleanUrl.includes('/services')) {
+          queryClient.invalidateQueries({ queryKey: ['services'] });
+          queryClient.invalidateQueries({ queryKey: ['service'] });
+          invalidateBrowserCache('services');
+        } else if (cleanUrl.includes('/treatments')) {
+          queryClient.invalidateQueries({ queryKey: ['treatments'] });
+          queryClient.invalidateQueries({ queryKey: ['treatment'] });
+          queryClient.invalidateQueries({ queryKey: ['treatment-categories'] });
+          invalidateBrowserCache('treatments');
+        } else if (cleanUrl.includes('/gallery')) {
+          queryClient.invalidateQueries({ queryKey: ['gallery'] });
+          invalidateBrowserCache('gallery');
+        } else if (cleanUrl.includes('/reels')) {
+          queryClient.invalidateQueries({ queryKey: ['reels'] });
+          invalidateBrowserCache('reels');
+        } else if (cleanUrl.includes('/testimonials')) {
+          queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+          invalidateBrowserCache('testimonials');
+        } else if (cleanUrl.includes('/swarna-bindu')) {
+          queryClient.invalidateQueries({ queryKey: ['swarna-bindu'] });
+          invalidateBrowserCache('swarna-bindu');
+        } else if (cleanUrl.includes('/settings')) {
+          queryClient.invalidateQueries({ queryKey: ['settings'] });
+          invalidateBrowserCache('settings');
+        } else {
+          queryClient.invalidateQueries();
+          clearAllBrowserCache();
+        }
+      } catch (_) {}
 
       // Don't auto-log normal login query here as AuthContext handles it with user credentials
       if (!url.includes('/auth/login') && !url.includes('/auth/register')) {

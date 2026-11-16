@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { getSupabase } = require('../config/supabase');
 const env = require('../config/environment');
 const logger = require('../utils/logger');
@@ -14,23 +16,64 @@ const {
   fallbackSwarnaBindu,
 } = require('../data/fallbackData');
 
+// ==============================================================================
+// PERSISTENT LOCAL FILE STORE
+// Guarantees all admin creates, updates, and deletes permanently survive
+// server restarts, nodemon reloads, and page refreshes even offline.
+// ==============================================================================
+const LOCAL_STORE_PATH = path.resolve(__dirname, '../data/clinicFallbackStore.json');
+
+const loadFallbackStore = () => {
+  try {
+    if (fs.existsSync(LOCAL_STORE_PATH)) {
+      const raw = fs.readFileSync(LOCAL_STORE_PATH, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    logger.warn(`Could not load local fallback store: ${err.message}`);
+  }
+  return null;
+};
+
+const saveFallbackStore = (stores) => {
+  try {
+    const dir = path.dirname(LOCAL_STORE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(LOCAL_STORE_PATH, JSON.stringify(stores, null, 2), 'utf8');
+  } catch (err) {
+    logger.warn(`Could not persist local fallback store: ${err.message}`);
+  }
+};
+
+const savedStores = loadFallbackStore();
+
 // In-memory data stores for flawless local development and offline fallback
 const memoryStores = {
-  doctors: [...fallbackDoctors],
-  services: [...fallbackServices],
-  treatments: [...fallbackTreatments],
-  site_settings: [{ ...fallbackSettings }],
-  testimonials: [...fallbackTestimonials],
-  gallery: [...fallbackGallery],
-  users: [...fallbackUsers],
-  reels: [...fallbackReels],
-  appointments: [],
-  contact_messages: [],
-  newsletters: [],
-  swarna_bindu: [...fallbackSwarnaBindu],
-  groq_key_periods: [],
-  groq_usage_logs: [],
+  doctors: savedStores?.doctors ? [...savedStores.doctors] : [...fallbackDoctors],
+  services: savedStores?.services ? [...savedStores.services] : [...fallbackServices],
+  treatments: savedStores?.treatments ? [...savedStores.treatments] : [...fallbackTreatments],
+  site_settings: savedStores?.site_settings ? [...savedStores.site_settings] : [{ ...fallbackSettings }],
+  testimonials: savedStores?.testimonials ? [...savedStores.testimonials] : [...fallbackTestimonials],
+  gallery: savedStores?.gallery ? [...savedStores.gallery] : [...fallbackGallery],
+  users: savedStores?.users ? [...savedStores.users] : [...fallbackUsers],
+  reels: savedStores?.reels ? [...savedStores.reels] : [...fallbackReels],
+  appointments: savedStores?.appointments ? [...savedStores.appointments] : [],
+  contact_messages: savedStores?.contact_messages ? [...savedStores.contact_messages] : [],
+  newsletters: savedStores?.newsletters ? [...savedStores.newsletters] : [],
+  swarna_bindu: savedStores?.swarna_bindu ? [...savedStores.swarna_bindu] : [...fallbackSwarnaBindu],
+  groq_key_periods: savedStores?.groq_key_periods ? [...savedStores.groq_key_periods] : [],
+  groq_usage_logs: savedStores?.groq_usage_logs ? [...savedStores.groq_usage_logs] : [],
 };
+
+// Write initial store to disk if not present
+if (!savedStores) {
+  saveFallbackStore(memoryStores);
+}
 
 const isSupabaseLive = () => {
   const url = env.supabaseUrl;
@@ -124,7 +167,7 @@ const snakeToCamel = (str) => {
 /**
  * Clean and convert input object keys to snake_case for Supabase columns.
  */
-const toDbRow = (data) => {
+const toDbRow = (data, tableName = '') => {
   if (!data || typeof data !== 'object') return data;
   const result = {};
 
@@ -133,6 +176,27 @@ const toDbRow = (data) => {
     const snakeKey = camelToSnake(key);
     result[snakeKey] = value;
   }
+
+  // Model-specific normalization to prevent column mismatch in PostgreSQL/Supabase
+  if (tableName === 'reels') {
+    if (result['start'] !== undefined || result['start_time'] !== undefined) {
+      const startVal = Number(result['start'] !== undefined ? result['start'] : result['start_time']) || 0;
+      result['start'] = startVal;
+      result['start_time'] = startVal;
+    }
+    if (result['desc'] !== undefined || result['description'] !== undefined) {
+      const descVal = result['desc'] || result['description'] || '';
+      result['desc'] = descVal;
+      result['description'] = descVal;
+    }
+  }
+
+  if (tableName === 'swarna_bindu') {
+    if (result['order'] !== undefined) {
+      result['order_index'] = Number(result['order']) || 0;
+    }
+  }
+
   return result;
 };
 
@@ -158,6 +222,13 @@ const formatRow = (row, tableName, customMethods = {}) => {
     }
   }
 
+  // Model-specific normalization for frontend consumers
+  if (tableName === 'reels') {
+    formatted.start = row.start !== undefined ? row.start : (row.start_time !== undefined ? row.start_time : 0);
+    formatted.desc = row.desc || row.description || '';
+    formatted.description = row.description || row.desc || '';
+  }
+
   formatted.save = async function () {
     const updateData = { ...this };
     delete updateData.save;
@@ -169,7 +240,7 @@ const formatRow = (row, tableName, customMethods = {}) => {
     if (isSupabaseLive()) {
       try {
         const client = getSupabase();
-        const dbRow = toDbRow(updateData);
+        const dbRow = toDbRow(updateData, tableName);
         delete dbRow.id;
         delete dbRow.created_at;
 
@@ -183,6 +254,12 @@ const formatRow = (row, tableName, customMethods = {}) => {
         if (!error && data) {
           const updated = formatRow(data, tableName, customMethods);
           Object.assign(this, updated);
+          const store = memoryStores[tableName] || [];
+          const idx = store.findIndex((i) => i.id === targetId || i._id === targetId);
+          if (idx !== -1) {
+            store[idx] = { ...store[idx], ...updated };
+            saveFallbackStore(memoryStores);
+          }
           return this;
         }
       } catch {
@@ -195,6 +272,7 @@ const formatRow = (row, tableName, customMethods = {}) => {
     const idx = store.findIndex((i) => i.id === targetId || i._id === targetId);
     if (idx !== -1) {
       store[idx] = { ...store[idx], ...updateData };
+      saveFallbackStore(memoryStores);
       const updated = formatRow(store[idx], tableName, customMethods);
       Object.assign(this, updated);
     }
@@ -597,10 +675,11 @@ const createSupabaseModel = (tableName, options = {}) => {
       payload.createdAt = payload.createdAt || new Date().toISOString();
       payload.updatedAt = new Date().toISOString();
 
+      let supabaseCreated = null;
       if (isSupabaseLive()) {
         try {
           const client = getSupabase();
-          const dbRow = toDbRow(payload);
+          const dbRow = toDbRow(payload, tableName);
           const { data: created, error } = await client
             .from(tableName)
             .insert(dbRow)
@@ -608,17 +687,26 @@ const createSupabaseModel = (tableName, options = {}) => {
             .single();
 
           if (!error && created) {
-            return formatRow(created, tableName, customMethods);
+            supabaseCreated = formatRow(created, tableName, customMethods);
+          } else if (error) {
+            logger.warn(`Supabase insert error on ${tableName}: ${error.message} (${error.code})`);
           }
         } catch (err) {
           logger.warn(`Supabase insert failed on ${tableName}: ${err.message}. Persisting in memory.`);
         }
       }
 
-      // Memory fallback persist
+      // Memory & local disk store persist
       if (!memoryStores[tableName]) memoryStores[tableName] = [];
-      memoryStores[tableName].push(payload);
-      return formatRow(payload, tableName, customMethods);
+      const itemToSave = supabaseCreated || payload;
+      const existingIdx = memoryStores[tableName].findIndex((i) => i.id === itemToSave.id || i._id === itemToSave.id);
+      if (existingIdx !== -1) {
+        memoryStores[tableName][existingIdx] = itemToSave;
+      } else {
+        memoryStores[tableName].push(itemToSave);
+      }
+      saveFallbackStore(memoryStores);
+      return supabaseCreated || formatRow(payload, tableName, customMethods);
     },
 
     async findByIdAndUpdate(id, updateData, _options = {}) {
@@ -627,10 +715,11 @@ const createSupabaseModel = (tableName, options = {}) => {
       let payload = { ...updateData };
       payload.updatedAt = new Date().toISOString();
 
+      let supabaseUpdated = null;
       if (isSupabaseLive()) {
         try {
           const client = getSupabase();
-          const dbRow = toDbRow(payload);
+          const dbRow = toDbRow(payload, tableName);
           delete dbRow.id;
           delete dbRow.created_at;
 
@@ -642,20 +731,27 @@ const createSupabaseModel = (tableName, options = {}) => {
             .maybeSingle();
 
           if (!error && data) {
-            return formatRow(data, tableName, customMethods);
+            supabaseUpdated = formatRow(data, tableName, customMethods);
+          } else if (error) {
+            logger.warn(`Supabase update error on ${tableName}: ${error.message} (${error.code})`);
           }
-        } catch {
-          // Fallback below
+        } catch (err) {
+          logger.warn(`Supabase update failed on ${tableName}: ${err.message}`);
         }
       }
 
       const store = memoryStores[tableName] || [];
       const idx = store.findIndex((i) => i.id === id || i._id === id);
       if (idx !== -1) {
-        store[idx] = { ...store[idx], ...payload };
-        return formatRow(store[idx], tableName, customMethods);
+        store[idx] = { ...store[idx], ...(supabaseUpdated || payload) };
+        saveFallbackStore(memoryStores);
+        return supabaseUpdated || formatRow(store[idx], tableName, customMethods);
+      } else if (supabaseUpdated) {
+        store.push(supabaseUpdated);
+        saveFallbackStore(memoryStores);
+        return supabaseUpdated;
       }
-      return null;
+      return supabaseUpdated || null;
     },
 
     async findOneAndUpdate(filter = {}, updateData, _options = {}) {
@@ -663,10 +759,11 @@ const createSupabaseModel = (tableName, options = {}) => {
       let payload = { ...updateData };
       payload.updatedAt = new Date().toISOString();
 
+      let supabaseUpdated = null;
       if (isSupabaseLive()) {
         try {
           const client = getSupabase();
-          const dbRow = toDbRow(payload);
+          const dbRow = toDbRow(payload, tableName);
           delete dbRow.id;
           delete dbRow.created_at;
 
@@ -684,7 +781,7 @@ const createSupabaseModel = (tableName, options = {}) => {
 
           const { data, error } = await query.select().maybeSingle();
           if (!error && data) {
-            return formatRow(data, tableName, customMethods);
+            supabaseUpdated = formatRow(data, tableName, customMethods);
           }
         } catch {
           // Fallback below
@@ -695,18 +792,22 @@ const createSupabaseModel = (tableName, options = {}) => {
       const matches = filterMemoryStore(store, filter);
       if (matches.length > 0) {
         const item = matches[0];
-        Object.assign(item, payload);
-        return formatRow(item, tableName, customMethods);
+        Object.assign(item, supabaseUpdated || payload);
+        saveFallbackStore(memoryStores);
+        return supabaseUpdated || formatRow(item, tableName, customMethods);
       } else if (Object.keys(filter).length === 0 && store.length > 0) {
-        Object.assign(store[0], payload);
-        return formatRow(store[0], tableName, customMethods);
+        Object.assign(store[0], supabaseUpdated || payload);
+        saveFallbackStore(memoryStores);
+        return supabaseUpdated || formatRow(store[0], tableName, customMethods);
       }
-      return null;
+      return supabaseUpdated || null;
     },
 
     async findByIdAndDelete(id) {
       if (!id) return null;
       invalidateTableCache(tableName);
+      let deletedRow = null;
+
       if (isSupabaseLive()) {
         try {
           const client = getSupabase();
@@ -718,10 +819,12 @@ const createSupabaseModel = (tableName, options = {}) => {
             .maybeSingle();
 
           if (!error && data) {
-            return formatRow(data, tableName, customMethods);
+            deletedRow = formatRow(data, tableName, customMethods);
+          } else if (error) {
+            logger.warn(`Supabase delete error on ${tableName}: ${error.message}`);
           }
-        } catch {
-          // Fallback below
+        } catch (err) {
+          logger.warn(`Supabase delete failed on ${tableName}: ${err.message}`);
         }
       }
 
@@ -729,13 +832,20 @@ const createSupabaseModel = (tableName, options = {}) => {
       const idx = store.findIndex((i) => i.id === id || i._id === id);
       if (idx !== -1) {
         const deleted = store.splice(idx, 1)[0];
-        return formatRow(deleted, tableName, customMethods);
+        saveFallbackStore(memoryStores);
+        return deletedRow || formatRow(deleted, tableName, customMethods);
+      }
+      if (deletedRow) {
+        saveFallbackStore(memoryStores);
+        return deletedRow;
       }
       return null;
     },
 
     async findOneAndDelete(filter = {}) {
       invalidateTableCache(tableName);
+      let deletedRow = null;
+
       if (isSupabaseLive()) {
         try {
           const client = getSupabase();
@@ -746,7 +856,7 @@ const createSupabaseModel = (tableName, options = {}) => {
             query = query.eq(col, value);
           }
           const { data, error } = await query.select().maybeSingle();
-          if (!error && data) return formatRow(data, tableName, customMethods);
+          if (!error && data) deletedRow = formatRow(data, tableName, customMethods);
         } catch {
           // Fallback below
         }
@@ -757,7 +867,12 @@ const createSupabaseModel = (tableName, options = {}) => {
       if (matches.length > 0) {
         const idx = store.indexOf(matches[0]);
         const deleted = store.splice(idx, 1)[0];
-        return formatRow(deleted, tableName, customMethods);
+        saveFallbackStore(memoryStores);
+        return deletedRow || formatRow(deleted, tableName, customMethods);
+      }
+      if (deletedRow) {
+        saveFallbackStore(memoryStores);
+        return deletedRow;
       }
       return null;
     },
@@ -778,7 +893,16 @@ const createSupabaseModel = (tableName, options = {}) => {
             }
           }
           const { data, error } = await query.select('id');
-          if (!error && data) return { deletedCount: data.length };
+          if (!error && data) {
+            if (Object.keys(filter).length === 0) {
+              memoryStores[tableName] = [];
+            } else {
+              const store = memoryStores[tableName] || [];
+              memoryStores[tableName] = store.filter((item) => !filterMemoryStore([item], filter).length);
+            }
+            saveFallbackStore(memoryStores);
+            return { deletedCount: data.length };
+          }
         } catch {
           // Fallback below
         }
@@ -787,12 +911,14 @@ const createSupabaseModel = (tableName, options = {}) => {
       if (Object.keys(filter).length === 0) {
         const count = (memoryStores[tableName] || []).length;
         memoryStores[tableName] = [];
+        saveFallbackStore(memoryStores);
         return { deletedCount: count };
       }
       const store = memoryStores[tableName] || [];
       const toKeep = store.filter((item) => !filterMemoryStore([item], filter).length);
       const deletedCount = store.length - toKeep.length;
       memoryStores[tableName] = toKeep;
+      saveFallbackStore(memoryStores);
       return { deletedCount };
     },
 

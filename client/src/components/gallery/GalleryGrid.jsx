@@ -40,18 +40,16 @@ const GalleryGrid = ({ activeTab }) => {
   const { data: rawData, isLoading } = useGallery(activeTab);
 
   const images = useMemo(() => {
-    if (Array.isArray(rawData) && rawData.length > 0) {
-      const validRealImages = rawData
-        .filter((item) => item.image && !isMockImage(item.image))
-        .map((item) => ({
-          id: item._id || item.id,
-          src: getImageUrl(item.image),
-          category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
-          alt: item.title || item.description || 'Clinic photo'
-        }));
-      if (validRealImages.length > 0) return validRealImages;
-    }
-    return authenticDefaultGallery;
+    if (!rawData) return authenticDefaultGallery;
+    if (Array.isArray(rawData) && rawData.length === 0) return [];
+    return rawData
+      .filter((item) => item.image && !isMockImage(item.image))
+      .map((item) => ({
+        id: item._id || item.id,
+        src: getImageUrl(item.image),
+        category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
+        alt: item.title || item.description || 'Clinic photo'
+      }));
   }, [rawData]);
 
   const loading = isLoading && (!rawData || rawData.length === 0);

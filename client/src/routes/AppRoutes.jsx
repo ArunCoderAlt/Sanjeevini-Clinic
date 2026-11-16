@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Loading from '../components/common/Loading';
 
@@ -44,33 +44,6 @@ const AdminRoutes = lazy(() => import('./AdminRoutes'));
 
 export default function AppRoutes() {
   const location = useLocation();
-
-  // Automatic Background Pre-fetching:
-  // Once the initial page (Home) is loaded and painted, gently prefetch all other pages
-  // during browser idle time so subsequent navigation is 100% instant with zero delay.
-  useEffect(() => {
-    if (location.pathname.startsWith('/admin')) return;
-
-    const prefetchOtherPages = () => {
-      const importers = Object.values(routeImporters);
-      importers.forEach((importFn, index) => {
-        // Stagger chunk requests slightly so CPU & network stay free for smooth user scrolling
-        setTimeout(() => {
-          importFn().catch(() => {});
-        }, index * 100);
-      });
-    };
-
-    if ('requestIdleCallback' in window) {
-      const handle = window.requestIdleCallback(prefetchOtherPages, { timeout: 3000 });
-      return () => {
-        if (window.cancelIdleCallback) window.cancelIdleCallback(handle);
-      };
-    } else {
-      const timer = setTimeout(prefetchOtherPages, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   return (
     <Suspense fallback={<Loading fullPage />}>

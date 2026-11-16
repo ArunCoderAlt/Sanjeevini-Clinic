@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Check
+  Check,
+  Film
 } from 'lucide-react';
 import { clinicInfo } from '../../data/clinicInfo';
 import { useReels } from '../../hooks/useQueries';
@@ -26,8 +27,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
+const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenModal }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(parseInt(reel.likes) || 2400);
@@ -35,7 +35,7 @@ const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
 
   const togglePlay = (e) => {
     e.stopPropagation();
-    setIsPlaying(!isPlaying);
+    onTogglePlay();
   };
 
   const toggleMute = (e) => {
@@ -63,7 +63,7 @@ const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
       <div className="relative bg-neutral-950 rounded-2xl overflow-hidden shadow-xl h-full border border-white/10 transition-all duration-300 group-hover:shadow-2xl group-hover:border-gold/40">
         {/* 9:16 Vertical Reel Aspect */}
         <div className="relative aspect-[9/16] min-h-[460px] max-h-[520px] overflow-hidden bg-neutral-900">
-          {/* Autoplaying Video */}
+          {/* Autoplaying Video - Only mounted when active to conserve memory */}
           {isPlaying ? (
             <div className="absolute inset-0 w-full h-full overflow-hidden">
               <iframe
@@ -79,15 +79,23 @@ const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
               />
             </div>
           ) : (
-            <div className="absolute inset-0 w-full h-full">
+            <div 
+              className="absolute inset-0 w-full h-full cursor-pointer group/thumb"
+              onClick={togglePlay}
+              role="button"
+              tabIndex={0}
+              aria-label={`Play reel: ${reel.title}`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlay(e); }}
+            >
               <img
                 src={reel.thumbnail || `https://i.ytimg.com/vi/${reel.videoId}/hq720.jpg`}
                 alt={reel.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
                 loading="lazy"
+                decoding="async"
               />
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl">
+              <div className="absolute inset-0 bg-black/40 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 group-hover/thumb:bg-white/30 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl group-hover/thumb:scale-110 transition-transform">
                   <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
                 </div>
               </div>
@@ -254,10 +262,22 @@ const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
 const InstagramReels = () => {
   const { data: rawReels } = useReels();
   const reels = useMemo(() => {
-    if (Array.isArray(rawReels) && rawReels.length > 0) return rawReels;
-    return defaultClinicReels;
+    if (!rawReels) return defaultClinicReels;
+    if (Array.isArray(rawReels) && rawReels.length === 0) return [];
+    return rawReels;
   }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
+  const [activePlayingId, setActivePlayingId] = useState(null);
+
+  if (Array.isArray(rawReels) && reels.length === 0) {
+    return (
+      <div className="text-center py-16 bg-neutral-900 rounded-3xl border border-white/10 p-8 max-w-xl mx-auto my-8">
+        <Film className="w-12 h-12 mx-auto text-neutral-500 mb-3" />
+        <h3 className="text-xl font-serif text-white font-semibold mb-2">No Video Reels Currently Available</h3>
+        <p className="text-neutral-400 text-sm">Clinical reels and patient stories will be posted soon. Follow @sanjeevinisiddha on Instagram for live updates.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -325,15 +345,23 @@ const InstagramReels = () => {
           }}
           className="!pb-14"
         >
-          {reels.map((reel, index) => (
-            <SwiperSlide key={reel.id || reel._id || index} className="h-auto">
-              <GalleryReelCard
-                reel={reel}
-                isFirstItem={index === 0}
-                onOpenModal={(r) => setSelectedModalReel(r)}
-              />
-            </SwiperSlide>
-          ))}
+          {reels.map((reel, index) => {
+            const reelKey = reel.id || reel._id || `gallery-reel-${index}`;
+            return (
+              <SwiperSlide key={reelKey} className="h-auto">
+                <GalleryReelCard
+                  reel={reel}
+                  isFirstItem={index === 0}
+                  isPlaying={activePlayingId === reelKey}
+                  onTogglePlay={() => setActivePlayingId((prev) => (prev === reelKey ? null : reelKey))}
+                  onOpenModal={(r) => {
+                    setActivePlayingId(null);
+                    setSelectedModalReel(r);
+                  }}
+                />
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       </div>
 

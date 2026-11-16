@@ -1,19 +1,56 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Container from '../common/Container';
-import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
+import { useTreatments } from '../../hooks/useQueries';
 
-const categories = [
+const categoryIcons = {
+  'Gastrointestinal': '🌿',
+  'Dermatology': '✨',
+  "Women's Health": '🌸',
+  'Musculoskeletal': '🦴',
+  'Neurology': '🧠',
+  'Respiratory': '🫁',
+  'Kidney': '💧',
+  'Pediatrics': '👶',
+  'Anorectal': '⚕️',
+  "Men's Health": '⚡',
+  'Other': '🌿',
+};
+
+const defaultCategories = [
   { name: 'Gastrointestinal', count: 5, icon: '🌿' },
   { name: 'Dermatology', count: 6, icon: '✨' },
-  { name: 'Women\'s Health', count: 4, icon: '🌸' },
+  { name: "Women's Health", count: 4, icon: '🌸' },
   { name: 'Musculoskeletal', count: 4, icon: '🦴' },
   { name: 'Neurology', count: 4, icon: '🧠' },
   { name: 'Respiratory', count: 4, icon: '🫁' }
 ];
 
 const TreatmentsPreview = () => {
+  const { data: rawTreatments } = useTreatments();
+
+  const categories = useMemo(() => {
+    if (!rawTreatments) return defaultCategories;
+    if (Array.isArray(rawTreatments) && rawTreatments.length === 0) return [];
+
+    const map = new Map();
+    rawTreatments.forEach((t) => {
+      if (!t.category) return;
+      const count = map.get(t.category) || 0;
+      map.set(t.category, count + 1);
+    });
+
+    if (map.size === 0) return [];
+
+    return Array.from(map.entries()).slice(0, 6).map(([name, count]) => ({
+      name,
+      count,
+      icon: categoryIcons[name] || '🌿'
+    }));
+  }, [rawTreatments]);
+
   return (
     <section className="py-24 bg-white">
       <Container>
@@ -27,25 +64,31 @@ const TreatmentsPreview = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <Link to={`/treatments?category=${cat.name}`} className="block bg-white hover:bg-primary-50/50 p-6 rounded-2xl border border-slate-200/80 hover:border-primary-500/40 shadow-xs hover:shadow-md transition-all duration-300 group">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl">{cat.icon}</span>
-                  <span className="text-sm font-medium text-primary-700 bg-primary-50 px-3 py-1 rounded-full border border-primary-100">{cat.count} Conditions</span>
-                </div>
-                <h3 className="text-xl font-serif text-primary-700 group-hover:text-primary-600 transition-colors">{cat.name} Care</h3>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+        {categories.length === 0 ? (
+          <div className="text-center py-16 bg-slate-50 rounded-3xl border border-slate-200 p-8 max-w-xl mx-auto my-8">
+            <p className="text-slate-600 text-sm">Treatment protocols are currently being updated. Please contact the clinic for direct condition consultations.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((cat, idx) => (
+              <motion.div
+                key={cat.name || idx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Link to={`/treatments?category=${cat.name}`} className="block bg-white hover:bg-primary-50/50 p-6 rounded-2xl border border-slate-200/80 hover:border-primary-500/40 shadow-xs hover:shadow-md transition-all duration-300 group">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-3xl">{cat.icon}</span>
+                    <span className="text-sm font-medium text-primary-700 bg-primary-50 px-3 py-1 rounded-full border border-primary-100">{cat.count} Conditions</span>
+                  </div>
+                  <h3 className="text-xl font-serif text-primary-700 group-hover:text-primary-600 transition-colors">{cat.name} Care</h3>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </Container>
     </section>
   );

@@ -97,8 +97,7 @@ export const defaultClinicReels = [
 
 export const clinicReelsData = defaultClinicReels;
 
-const HomeReelCard = ({ reel, isFirstItem, onOpenModal }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
+const HomeReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenModal }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(parseInt(reel.likes) || 2400);
@@ -106,7 +105,7 @@ const HomeReelCard = ({ reel, isFirstItem, onOpenModal }) => {
 
   const togglePlay = (e) => {
     e.stopPropagation();
-    setIsPlaying(!isPlaying);
+    onTogglePlay();
   };
 
   const toggleMute = (e) => {
@@ -150,15 +149,23 @@ const HomeReelCard = ({ reel, isFirstItem, onOpenModal }) => {
               />
             </div>
           ) : (
-            <div className="absolute inset-0 w-full h-full">
+            <div 
+              className="absolute inset-0 w-full h-full cursor-pointer group/thumb"
+              onClick={togglePlay}
+              role="button"
+              tabIndex={0}
+              aria-label={`Play reel: ${reel.title}`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlay(e); }}
+            >
               <img
                 src={reel.thumbnail || `https://i.ytimg.com/vi/${reel.videoId}/hq720.jpg`}
                 alt={reel.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
                 loading="lazy"
+                decoding="async"
               />
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl">
+              <div className="absolute inset-0 bg-black/40 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 group-hover/thumb:bg-white/30 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl group-hover/thumb:scale-110 transition-transform">
                   <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
                 </div>
               </div>
@@ -397,10 +404,12 @@ const ReelLightboxModal = ({ reel, onClose }) => {
 const InstagramSection = () => {
   const { data: rawReels } = useReels();
   const reels = useMemo(() => {
-    if (Array.isArray(rawReels) && rawReels.length > 0) return rawReels;
-    return defaultClinicReels;
+    if (!rawReels) return defaultClinicReels;
+    if (Array.isArray(rawReels) && rawReels.length === 0) return [];
+    return rawReels;
   }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
+  const [activePlayingId, setActivePlayingId] = useState(null);
 
   return (
     <section
@@ -420,69 +429,87 @@ const InstagramSection = () => {
           </div>
 
           {/* Clean Navigation Controls - Placed above carousel with ZERO overlap on video cards! */}
-          <div className="flex items-center gap-3 self-start md:self-end flex-shrink-0">
-            <span className="text-xs font-medium text-gray-500 hidden sm:inline-block">
-              {reels.length} {reels.length === 1 ? 'Reel' : 'Reels'} Total
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                className="home-reels-prev w-11 h-11 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-primary-700 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all duration-200 cursor-pointer disabled:opacity-40"
-                aria-label="Previous reel"
-                title="Previous reel"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                className="home-reels-next w-11 h-11 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-primary-700 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all duration-200 cursor-pointer disabled:opacity-40"
-                aria-label="Next reel"
-                title="Next reel"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+          {reels.length > 0 && (
+            <div className="flex items-center gap-3 self-start md:self-end flex-shrink-0">
+              <span className="text-xs font-medium text-gray-500 hidden sm:inline-block">
+                {reels.length} {reels.length === 1 ? 'Reel' : 'Reels'} Total
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  className="home-reels-prev w-11 h-11 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-primary-700 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all duration-200 cursor-pointer disabled:opacity-40"
+                  aria-label="Previous reel"
+                  title="Previous reel"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  className="home-reels-next w-11 h-11 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-primary-700 hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all duration-200 cursor-pointer disabled:opacity-40"
+                  aria-label="Next reel"
+                  title="Next reel"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Autoplay Reels Slider - Clean layout with generous padding so arrows never collide */}
-        <div className="relative">
-          <Swiper
-            modules={[Autoplay, Navigation, Pagination]}
-            spaceBetween={20}
-            slidesPerView={1.2}
-            loop={reels.length > 3}
-            autoplay={{
-              delay: 4500,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            navigation={{
-              nextEl: '.home-reels-next',
-              prevEl: '.home-reels-prev',
-            }}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            breakpoints={{
-              480: { slidesPerView: 1.6, spaceBetween: 20 },
-              640: { slidesPerView: 2.2, spaceBetween: 22 },
-              768: { slidesPerView: 2.8, spaceBetween: 24 },
-              1024: { slidesPerView: 3.4, spaceBetween: 26 },
-              1280: { slidesPerView: 4, spaceBetween: 28 },
-            }}
-            className="!pb-14"
-          >
-            {reels.map((reel, index) => (
-              <SwiperSlide key={reel.id || reel._id || index} className="h-auto">
-                <HomeReelCard
-                  reel={reel}
-                  isFirstItem={index === 0}
-                  onOpenModal={(r) => setSelectedModalReel(r)}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+        {/* Autoplay Reels Slider or Empty Notice */}
+        {reels.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8 max-w-xl mx-auto my-8 shadow-sm">
+            <Film className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+            <h3 className="text-xl font-serif text-slate-800 font-semibold mb-2">No Video Reels Currently Available</h3>
+            <p className="text-slate-500 text-sm">Clinical reels and patient recovery updates will be posted soon. Follow @sanjeevinisiddha on Instagram for live updates.</p>
+          </div>
+        ) : (
+          <div className="relative">
+            <Swiper
+              modules={[Autoplay, Navigation, Pagination]}
+              spaceBetween={20}
+              slidesPerView={1.2}
+              loop={reels.length > 3}
+              autoplay={{
+                delay: 4500,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              navigation={{
+                nextEl: '.home-reels-next',
+                prevEl: '.home-reels-prev',
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              breakpoints={{
+                480: { slidesPerView: 1.6, spaceBetween: 20 },
+                640: { slidesPerView: 2.2, spaceBetween: 22 },
+                768: { slidesPerView: 2.8, spaceBetween: 24 },
+                1024: { slidesPerView: 3.4, spaceBetween: 26 },
+                1280: { slidesPerView: 4, spaceBetween: 28 },
+              }}
+              className="!pb-14"
+            >
+              {reels.map((reel, index) => {
+                const reelKey = reel.id || reel._id || `reel-${index}`;
+                return (
+                  <SwiperSlide key={reelKey} className="h-auto">
+                    <HomeReelCard
+                      reel={reel}
+                      isFirstItem={index === 0}
+                      isPlaying={activePlayingId === reelKey}
+                      onTogglePlay={() => setActivePlayingId((prev) => (prev === reelKey ? null : reelKey))}
+                      onOpenModal={(r) => {
+                        setActivePlayingId(null);
+                        setSelectedModalReel(r);
+                      }}
+                    />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </div>
+        )}
 
         {/* Follow CTA */}
         <div className="text-center mt-6">

@@ -18,8 +18,9 @@ import { useSwarnaBindu } from '../hooks/useQueries';
 const SwarnaBindu = () => {
   const { data: rawEvents, isLoading } = useSwarnaBindu();
   const schedule = useMemo(() => {
-    if (Array.isArray(rawEvents) && rawEvents.length > 0) return rawEvents;
-    return defaultPushyaSchedule;
+    if (!rawEvents) return defaultPushyaSchedule;
+    if (Array.isArray(rawEvents) && rawEvents.length === 0) return [];
+    return rawEvents;
   }, [rawEvents]);
   const loading = isLoading && (!rawEvents || rawEvents.length === 0);
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'completed'
@@ -216,7 +217,14 @@ const SwarnaBindu = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
-                    {filteredSchedule.map((row, idx) => {
+                    {filteredSchedule.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-12 px-6 text-center text-slate-500 font-medium bg-slate-50/50">
+                          No camp dates scheduled under this filter. Please check back soon or contact the clinic.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredSchedule.map((row, idx) => {
                       const isNext = row.status === 'Next Camp';
                       const isUpcoming = row.status === 'Upcoming';
                       const isCompleted = row.status === 'Completed';
@@ -291,7 +299,7 @@ const SwarnaBindu = () => {
                           </td>
                         </tr>
                       );
-                    })}
+                    }))}
                   </tbody>
                 </table>
               </div>

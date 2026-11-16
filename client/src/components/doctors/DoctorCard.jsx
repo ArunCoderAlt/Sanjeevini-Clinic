@@ -11,8 +11,8 @@ const DoctorCard = ({ doctor }) => {
     image = '/images/doctors/dr-thiagarajan.jpg';
   } else if (doctor.name?.includes('Subashini') && (!image || image.includes('ui-avatars') || image.includes('unsplash.com'))) {
     image = '/images/doctors/dr-subashini.jpg';
-  } else if (!image || image.includes('unsplash.com')) {
-    image = '/images/doctors/dr-thiagarajan.jpg';
+  } else if (!image) {
+    image = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name || 'Doctor')}&background=0C2B4B&color=fff&size=512`;
   }
 
   return (

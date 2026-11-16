@@ -527,4 +527,61 @@ CREATE TABLE IF NOT EXISTS public.groq_usage_logs (
 CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_created ON public.groq_usage_logs(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_key_version ON public.groq_usage_logs(key_version);
 
+-- ------------------------------------------------------------------------------
+-- 14. REELS TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.reels (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  tag TEXT DEFAULT 'Panchakarma & Siddha',
+  video_id TEXT NOT NULL DEFAULT '8oLZSitF20E',
+  start INTEGER DEFAULT 0,
+  start_time INTEGER DEFAULT 0,
+  thumbnail TEXT DEFAULT '',
+  likes TEXT DEFAULT '2.4K',
+  views TEXT DEFAULT '18.9K',
+  "desc" TEXT DEFAULT '',
+  description TEXT DEFAULT '',
+  instagram_url TEXT DEFAULT 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
+  is_active BOOLEAN DEFAULT TRUE,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS trg_reels_updated_at ON public.reels;
+CREATE TRIGGER trg_reels_updated_at
+  BEFORE UPDATE ON public.reels
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE INDEX IF NOT EXISTS idx_reels_active_created ON public.reels (is_active, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reels_tag_active ON public.reels (tag, is_active, created_at DESC);
+
+-- ------------------------------------------------------------------------------
+-- 15. SWARNA BINDU TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.swarna_bindu (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  month TEXT NOT NULL,
+  date TEXT NOT NULL,
+  day TEXT NOT NULL,
+  nakshatra TEXT DEFAULT 'Pushya (Poosam)',
+  timings TEXT DEFAULT 'All Day',
+  venue TEXT DEFAULT 'Sanjeevini Medical Centre, Karaikal',
+  status TEXT DEFAULT 'Upcoming' CHECK (status IN ('Next Camp', 'Upcoming', 'Completed', 'Cancelled', 'Rescheduled')),
+  notes TEXT DEFAULT '',
+  order_index INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS trg_swarna_bindu_updated_at ON public.swarna_bindu;
+CREATE TRIGGER trg_swarna_bindu_updated_at
+  BEFORE UPDATE ON public.swarna_bindu
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE INDEX IF NOT EXISTS idx_swarna_bindu_active_date ON public.swarna_bindu (is_active, date ASC, order_index ASC);
+
+
 

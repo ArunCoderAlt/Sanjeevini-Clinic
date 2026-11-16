@@ -20,7 +20,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      gcTime: 24 * 60 * 60 * 1000,
+      gcTime: 10 * 60 * 1000, // 10 mins: Automatically garbage-collect inactive queries from RAM
       refetchOnWindowFocus: false,
       refetchOnReconnect: 'always',
       retry: 1,
@@ -40,8 +40,8 @@ if (typeof window !== 'undefined') {
     persistQueryClient({
       queryClient,
       persister,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours persistence
-      buster: 'v2.1',
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours storage persistence
+      buster: 'v2.2',
     });
   } catch (err) {
     console.warn('React Query browser storage persistence notice:', err);

@@ -43,6 +43,28 @@ const HeroSection = () => {
         video.addEventListener('loadeddata', attemptPlay, { once: true });
         video.addEventListener('canplay', attemptPlay, { once: true });
       }
+
+      // Memory saver: Pause video decoding when hero is scrolled out of viewport
+      let observer;
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                if (video.paused) video.play().catch(() => {});
+              } else {
+                if (!video.paused) video.pause();
+              }
+            });
+          },
+          { threshold: 0.05 }
+        );
+        observer.observe(video);
+      }
+
+      return () => {
+        if (observer) observer.disconnect();
+      };
     }
   }, []);
 
@@ -84,7 +106,7 @@ const HeroSection = () => {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/images/hero/slide-1.png"
           className="w-full h-full object-cover object-center"
         >

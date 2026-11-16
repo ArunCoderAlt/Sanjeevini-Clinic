@@ -28,17 +28,16 @@ const DoctorsPreview = () => {
   const { data: rawDoctors } = useDoctors();
 
   const team = useMemo(() => {
-    if (!Array.isArray(rawDoctors) || rawDoctors.length === 0) {
-      return defaultDoctors;
-    }
+    if (!rawDoctors) return defaultDoctors;
+    if (Array.isArray(rawDoctors) && rawDoctors.length === 0) return [];
     return rawDoctors.map((d) => {
       let img = d.image;
       if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
         img = '/images/doctors/dr-thiagarajan.jpg';
       } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
         img = '/images/doctors/dr-subashini.jpg';
-      } else if (!img || img.includes('unsplash.com')) {
-        img = '/images/doctors/dr-thiagarajan.jpg';
+      } else if (!img) {
+        img = `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name || 'Doctor')}&background=0C2B4B&color=fff&size=512`;
       }
       return {
         id: d._id || d.id || d.slug,
@@ -60,38 +59,44 @@ const DoctorsPreview = () => {
           light
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mt-10 md:mt-16 max-w-4xl mx-auto items-stretch">
-          {team.map((doc, idx) => (
-            <motion.div
-              key={doc.slug || doc.id || idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.2 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group border border-white/50 h-full flex flex-col justify-between"
-            >
-              <div className="aspect-[4/5] overflow-hidden bg-slate-800 relative">
-                <img 
-                  src={doc.img} 
-                  alt={doc.name} 
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
-                />
-              </div>
-              <div className="p-6 sm:p-8 text-center flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-serif text-primary-700 mb-2 leading-snug">{doc.name}</h3>
-                  <p className="text-gold font-medium mb-1 text-sm sm:text-base">{doc.qual}</p>
-                  <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-6">{doc.spec}</p>
+        {team.length === 0 ? (
+          <div className="text-center py-16 bg-white/5 rounded-3xl border border-white/10 p-8 max-w-xl mx-auto my-12">
+            <p className="text-slate-300 text-sm">Doctor profiles will be updated shortly. Please contact reception for direct doctor consultation schedules.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mt-10 md:mt-16 max-w-4xl mx-auto items-stretch">
+            {team.map((doc, idx) => (
+              <motion.div
+                key={doc.slug || doc.id || idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group border border-white/50 h-full flex flex-col justify-between"
+              >
+                <div className="aspect-[4/5] overflow-hidden bg-slate-800 relative">
+                  <img 
+                    src={doc.img} 
+                    alt={doc.name} 
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                  />
                 </div>
-                <Button to={`/doctors/${doc.slug || doc.id}`} variant="primary" className="w-full mt-auto py-2.5 sm:py-3 text-sm font-semibold">
-                  View Profile
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                <div className="p-6 sm:p-8 text-center flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-serif text-primary-700 mb-2 leading-snug">{doc.name}</h3>
+                    <p className="text-gold font-medium mb-1 text-sm sm:text-base">{doc.qual}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-6">{doc.spec}</p>
+                  </div>
+                  <Button to={`/doctors/${doc.slug || doc.id}`} variant="primary" className="w-full mt-auto py-2.5 sm:py-3 text-sm font-semibold">
+                    View Profile
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </Container>
     </section>
   );

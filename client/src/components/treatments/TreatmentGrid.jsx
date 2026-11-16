@@ -21,9 +21,8 @@ const TreatmentGrid = ({ searchTerm, activeCategory }) => {
   const { data: rawTreatments } = useTreatments(activeCategory);
 
   const items = useMemo(() => {
-    if (!Array.isArray(rawTreatments) || rawTreatments.length === 0) {
-      return defaultTreatments;
-    }
+    if (!rawTreatments) return defaultTreatments;
+    if (Array.isArray(rawTreatments) && rawTreatments.length === 0) return [];
     return rawTreatments.map((t) => {
       const def = defaultTreatments.find(d => d.slug === t.slug || d.category?.toLowerCase() === t.category?.toLowerCase() || d.name?.toLowerCase() === t.name?.toLowerCase()) || {};
       return {

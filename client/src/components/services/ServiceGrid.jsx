@@ -13,9 +13,9 @@ const ServiceGrid = () => {
   const { data: rawServices, isLoading } = useServices();
 
   const services = useMemo(() => {
-    if (!Array.isArray(rawServices) || rawServices.length === 0) {
-      return defaultServices;
-    }
+    if (!rawServices) return defaultServices;
+    if (Array.isArray(rawServices) && rawServices.length === 0) return [];
+
     const filtered = rawServices.filter(item => item.slug !== 'consultation');
     return filtered.map(item => {
       const def = defaultServices.find(d => d.slug === item.slug) || {};
@@ -24,12 +24,21 @@ const ServiceGrid = () => {
         slug: item.slug || def.slug,
         title: item.title,
         desc: item.shortDescription || def.desc,
-        iconName: def.iconName || 'Activity'
+        iconName: item.icon || def.iconName || 'Activity'
       };
     });
   }, [rawServices]);
 
   if (isLoading && (!rawServices || rawServices.length === 0)) return <Loading />;
+
+  if (!isLoading && Array.isArray(rawServices) && services.length === 0) {
+    return (
+      <div className="text-center py-16 bg-white rounded-3xl border border-slate-200/80 p-8 max-w-xl mx-auto shadow-sm">
+        <h3 className="text-xl font-serif text-slate-800 font-semibold mb-2">No Services Currently Available</h3>
+        <p className="text-slate-500 text-sm">Services are currently being updated. Please check back soon or contact the clinic directly.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

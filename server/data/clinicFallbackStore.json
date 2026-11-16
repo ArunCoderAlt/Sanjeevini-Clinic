@@ -1,0 +1,819 @@
+{
+  "doctors": [
+    {
+      "id": "11111111-1111-4111-a111-111111111111",
+      "name": "Dr. Thiagarajan Saminadane",
+      "slug": "thiagarajan-saminadane",
+      "qualification": "MD (Siddha)",
+      "specialization": "Siddha",
+      "experience": 20,
+      "bio": "Expert in Siddha diagnostic methods and comprehensive health assessment with over two decades of clinical experience restoring holistic balance.",
+      "image": "/images/doctors/dr-thiagarajan.jpg",
+      "consultationHours": "Monday – Saturday, 5:00 PM – 9:30 PM",
+      "languages": [
+        "English",
+        "Tamil"
+      ],
+      "achievements": [
+        "Gold Medalist in Siddha Medicine",
+        "20+ Years Clinical Excellence"
+      ],
+      "order": 1,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.495Z"
+    },
+    {
+      "id": "22222222-2222-4222-a222-222222222222",
+      "name": "Dr. Subashini Ganesan",
+      "slug": "subashini-ganesan",
+      "qualification": "BAMS (Ayurveda)",
+      "specialization": "Ayurveda",
+      "experience": 15,
+      "bio": "Expert in Ayurvedic treatments, Panchakarma therapies, and holistic lifestyle wellness.",
+      "image": "/images/doctors/dr-subashini.jpg",
+      "consultationHours": "Monday – Saturday, 5:00 PM – 9:30 PM",
+      "languages": [
+        "English",
+        "Tamil"
+      ],
+      "achievements": [
+        "Specialist in Traditional Ayurvedic Formulations"
+      ],
+      "order": 2,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    }
+  ],
+  "services": [
+    {
+      "id": "33333333-3333-4333-a333-333333333332",
+      "title": "Varmam Therapy",
+      "slug": "varmam-therapy",
+      "shortDescription": "Traditional therapeutic technique targeting vital energy points to stimulate healing.",
+      "fullDescription": "Ancient Siddha vital point manipulation therapy that restores energy flow, alleviates chronic pain, and accelerates neurological recovery.",
+      "image": null,
+      "icon": "HeartPulse",
+      "benefits": [
+        "Relief from joint and nerve pain",
+        "Improved mobility",
+        "Revitalized energy pathways"
+      ],
+      "procedures": [
+        "Point identification",
+        "Gentle pressure stimulation",
+        "Rebalancing"
+      ],
+      "order": 1,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "33333333-3333-4333-a333-333333333333",
+      "title": "Thokkanam Therapy",
+      "slug": "thokkanam-therapy",
+      "shortDescription": "Traditional Siddha physical manipulation and medicinal oil massage therapy.",
+      "fullDescription": "Nine specialized physical touch techniques combined with medicated herbal oils to rejuvenate muscle tissues and relieve stress.",
+      "image": null,
+      "icon": "Sparkles",
+      "benefits": [
+        "Deep muscle relaxation",
+        "Enhanced blood circulation",
+        "Toxin elimination"
+      ],
+      "procedures": [
+        "Medicated oil selection",
+        "Therapeutic touch massage",
+        "Steam therapy"
+      ],
+      "order": 2,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "33333333-3333-4333-a333-333333333334",
+      "title": "Wellness Support",
+      "slug": "wellness-support",
+      "shortDescription": "Holistic wellness, dietetics, and preventive care programs for lasting vitality.",
+      "fullDescription": "Customized dietary guidance, seasonal routines, and preventive regimens based on ancient principles for overall vitality.",
+      "image": null,
+      "icon": "ShieldCheck",
+      "benefits": [
+        "Immunity enhancement",
+        "Balanced metabolic health",
+        "Preventive care"
+      ],
+      "procedures": [
+        "Dietary planning",
+        "Seasonal regimen",
+        "Herbal supplements"
+      ],
+      "order": 3,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    }
+  ],
+  "treatments": [
+    {
+      "id": "44444444-4444-4444-a444-444444444400",
+      "name": "Gastrointestinal Treatments - வயிறு / குடல் சார்ந்த நோய்கள்",
+      "slug": "gastrointestinal",
+      "category": "Gastrointestinal",
+      "description": "Holistic healing for ulcers, GERD, IBS, and chronic indigestion using herbal formulations and gut-reset diets.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": "/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png",
+      "order": 1,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444401",
+      "name": "Dermatology Treatments - தோல் நோய்கள்",
+      "slug": "dermatology",
+      "category": "Dermatology",
+      "description": "Natural Siddha and Ayurvedic solutions for psoriasis, eczema, acne, and vitiligo with pure plant extracts.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": "/uploads/dermatology-treatment-1794426000000.png",
+      "order": 2,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444402",
+      "name": "Women's Health Treatments",
+      "slug": "women-s-health",
+      "category": "Women's Health",
+      "description": "Supportive care for PCOD, hormonal imbalances, fertility optimization, and menopause.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 3,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444403",
+      "name": "Kidney & Urinary Treatments",
+      "slug": "kidney",
+      "category": "Kidney",
+      "description": "Therapeutic care for kidney stones, urinary tract infections, and renal wellness.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 4,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444404",
+      "name": "Musculoskeletal Treatments",
+      "slug": "musculoskeletal",
+      "category": "Musculoskeletal",
+      "description": "Varmam therapy and herbal oils for arthritis, sciatica, spondylosis, and frozen shoulder.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": "/uploads/musculoskeletal-treatment-1794426000000.png",
+      "order": 5,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444405",
+      "name": "Pediatrics Treatments",
+      "slug": "pediatrics",
+      "category": "Pediatrics",
+      "description": "Gentle, natural formulations to bolster immunity and growth for infants and children.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 6,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444406",
+      "name": "Respiratory Treatments",
+      "slug": "respiratory",
+      "category": "Respiratory",
+      "description": "Relief from chronic sinusitis, asthma, bronchitis, and allergies through pranayama and herbal remedies.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 7,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444407",
+      "name": "Neurology Treatments",
+      "slug": "neurology",
+      "category": "Neurology",
+      "description": "Vital point Varmam therapy and neural rejuvenation for migraine, neuropathy, and paralysis rehabilitation.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 8,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444408",
+      "name": "Anorectal Treatments",
+      "slug": "anorectal",
+      "category": "Anorectal",
+      "description": "Non-surgical traditional management for piles, fissures, and fistula with soothing herbal care.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 9,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444409",
+      "name": "Men's Health Treatments",
+      "slug": "men-s-health",
+      "category": "Men's Health",
+      "description": "Restorative therapy for vitality, prostate wellness, and stress-related fatigue.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 10,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444410",
+      "name": "General Wellness Treatments",
+      "slug": "other",
+      "category": "Other",
+      "description": "Detoxification, rejuvenation (Rasayana), and immune modulation for longevity.",
+      "conditions": [
+        "Chronic pain",
+        "System imbalance",
+        "Inflammation"
+      ],
+      "symptoms": [
+        "Discomfort",
+        "Fatigue",
+        "Restricted mobility"
+      ],
+      "approaches": [
+        "Internal herbal medicines",
+        "External Varmam therapy",
+        "Constitutional diet"
+      ],
+      "image": null,
+      "order": 11,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    }
+  ],
+  "site_settings": [
+    {
+      "id": "55555555-5555-4555-a555-555555555555",
+      "clinicName": "Sanjeevini Siddha & Ayurveda Medical Centre",
+      "address": "No. 22, Dr. Ambedkar Street, Karaikal - 609602, Puducherry (U.T.), India",
+      "phone": "+91 98430 66362",
+      "email": "sanjeevinisiddha@gmail.com",
+      "consultationHours": "Monday – Saturday, 5:00 PM – 9:30 PM",
+      "whatsappNumber": "919486838368",
+      "mapUrl": "https://maps.app.goo.gl/Yt69f1M1mUipkFbi9",
+      "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3917.6012698626005!2d79.8311448!3d10.9178771!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a55114c73bcb10f%3A0xa87a8127466e42ab!2sSanjeevini%20Siddha%20%26%20Ayurveda%20Medical%20centre!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin",
+      "socialLinks": {
+        "twitter": "https://twitter.com/Sanjeevini_KKL",
+        "youtube": "https://www.youtube.com/@SanjeeviniSiddha",
+        "instagram": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4"
+      },
+      "aboutText": "Authentic Siddha & Ayurveda healing crafted with compassionate care in Karaikal.",
+      "philosophy": "Treating the root cause through natural and time-tested ancient wisdom.",
+      "missionStatement": "To offer accessible, authentic, and compassionate traditional healthcare to all.",
+      "visionStatement": "To become a premier centre for holistic traditional medicine and wellness.",
+      "metaTitle": "Sanjeevini Siddha & Ayurveda Medical Centre | Karaikal",
+      "metaDescription": "Authentic Siddha and Ayurvedic healthcare services in Karaikal.",
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "66666666-6666-4666-a666-666666666661",
+      "name": "R. Senthil Kumar",
+      "location": "Karaikal",
+      "rating": 5,
+      "treatment": "Musculoskeletal",
+      "review": "I suffered from chronic lower back pain for over 3 years. After Varmam and Thokkanam sessions here, the relief was unbelievable.",
+      "isApproved": true,
+      "isFeatured": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "66666666-6666-4666-a666-666666666662",
+      "name": "Meenakshi Sundaram",
+      "location": "Nagapattinam",
+      "rating": 5,
+      "treatment": "Dermatology",
+      "review": "Authentic Ayurvedic skin care treatments helped cure my stubborn eczema when modern medicine provided only temporary relief.",
+      "isApproved": true,
+      "isFeatured": true,
+      "createdAt": "2026-11-16T04:41:47.496Z"
+    },
+    {
+      "id": "66666666-6666-4666-a666-666666666663",
+      "name": "K. Anbarasan",
+      "location": "Kumbakonam",
+      "rating": 5,
+      "treatment": "Gastrointestinal",
+      "review": "Dr. Thiagarajan diagnosed my digestive issues accurately through Naadi. With traditional herbal medicine and diet changes, I am completely healed.",
+      "isApproved": true,
+      "isFeatured": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "77777777-7777-4777-a777-777777777771",
+      "title": "Rooted in Tradition, Focused on Health",
+      "description": "Holistic care combining traditional Siddha and Ayurveda.",
+      "image": "/images/hero/slide-1.png",
+      "category": "clinic",
+      "isActive": true,
+      "order": 1,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "77777777-7777-4777-a777-777777777772",
+      "title": "Individualized Patient Wellness",
+      "description": "Comprehensive assessment and tailored therapeutic regimens.",
+      "image": "/images/hero/slide-2.png",
+      "category": "treatment",
+      "isActive": true,
+      "order": 2,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "77777777-7777-4777-a777-777777777773",
+      "title": "Specialist Clinical Consultation",
+      "description": "Traditional Siddha and Ayurvedic consultation at Karaikal.",
+      "image": "/images/hero/slide-3.png",
+      "category": "clinic",
+      "isActive": true,
+      "order": 3,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "77777777-7777-4777-a777-777777777774",
+      "title": "Specialised Point Stimulation & Care",
+      "description": "Therapeutic Siddha treatments and external modalities.",
+      "image": "/images/hero/slide-4.png",
+      "category": "treatment",
+      "isActive": true,
+      "order": 4,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "77777777-7777-4777-a777-777777777775",
+      "title": "Ancient Wisdom & SAMC Philosophy",
+      "description": "Natural healing rooted in authentic Siddha and Ayurvedic principles.",
+      "image": "/images/about/samc-philosophy.jpg",
+      "category": "treatment",
+      "isActive": true,
+      "order": 5,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "88888888-8888-4888-a888-888888888888",
+      "name": "Admin",
+      "email": "admin@sanjeevinisiddha.in",
+      "password": "$2a$10$0jrs0SQ1AQc2JAgAg9fXcOSgb0Iy0P4LqFpyd9Jwq9iH/kp9pTmBe",
+      "role": "admin",
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    }
+  ],
+  "reels": [
+    {
+      "id": "99999999-9999-4999-a999-999999999991",
+      "title": "Hospital Care & Herbal Treatments",
+      "tag": "Panchakarma & Siddha",
+      "videoId": "8oLZSitF20E",
+      "start": 0,
+      "thumbnail": "https://i.ytimg.com/vi/8oLZSitF20E/hq720.jpg",
+      "likes": "2.4K",
+      "views": "18.9K",
+      "desc": "Virtual walkthrough of Sanjeevini Siddha inpatient rooms, traditional herbal care, and therapy facilities in Karaikal.",
+      "instagramUrl": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4",
+      "isActive": true,
+      "order": 1,
+      "createdAt": "2026-10-10T10:00:00.000Z"
+    },
+    {
+      "id": "99999999-9999-4999-a999-999999999992",
+      "title": "Ayush Therapies & Traditional Medicine",
+      "tag": "Ayush Certified",
+      "videoId": "-Fz1SBNlSw0",
+      "start": 12,
+      "thumbnail": "https://i.ytimg.com/vi/-Fz1SBNlSw0/hq720.jpg",
+      "likes": "3.1K",
+      "views": "24.5K",
+      "desc": "Clinical insights on authentic Siddha herbal preparations, dietary regimens, and holistic healing principles.",
+      "instagramUrl": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4",
+      "isActive": true,
+      "order": 2,
+      "createdAt": "2026-10-11T10:00:00.000Z"
+    },
+    {
+      "id": "99999999-9999-4999-a999-999999999993",
+      "title": "Nadi Parikshai Pulse Diagnosis",
+      "tag": "Siddha Diagnosis",
+      "videoId": "8oLZSitF20E",
+      "start": 45,
+      "thumbnail": "https://i.ytimg.com/vi/8oLZSitF20E/hq720.jpg",
+      "likes": "4.8K",
+      "views": "32.1K",
+      "desc": "Dr. Thiagarajan explains the assessment of body doshas (Vatham, Pitham, Kapham) through ancient pulse examination.",
+      "instagramUrl": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4",
+      "isActive": true,
+      "order": 3,
+      "createdAt": "2026-10-12T10:00:00.000Z"
+    },
+    {
+      "id": "99999999-9999-4999-a999-999999999994",
+      "title": "Varmam Vital Point Energy Therapy",
+      "tag": "Energy Locks",
+      "videoId": "-Fz1SBNlSw0",
+      "start": 78,
+      "thumbnail": "https://i.ytimg.com/vi/-Fz1SBNlSw0/hq720.jpg",
+      "likes": "3.6K",
+      "views": "28.3K",
+      "desc": "Demonstration of vital pressure points (Varmam) to treat chronic spinal stiffness, nerve compression, and joint mobility.",
+      "instagramUrl": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4",
+      "isActive": true,
+      "order": 4,
+      "createdAt": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "id": "99999999-9999-4999-a999-999999999995",
+      "title": "Authentic Herbal Pharmacy & Decoctions",
+      "tag": "Natural Pharmacy",
+      "videoId": "8oLZSitF20E",
+      "start": 110,
+      "thumbnail": "https://i.ytimg.com/vi/8oLZSitF20E/hq720.jpg",
+      "likes": "1.9K",
+      "views": "15.7K",
+      "desc": "Preparation of customized herbal Kashayams and medicated oils according to classical Agathiyar Siddha formulations.",
+      "instagramUrl": "https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4",
+      "isActive": true,
+      "order": 5,
+      "createdAt": "2026-10-14T10:00:00.000Z"
+    }
+  ],
+  "appointments": [],
+  "contact_messages": [],
+  "newsletters": [],
+  "swarna_bindu": [
+    {
+      "id": "sb-2026-01",
+      "month": "January",
+      "date": "2026-01-08",
+      "day": "Thursday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "All Day",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Camp completed successfully",
+      "order": 1,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-02",
+      "month": "February",
+      "date": "2026-02-04",
+      "day": "Wednesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "All Day",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Camp completed successfully",
+      "order": 2,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-03a",
+      "month": "March",
+      "date": "2026-03-04",
+      "day": "Wednesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Evening pediatric session",
+      "order": 3,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-03b",
+      "month": "March",
+      "date": "2026-03-31",
+      "day": "Tuesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Second March camp",
+      "order": 4,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-04",
+      "month": "April",
+      "date": "2026-04-28",
+      "day": "Tuesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 5,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-05",
+      "month": "May",
+      "date": "2026-05-25",
+      "day": "Monday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 6,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-06",
+      "month": "June",
+      "date": "2026-06-21",
+      "day": "Sunday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Sunday special camp",
+      "order": 7,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-07",
+      "month": "July",
+      "date": "2026-07-18",
+      "day": "Saturday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Saturday special camp",
+      "order": 8,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-08",
+      "month": "August",
+      "date": "2026-08-15",
+      "day": "Saturday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 9,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-09",
+      "month": "September",
+      "date": "2026-09-11",
+      "day": "Friday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 10,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-10",
+      "month": "October",
+      "date": "2026-10-08",
+      "day": "Thursday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 11,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-11a",
+      "month": "November",
+      "date": "2026-11-04",
+      "day": "Wednesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Completed",
+      "notes": "Conducted successfully",
+      "order": 12,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-11b",
+      "month": "November",
+      "date": "2026-11-28",
+      "day": "Saturday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Next Camp",
+      "notes": "Mega Swarna Bindu Prashana Camp — Pre-registration open",
+      "order": 13,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-12a",
+      "month": "December",
+      "date": "2026-12-01",
+      "day": "Tuesday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Upcoming",
+      "notes": "Evening pediatric session",
+      "order": 14,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "id": "sb-2026-12b",
+      "month": "December",
+      "date": "2026-12-28",
+      "day": "Monday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM – 9:30 PM",
+      "venue": "Sanjeevini Medical Centre, Karaikal",
+      "status": "Upcoming",
+      "notes": "Year-end Pushya Nakshatra camp",
+      "order": 15,
+      "isActive": true,
+      "createdAt": "2026-11-16T04:41:47.497Z"
+    }
+  ],
+  "groq_key_periods": [],
+  "groq_usage_logs": []
+}
