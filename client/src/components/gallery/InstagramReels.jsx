@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -262,12 +262,39 @@ const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenMod
 const InstagramReels = () => {
   const { data: rawReels } = useReels();
   const reels = useMemo(() => {
-    if (!rawReels) return defaultClinicReels;
-    if (Array.isArray(rawReels) && rawReels.length === 0) return [];
-    return rawReels;
+    const list = Array.isArray(rawReels) && rawReels.length > 0 ? rawReels : (!rawReels ? defaultClinicReels : []);
+    if (!Array.isArray(list) || list.length === 0) return [];
+
+    // Always sort newest / latest reels first so the latest reel is displayed first
+    return [...list].sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.created_at || 0).getTime();
+      const timeB = new Date(b.createdAt || b.created_at || 0).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+      return (a.order ?? 999) - (b.order ?? 999);
+    });
   }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
-  const [activePlayingId, setActivePlayingId] = useState(null);
+  const [swiperInstance, setSwiperInstance] = useState(null);
+  const [activePlayingId, setActivePlayingId] = useState(() => {
+    return defaultClinicReels[0]?.id || 'default-1';
+  });
+
+  // Automatically activate latest first reel on mount or dynamic load
+  useEffect(() => {
+    if (reels.length > 0) {
+      setActivePlayingId(reels[0].id || reels[0]._id || 'default-1');
+    }
+  }, [reels]);
+
+  // Synchronize playing reel with Swiper autoplay slide transition
+  const handleSlideChange = (swiper) => {
+    const idx = swiper.realIndex ?? swiper.activeIndex;
+    const currentReel = reels[idx];
+    if (currentReel) {
+      const reelKey = currentReel.id || currentReel._id || `gallery-reel-${idx}`;
+      setActivePlayingId(reelKey);
+    }
+  };
 
   if (Array.isArray(rawReels) && reels.length === 0) {
     return (
@@ -324,10 +351,12 @@ const InstagramReels = () => {
           slidesPerView={1.2}
           loop={reels.length > 3}
           autoplay={{
-            delay: 4500,
+            delay: 5000,
             disableOnInteraction: false,
             pauseOnMouseEnter: true,
           }}
+          onSwiper={setSwiperInstance}
+          onSlideChange={handleSlideChange}
           navigation={{
             nextEl: '.gallery-reels-next',
             prevEl: '.gallery-reels-prev',
@@ -353,7 +382,16 @@ const InstagramReels = () => {
                   reel={reel}
                   isFirstItem={index === 0}
                   isPlaying={activePlayingId === reelKey}
-                  onTogglePlay={() => setActivePlayingId((prev) => (prev === reelKey ? null : reelKey))}
+                  onTogglePlay={() => {
+                    setActivePlayingId(reelKey);
+                    if (swiperInstance) {
+                      if (typeof swiperInstance.slideToLoop === 'function') {
+                        swiperInstance.slideToLoop(index);
+                      } else {
+                        swiperInstance.slideTo(index);
+                      }
+                    }
+                  }}
                   onOpenModal={(r) => {
                     setActivePlayingId(null);
                     setSelectedModalReel(r);

@@ -69,7 +69,13 @@ const ReelsAdmin = () => {
     setLoading(true);
     try {
       const res = await getReels({ all: 'true' });
-      setReels(res.data.data || []);
+      const raw = res.data.data || [];
+      const sorted = [...raw].sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || 0).getTime();
+        const timeB = new Date(b.createdAt || b.created_at || 0).getTime();
+        return timeB - timeA;
+      });
+      setReels(sorted);
     } catch (err) {
       if (err.response?.status !== 401) {
         toast.error('Failed to load reels.');

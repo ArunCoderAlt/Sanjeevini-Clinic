@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -38,7 +38,7 @@ export const defaultClinicReels = [
     likes: '2.4K',
     views: '18.9K',
     desc: 'Virtual walkthrough of Sanjeevini Siddha inpatient rooms, traditional herbal care, and therapy facilities in Karaikal.',
-    instagramUrl: clinicInfo.socialLinks.instagram,
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     createdAt: '2026-10-14T10:00:00Z',
   },
   {
@@ -51,7 +51,7 @@ export const defaultClinicReels = [
     likes: '3.1K',
     views: '24.5K',
     desc: 'Clinical insights on authentic Siddha herbal preparations, dietary regimens, and holistic healing principles.',
-    instagramUrl: clinicInfo.socialLinks.instagram,
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     createdAt: '2026-10-13T10:00:00Z',
   },
   {
@@ -64,7 +64,7 @@ export const defaultClinicReels = [
     likes: '4.8K',
     views: '32.1K',
     desc: 'Dr. Thiagarajan explains the assessment of body doshas (Vatham, Pitham, Kapham) through ancient pulse examination.',
-    instagramUrl: clinicInfo.socialLinks.instagram,
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     createdAt: '2026-10-12T10:00:00Z',
   },
   {
@@ -77,7 +77,7 @@ export const defaultClinicReels = [
     likes: '3.6K',
     views: '28.3K',
     desc: 'Demonstration of vital pressure points (Varmam) to treat chronic spinal stiffness, nerve compression, and joint mobility.',
-    instagramUrl: clinicInfo.socialLinks.instagram,
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     createdAt: '2026-10-11T10:00:00Z',
   },
   {
@@ -90,8 +90,47 @@ export const defaultClinicReels = [
     likes: '1.9K',
     views: '15.7K',
     desc: 'Preparation of customized herbal Kashayams and medicated oils according to classical Agathiyar Siddha formulations.',
-    instagramUrl: clinicInfo.socialLinks.instagram,
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
     createdAt: '2026-10-10T10:00:00Z',
+  },
+  {
+    id: 'default-6',
+    videoId: '-Fz1SBNlSw0',
+    start: 135,
+    thumbnail: 'https://i.ytimg.com/vi/-Fz1SBNlSw0/hq720.jpg',
+    title: 'Swarna Bindu Prashana Drops for Children',
+    tag: 'Pediatric Immunity',
+    likes: '4.2K',
+    views: '29.7K',
+    desc: 'Monthly Pushya Nakshatra memory and immunity enhancement drops prepared with purified gold ash and herbal honey.',
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
+    createdAt: '2026-10-09T10:00:00Z',
+  },
+  {
+    id: 'default-7',
+    videoId: '8oLZSitF20E',
+    start: 160,
+    thumbnail: 'https://i.ytimg.com/vi/8oLZSitF20E/hq720.jpg',
+    title: 'Elakizhi Herbal Leaf Compress Pain Therapy',
+    tag: 'Spine & Joint Care',
+    likes: '3.8K',
+    views: '26.4K',
+    desc: 'Warm herbal poultice massage for chronic back pain, cervical spondylosis, and neuromuscular stiffness.',
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
+    createdAt: '2026-10-08T10:00:00Z',
+  },
+  {
+    id: 'default-8',
+    videoId: '-Fz1SBNlSw0',
+    start: 190,
+    thumbnail: 'https://i.ytimg.com/vi/-Fz1SBNlSw0/hq720.jpg',
+    title: 'Daily Siddha Regimen & Preventive Health',
+    tag: 'Holistic Wellness',
+    likes: '5.1K',
+    views: '35.8K',
+    desc: 'Daily Dinacharya guidelines, herbal teas, and seasonal detox protocols recommended by Dr. Thiagarajan.',
+    instagramUrl: 'https://www.instagram.com/sanjeevinisiddha?rpxt=aWZydDRmMXl3aWg4',
+    createdAt: '2026-10-07T10:00:00Z',
   },
 ];
 
@@ -404,12 +443,39 @@ const ReelLightboxModal = ({ reel, onClose }) => {
 const InstagramSection = () => {
   const { data: rawReels } = useReels();
   const reels = useMemo(() => {
-    if (!rawReels) return defaultClinicReels;
-    if (Array.isArray(rawReels) && rawReels.length === 0) return [];
-    return rawReels;
+    const list = Array.isArray(rawReels) && rawReels.length > 0 ? rawReels : (!rawReels ? defaultClinicReels : []);
+    if (!Array.isArray(list) || list.length === 0) return [];
+
+    // Always sort newest / latest reels first so the latest reel is displayed first
+    return [...list].sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.created_at || 0).getTime();
+      const timeB = new Date(b.createdAt || b.created_at || 0).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+      return (a.order ?? 999) - (b.order ?? 999);
+    });
   }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
-  const [activePlayingId, setActivePlayingId] = useState(null);
+  const [swiperInstance, setSwiperInstance] = useState(null);
+  const [activePlayingId, setActivePlayingId] = useState(() => {
+    return defaultClinicReels[0]?.id || 'default-1';
+  });
+
+  // Automatically activate latest first reel on mount or dynamic load
+  useEffect(() => {
+    if (reels.length > 0) {
+      setActivePlayingId(reels[0].id || reels[0]._id || 'default-1');
+    }
+  }, [reels]);
+
+  // Synchronize playing reel with Swiper autoplay slide transition
+  const handleSlideChange = (swiper) => {
+    const idx = swiper.realIndex ?? swiper.activeIndex;
+    const currentReel = reels[idx];
+    if (currentReel) {
+      const reelKey = currentReel.id || currentReel._id || `reel-${idx}`;
+      setActivePlayingId(reelKey);
+    }
+  };
 
   return (
     <section
@@ -469,10 +535,12 @@ const InstagramSection = () => {
               slidesPerView={1.2}
               loop={reels.length > 3}
               autoplay={{
-                delay: 4500,
+                delay: 5000,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
+              onSwiper={setSwiperInstance}
+              onSlideChange={handleSlideChange}
               navigation={{
                 nextEl: '.home-reels-next',
                 prevEl: '.home-reels-prev',
@@ -498,7 +566,16 @@ const InstagramSection = () => {
                       reel={reel}
                       isFirstItem={index === 0}
                       isPlaying={activePlayingId === reelKey}
-                      onTogglePlay={() => setActivePlayingId((prev) => (prev === reelKey ? null : reelKey))}
+                      onTogglePlay={() => {
+                        setActivePlayingId(reelKey);
+                        if (swiperInstance) {
+                          if (typeof swiperInstance.slideToLoop === 'function') {
+                            swiperInstance.slideToLoop(index);
+                          } else {
+                            swiperInstance.slideTo(index);
+                          }
+                        }
+                      }}
                       onOpenModal={(r) => {
                         setActivePlayingId(null);
                         setSelectedModalReel(r);
