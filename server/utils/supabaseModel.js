@@ -137,6 +137,10 @@ const getCacheKey = (tableName, queryType, params) => {
 };
 
 const getCachedQuery = (tableName, queryType, params) => {
+  // If Supabase is offline or in fallback mode, memoryStores is already in RAM (<0.01ms).
+  // Bypassing queryCache guarantees 100% real-time reflection of admin creates, updates, and deletes.
+  if (!isSupabaseLive()) return null;
+
   const ttl = TABLE_TTLS[tableName] !== undefined ? TABLE_TTLS[tableName] : 30 * 1000;
   if (ttl <= 0) return null;
 
@@ -1065,6 +1069,7 @@ module.exports = {
   camelToSnake,
   snakeToCamel,
   memoryStores,
+  isSupabaseLive,
   invalidateTableCache,
   clearAllQueryCache,
   purgeCache: invalidateTableCache,

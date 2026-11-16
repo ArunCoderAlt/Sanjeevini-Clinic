@@ -105,6 +105,9 @@ app.get('/api/health', (req, res) => {
 // Rate limiting
 app.use('/api', apiLimiter);
 
+// Disable ETags for dynamic API responses to guarantee fresh data without 304 stale caching
+app.set('etag', false);
+
 // High-performance HTTP caching: 60s browser, 300s CDN edge, 600s background revalidation
 const publicCache = cacheControl(60, 300, 600);
 const privateNoCache = noCache();

@@ -843,20 +843,6 @@
       "order": 15,
       "isActive": true,
       "createdAt": "2026-11-16T04:41:47.497Z"
-    },
-    {
-      "month": "TestMonth_2026",
-      "date": "2026-12-25",
-      "day": "Friday",
-      "nakshatra": "Pushya (Poosam)",
-      "timings": "5:00 PM - 9:30 PM",
-      "status": "Upcoming",
-      "description": "Test Event Description",
-      "order": 999,
-      "isActive": true,
-      "id": "d3447bf6-047c-4810-a443-4ee898744889",
-      "createdAt": "2026-11-16T18:03:17.672Z",
-      "updatedAt": "2026-11-16T18:03:17.672Z"
     }
   ],
   "groq_key_periods": [],

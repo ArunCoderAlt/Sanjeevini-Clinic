@@ -36,10 +36,10 @@ if (typeof window !== 'undefined') {
 export const purgeAndInvalidateQuery = (keys) => {
   const queryKeys = Array.isArray(keys) ? keys : [keys];
   for (const k of queryKeys) {
-    // 1. Immediately delete cached data from React Query cache (instant garbage collection)
-    queryClient.removeQueries({ queryKey: [k], exact: false });
-    // 2. Trigger fresh network refetch for any active components observing this key
-    queryClient.invalidateQueries({ queryKey: [k], refetchType: 'all' });
+    // 1. Reset matching queries so stale data is wiped and active components immediately refetch fresh data
+    queryClient.resetQueries({ queryKey: [k], exact: false });
+    // 2. Trigger fresh network refetch for all matching active observers
+    queryClient.invalidateQueries({ queryKey: [k], exact: false, refetchType: 'all' });
     // 3. Purge matching entries from browser persistent & RAM cache
     invalidateBrowserCache(k);
   }
@@ -56,6 +56,10 @@ export const purgeAllQueriesAndCache = () => {
 
 // Auto-purge matching query keys and browser cache when real-time updates happen across tabs
 if (typeof window !== 'undefined') {
+  window.addEventListener('focus', () => {
+    queryClient.invalidateQueries({ refetchType: 'all' });
+  });
+
   subscribeToDataChanges((event) => {
     const url = event?.url?.toLowerCase() || '';
     if (url.includes('/doctors')) {

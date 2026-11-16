@@ -295,6 +295,16 @@ class BotKnowledgeService {
    */
   async init() {
     try {
+      const { isSupabaseLive } = require('../utils/supabaseModel');
+      if (isSupabaseLive && !isSupabaseLive()) {
+        this.indexSeedDocument();
+        this.isInitialized = true;
+        logger.info(
+          `BotKnowledgeService initialized with seed knowledge: ${this.runtimeDocuments.length} docs, ${this.runtimeChunks.length} chunks`
+        );
+        return;
+      }
+
       await this.ensureBucketExists();
       await this.loadFromSupabase();
       await this.recoverStoragePdfs();

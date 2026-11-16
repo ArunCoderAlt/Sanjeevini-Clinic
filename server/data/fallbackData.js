@@ -316,20 +316,6 @@ const fallbackReels = [
 
 const fallbackSwarnaBindu = [
   {
-    id: 'sb-2026-01',
-    month: 'January',
-    date: '2026-01-08',
-    day: 'Thursday',
-    nakshatra: 'Pushya (Poosam)',
-    timings: 'All Day',
-    venue: 'Sanjeevini Medical Centre, Karaikal',
-    status: 'Completed',
-    notes: 'Camp completed successfully',
-    order: 1,
-    isActive: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
     id: 'sb-2026-02',
     month: 'February',
     date: '2026-02-04',

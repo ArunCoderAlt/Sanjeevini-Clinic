@@ -36,9 +36,11 @@ const cacheControl = (maxAge = 60, sMaxAge = 300, staleWhileRevalidate = 600) =>
       return next();
     }
 
-    // Dynamic catalog data: Browser always validates with server so changes appear instantly on refresh
-    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    // Dynamic catalog data: Never store in browser or proxy cache; always fetch latest database state
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
 
     next();
   };
