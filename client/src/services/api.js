@@ -37,12 +37,7 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Force no-store / no-cache headers on every single request
-  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-  config.headers['Pragma'] = 'no-cache';
-  config.headers['Expires'] = '0';
-
-  // For GET requests, append a timestamp to prevent browser & proxy response caching
+  // For GET requests, append dynamic timestamp to prevent browser & proxy response caching
   if (config.method?.toLowerCase() === 'get') {
     config.params = {
       ...config.params,
