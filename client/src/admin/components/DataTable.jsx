@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Edit2, Trash2, Eye, ChevronUp, ChevronDown } from 'lucide-react';
 
 const DataTable = ({ 
@@ -20,7 +20,7 @@ const DataTable = ({
     setSortConfig({ key, direction });
   };
 
-  const sortedData = React.useMemo(() => {
+  const sortedData = useMemo(() => {
     let sortableData = [...data];
     if (sortConfig.key !== null) {
       sortableData.sort((a, b) => {

@@ -11,6 +11,8 @@ exports.getDoctors = asyncHandler(async (req, res) => {
   return success(res, doctors);
 });
 
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 exports.getDoctorById = asyncHandler(async (req, res) => {
   const doctor = await Doctor.findById(req.params.id);
   if (!doctor) return error(res, 'Doctor not found', 404);
@@ -18,24 +20,24 @@ exports.getDoctorById = asyncHandler(async (req, res) => {
 });
 
 exports.getDoctorBySlug = asyncHandler(async (req, res) => {
-  let doctor = await Doctor.findOne({ slug: req.params.slug, isActive: true });
-  if (!doctor) {
-    doctor = await Doctor.findOne({ slug: req.params.slug });
+  const param = req.params.slug;
+  if (!param) return error(res, 'Doctor slug or ID required', 400);
+
+  // 1. If param is a UUID, perform indexed direct primary key lookup
+  if (isUUID(param)) {
+    const doctor = await Doctor.findById(param);
+    if (doctor) return success(res, doctor);
   }
+
+  // 2. Direct indexed slug query
+  let doctor = await Doctor.findOne({ slug: param });
+
+  // 3. Normalized prefix lookup (e.g. 'dr-thiagarajan-saminadane' vs 'thiagarajan-saminadane')
   if (!doctor) {
-    try {
-      doctor = await Doctor.findById(req.params.slug);
-    } catch (_) {}
+    const altSlug = param.startsWith('dr-') ? param.slice(3) : `dr-${param}`;
+    doctor = await Doctor.findOne({ slug: altSlug });
   }
-  if (!doctor) {
-    const all = await Doctor.find({});
-    doctor = all.find(
-      (d) =>
-        d.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
-        d.id?.toString() === req.params.slug ||
-        d._id?.toString() === req.params.slug
-    );
-  }
+
   if (!doctor) return error(res, 'Doctor not found', 404);
   return success(res, doctor);
 });

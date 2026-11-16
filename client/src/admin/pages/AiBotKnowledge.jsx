@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Bot, 
   Upload, 
@@ -88,7 +88,50 @@ CREATE TABLE IF NOT EXISTS public.rag_chunks (
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc_id ON public.rag_chunks(document_id);`;
+CREATE INDEX IF NOT EXISTS idx_rag_chunks_doc_id ON public.rag_chunks(document_id);
+
+-- ==============================================================================
+-- 4. Groq Key Tracking Periods (Guarantees Token Counters Persist Across Refreshes)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.groq_key_periods (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key_version TEXT NOT NULL,
+  key_fingerprint TEXT UNIQUE NOT NULL,
+  key_hint TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  total_requests INTEGER DEFAULT 0 NOT NULL,
+  total_input_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_output_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_tokens INTEGER DEFAULT 0 NOT NULL,
+  first_seen_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  last_used_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_groq_key_periods_fingerprint ON public.groq_key_periods(key_fingerprint);
+CREATE INDEX IF NOT EXISTS idx_groq_key_periods_active ON public.groq_key_periods(is_active);
+
+-- ==============================================================================
+-- 5. Groq Granular Usage Logs (Audited Telemetry & Rate-Limit Tracking)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.groq_usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key_version TEXT NOT NULL,
+  key_fingerprint TEXT NOT NULL,
+  model TEXT DEFAULT 'llama-3.3-70b-versatile',
+  input_tokens INTEGER DEFAULT 0 NOT NULL,
+  output_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_tokens INTEGER DEFAULT 0 NOT NULL,
+  status TEXT DEFAULT 'success',
+  http_status INTEGER DEFAULT 200,
+  usage_source TEXT DEFAULT 'bot_chat',
+  rate_limit_info JSONB,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_created ON public.groq_usage_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_key_version ON public.groq_usage_logs(key_version);`;
 
 const AVAILABLE_GROQ_MODELS = [
   { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile (Recommended - High Accuracy & Clinical Reasoning)' },
@@ -118,7 +161,29 @@ export default function AiBotKnowledge() {
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Groq API Key Usage Telemetry state
-  const [usageData, setUsageData] = useState(null);
+  const GROQ_USAGE_CACHE_KEY = 'sanjeevini_admin_groq_usage_cache';
+  const [usageData, setUsageData] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const cached = localStorage.getItem('sanjeevini_admin_groq_usage_cache');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const updateUsageData = (newData) => {
+    if (!newData) return;
+    setUsageData(prev => {
+      const merged = typeof newData === 'function' ? newData(prev) : { ...(prev || {}), ...newData };
+      if (typeof window !== 'undefined' && merged) {
+        try {
+          localStorage.setItem(GROQ_USAGE_CACHE_KEY, JSON.stringify(merged));
+        } catch (_) {}
+      }
+      return merged;
+    });
+  };
   const [loadingUsage, setLoadingUsage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -151,7 +216,7 @@ export default function AiBotKnowledge() {
           setSelectedModel(statusData.groq.model);
         }
         if (statusData?.usage) {
-          setUsageData(prev => ({ ...(prev || {}), ...statusData.usage }));
+          updateUsageData(statusData.usage);
         }
       }
 
@@ -160,7 +225,7 @@ export default function AiBotKnowledge() {
       }
 
       if (usageRes.status === 'fulfilled' && usageRes.value.data?.data) {
-        setUsageData(usageRes.value.data.data);
+        updateUsageData(usageRes.value.data.data);
       }
     } catch (err) {
       console.warn('Failed to load AI bot knowledge base data:', err);
@@ -174,7 +239,7 @@ export default function AiBotKnowledge() {
     try {
       const res = await getBotUsage();
       if (res.data?.data) {
-        setUsageData(res.data.data);
+        updateUsageData(res.data.data);
         toast.success('Token usage & rate limits refreshed');
       }
     } catch (err) {

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Clock, MapPin, ShieldCheck, HeartHandshake, Sparkles, CheckCircle2 } from 'lucide-react';
-import { getServiceBySlug } from '../services/serviceService';
+import { useService } from '../hooks/useQueries';
 import PageTransition from '../components/common/PageTransition';
 import Container from '../components/common/Container';
 import Loading from '../components/common/Loading';
@@ -67,47 +67,27 @@ export default function ServiceDetails() {
     return <Navigate to="/services" replace />;
   }
 
-  const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: rawService, isLoading } = useService(slug);
 
-  useEffect(() => {
-    if (!slug) return;
-    setLoading(true);
-
-    const fallback = serviceCatalog[slug.toLowerCase()] || 
-      serviceCatalog[slug.toLowerCase().replace('-therapy', '').replace('-support', '')] ||
+  const service = useMemo(() => {
+    const fallback = serviceCatalog[slug?.toLowerCase()] || 
+      serviceCatalog[slug?.toLowerCase().replace('-therapy', '').replace('-support', '')] ||
       null;
 
-    getServiceBySlug(slug)
-      .then((res) => {
-        const data = res.data.data || res.data;
-        if (data && data.title) {
-          setService({
-            ...data,
-            shortDescription: data.shortDescription || fallback?.shortDescription,
-            fullDescription: data.fullDescription || fallback?.fullDescription,
-            benefits: data.benefits || fallback?.benefits,
-            image: !isMockImage(data.image) ? data.image : null
-          });
-          setError(null);
-        } else if (fallback) {
-          setService(fallback);
-          setError(null);
-        } else {
-          setError('Service not found');
-        }
-      })
-      .catch(() => {
-        if (fallback) {
-          setService(fallback);
-          setError(null);
-        } else {
-          setError('Service not found');
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [slug]);
+    if (rawService && rawService.title) {
+      return {
+        ...rawService,
+        shortDescription: rawService.shortDescription || fallback?.shortDescription,
+        fullDescription: rawService.fullDescription || fallback?.fullDescription,
+        benefits: rawService.benefits || fallback?.benefits,
+        image: !isMockImage(rawService.image) ? rawService.image : null
+      };
+    }
+    return fallback;
+  }, [rawService, slug]);
+
+  const loading = isLoading && !service;
+  const error = !loading && !service ? 'Service not found' : null;
 
   if (loading) return <PageTransition><Loading fullPage /></PageTransition>;
 

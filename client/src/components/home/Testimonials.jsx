@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -8,8 +8,7 @@ import { Link } from 'react-router-dom';
 import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
-import { getTestimonials } from '../../services/testimonialService';
-import { useAppContext } from '../../context/AppContext';
+import { useTestimonials } from '../../hooks/useQueries';
 
 const fallbackTestimonials = [
   { name: 'Karthik R.', text: 'The Varmam therapy worked wonders for my chronic back pain. Dr. Thiagarajan is truly exceptional.', rating: 5 },
@@ -18,29 +17,20 @@ const fallbackTestimonials = [
 ];
 
 const Testimonials = () => {
-  const [items, setItems] = useState(fallbackTestimonials);
-  const { dataVersion } = useAppContext();
+  const { data: rawTestimonials } = useTestimonials();
 
-  useEffect(() => {
-    getTestimonials()
-      .then((res) => {
-        const data = res.data.data || res.data || [];
-        if (Array.isArray(data) && data.length > 0) {
-          // Map DB items (review -> text)
-          const mapped = data.map(d => ({
-            id: d._id || d.id,
-            name: d.name,
-            text: d.review || d.content || d.text,
-            rating: d.rating || 5,
-            location: d.location
-          }));
-          setItems(mapped);
-        }
-      })
-      .catch(() => {
-        // Fallback on error
-      });
-  }, [dataVersion]);
+  const items = useMemo(() => {
+    if (!Array.isArray(rawTestimonials) || rawTestimonials.length === 0) {
+      return fallbackTestimonials;
+    }
+    return rawTestimonials.map(d => ({
+      id: d._id || d.id,
+      name: d.name,
+      text: d.review || d.content || d.text,
+      rating: d.rating || 5,
+      location: d.location
+    }));
+  }, [rawTestimonials]);
 
   return (
     <section className="py-24 bg-dark-section">

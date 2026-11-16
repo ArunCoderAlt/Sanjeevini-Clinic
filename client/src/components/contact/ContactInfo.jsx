@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, ExternalLink, Facebook } from 'lucide-react';
 import { clinicInfo } from '../../data/clinicInfo';
 import { getWhatsAppUrl, handleWhatsAppClick, DEFAULT_WHATSAPP_MESSAGE } from '../../utils/helpers';

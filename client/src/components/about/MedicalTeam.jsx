@@ -1,4 +1,3 @@
-import React from 'react';
 import Container from '../common/Container';
 import DoctorGrid from '../doctors/DoctorGrid';
 import SectionTitle from '../common/SectionTitle';

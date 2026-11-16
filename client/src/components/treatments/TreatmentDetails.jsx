@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Activity, Stethoscope, Sparkles } from 'lucide-react';
 import { getImageUrl } from '../../utils/helpers';
 

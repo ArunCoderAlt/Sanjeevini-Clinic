@@ -1,4 +1,3 @@
-import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/common/PageTransition';
 import AboutHero from '../components/about/AboutHero';

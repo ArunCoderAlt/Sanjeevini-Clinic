@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft } from 'lucide-react';
 import PageTransition from '../components/common/PageTransition';
 import Container from '../components/common/Container';
 import DoctorProfile from '../components/doctors/DoctorProfile';
-import { getDoctorBySlug } from '../services/doctorService';
+import { useDoctor } from '../hooks/useQueries';
 import Loading from '../components/common/Loading';
 
 const fallbackDoctors = {
@@ -66,49 +66,19 @@ const fallbackDoctors = {
 const DoctorDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [doctor, setDoctor] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: queryData, isLoading } = useDoctor(slug);
 
-  useEffect(() => {
-    if (!slug) return;
-    setLoading(true);
-    setError(null);
+  const doctor = useMemo(() => {
+    if (queryData && queryData.name) return queryData;
+    if (!slug) return null;
+    return fallbackDoctors[slug.toLowerCase()] ||
+      (slug.toLowerCase().includes('thiagarajan') ? fallbackDoctors['dr-thiagarajan-saminadane'] : null) ||
+      (slug.toLowerCase().includes('subashini') ? fallbackDoctors['dr-subashini-ganesan'] : null) || null;
+  }, [queryData, slug]);
 
-    getDoctorBySlug(slug)
-      .then((res) => {
-        const data = res.data.data || res.data;
-        if (data && data.name) {
-          setDoctor(data);
-        } else {
-          // Check fallback
-          const fallback = fallbackDoctors[slug.toLowerCase()] ||
-            (slug.toLowerCase().includes('thiagarajan') ? fallbackDoctors['dr-thiagarajan-saminadane'] : null) ||
-            (slug.toLowerCase().includes('subashini') ? fallbackDoctors['dr-subashini-ganesan'] : null);
-          if (fallback) {
-            setDoctor(fallback);
-          } else {
-            setError('Doctor profile not found.');
-          }
-        }
-      })
-      .catch(() => {
-        // Fallback to established clinic doctor
-        const fallback = fallbackDoctors[slug.toLowerCase()] ||
-          (slug.toLowerCase().includes('thiagarajan') ? fallbackDoctors['dr-thiagarajan-saminadane'] : null) ||
-          (slug.toLowerCase().includes('subashini') ? fallbackDoctors['dr-subashini-ganesan'] : null);
-        if (fallback) {
-          setDoctor(fallback);
-        } else {
-          setError('Doctor profile not found.');
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [slug]);
+  if (isLoading && !doctor) return <PageTransition><Loading fullPage /></PageTransition>;
 
-  if (loading) return <PageTransition><Loading fullPage /></PageTransition>;
-
-  if (error || !doctor) {
+  if (!doctor) {
     return (
       <PageTransition>
         <div className="bg-cream min-h-screen py-20">
@@ -119,7 +89,7 @@ const DoctorDetails = () => {
             </button>
             <div className="text-center py-20">
               <h1 className="text-3xl font-serif text-primary-700 mb-4">Doctor Not Found</h1>
-              <p className="text-gray-600">{error || 'The doctor profile you are looking for does not exist.'}</p>
+              <p className="text-gray-600">The doctor profile you are looking for does not exist.</p>
             </div>
           </Container>
         </div>

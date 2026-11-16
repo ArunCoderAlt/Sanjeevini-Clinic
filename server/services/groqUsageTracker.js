@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
 const GroqKeyPeriod = require('../models/GroqKeyPeriod');
 const GroqUsageLog = require('../models/GroqUsageLog');
@@ -7,6 +9,90 @@ const env = require('../config/environment');
 // Memory cache for active period and latest rate-limit telemetry
 let cachedActivePeriod = null;
 let latestRateLimits = null;
+
+// Persistent file store path to guarantee counters survive server restarts, nodemon reloads, and container recycles
+const USAGE_STORE_PATH = path.join(__dirname, '../data/groqUsageStore.json');
+
+function readLocalStore() {
+  try {
+    if (fs.existsSync(USAGE_STORE_PATH)) {
+      const raw = fs.readFileSync(USAGE_STORE_PATH, 'utf8');
+      const parsed = JSON.parse(raw);
+      return {
+        periods: Array.isArray(parsed?.periods) ? parsed.periods : [],
+        latestRateLimits: parsed?.latestRateLimits || null,
+        logs: Array.isArray(parsed?.logs) ? parsed.logs : []
+      };
+    }
+  } catch (err) {
+    logger.warn(`[GroqUsageTracker] Failed to read ${USAGE_STORE_PATH}: ${err.message}`);
+  }
+  return { periods: [], latestRateLimits: null, logs: [] };
+}
+
+function writeLocalStore(data) {
+  try {
+    fs.writeFileSync(USAGE_STORE_PATH, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    logger.warn(`[GroqUsageTracker] Failed to write ${USAGE_STORE_PATH}: ${err.message}`);
+  }
+}
+
+function syncToLocalStore(activePeriod, storeData = readLocalStore()) {
+  if (!activePeriod) return;
+  const periods = storeData.periods || [];
+  const idx = periods.findIndex(p => p.keyFingerprint === activePeriod.keyFingerprint);
+  const plainObj = {
+    id: activePeriod.id || activePeriod._id,
+    keyVersion: activePeriod.keyVersion,
+    keyFingerprint: activePeriod.keyFingerprint,
+    keyHint: activePeriod.keyHint,
+    isActive: Boolean(activePeriod.isActive),
+    totalRequests: activePeriod.totalRequests || 0,
+    totalInputTokens: activePeriod.totalInputTokens || 0,
+    totalOutputTokens: activePeriod.totalOutputTokens || 0,
+    totalTokens: activePeriod.totalTokens || 0,
+    firstSeenAt: activePeriod.firstSeenAt,
+    lastUsedAt: activePeriod.lastUsedAt,
+    createdAt: activePeriod.createdAt,
+    updatedAt: activePeriod.updatedAt || new Date().toISOString(),
+  };
+
+  if (idx !== -1) {
+    periods[idx] = { ...periods[idx], ...plainObj };
+  } else {
+    periods.push(plainObj);
+  }
+
+  // Ensure other periods are marked inactive
+  periods.forEach(p => {
+    if (p.keyFingerprint !== activePeriod.keyFingerprint) {
+      p.isActive = false;
+    }
+  });
+
+  storeData.periods = periods;
+  if (latestRateLimits) {
+    storeData.latestRateLimits = latestRateLimits;
+  }
+  writeLocalStore(storeData);
+}
+
+// Hydrate initial memory state from persistent local store upon module load
+try {
+  const initialStore = readLocalStore();
+  if (initialStore.latestRateLimits) {
+    latestRateLimits = initialStore.latestRateLimits;
+  }
+  const currentKey = env.groqApiKey || process.env.GROQ_API_KEY;
+  const currentFingerprint = generateKeyFingerprint(currentKey);
+  if (currentFingerprint && Array.isArray(initialStore.periods)) {
+    const matchingPeriod = initialStore.periods.find(p => p.keyFingerprint === currentFingerprint);
+    if (matchingPeriod) {
+      cachedActivePeriod = matchingPeriod;
+    }
+  }
+} catch (_) {}
 
 // Warning cooldown map: key -> timestamp of last warning
 const warningCooldowns = new Map();
@@ -161,7 +247,7 @@ function checkRateLimitWarnings(rateLimitInfo, model = 'unknown') {
 
 /**
  * Retrieve or create active key tracking period
- * Ensures server restarts do NOT wipe or re-create an existing key's period.
+ * Ensures server restarts and page refreshes do NOT wipe or re-create an existing key's period.
  */
 async function getOrCreateActivePeriod(apiKey) {
   const currentKey = apiKey || env.groqApiKey || process.env.GROQ_API_KEY;
@@ -171,15 +257,37 @@ async function getOrCreateActivePeriod(apiKey) {
     return null;
   }
 
-  // Check in-memory cache first if fingerprint matches
+  // 1. Check in-memory cache first if fingerprint matches
   if (cachedActivePeriod && cachedActivePeriod.keyFingerprint === fingerprint && cachedActivePeriod.isActive) {
     return cachedActivePeriod;
   }
 
-  // Search database for an existing period with this fingerprint
+  // 2. Check persistent disk store
+  const storeData = readLocalStore();
+  const existingLocalPeriod = storeData.periods?.find(p => p.keyFingerprint === fingerprint);
+
+  // 3. Search database for an existing period with this fingerprint
   let existingPeriod = await GroqKeyPeriod.findOne({ keyFingerprint: fingerprint });
 
+  if (!existingPeriod && existingLocalPeriod) {
+    try {
+      existingPeriod = await GroqKeyPeriod.create(existingLocalPeriod);
+    } catch {
+      existingPeriod = existingLocalPeriod;
+    }
+  }
+
   if (existingPeriod) {
+    // Preserve highest recorded values across local store and database
+    if (existingLocalPeriod) {
+      existingPeriod.totalRequests = Math.max(existingPeriod.totalRequests || 0, existingLocalPeriod.totalRequests || 0);
+      existingPeriod.totalInputTokens = Math.max(existingPeriod.totalInputTokens || 0, existingLocalPeriod.totalInputTokens || 0);
+      existingPeriod.totalOutputTokens = Math.max(existingPeriod.totalOutputTokens || 0, existingLocalPeriod.totalOutputTokens || 0);
+      existingPeriod.totalTokens = Math.max(existingPeriod.totalTokens || 0, existingLocalPeriod.totalTokens || 0);
+      existingPeriod.firstSeenAt = existingPeriod.firstSeenAt || existingLocalPeriod.firstSeenAt;
+      existingPeriod.lastUsedAt = existingPeriod.lastUsedAt || existingLocalPeriod.lastUsedAt;
+    }
+
     // If found, ensure it is active and all other periods are inactive
     if (!existingPeriod.isActive) {
       const allOtherPeriods = await GroqKeyPeriod.find();
@@ -194,14 +302,18 @@ async function getOrCreateActivePeriod(apiKey) {
         { new: true }
       );
     }
+
     cachedActivePeriod = existingPeriod;
+    syncToLocalStore(existingPeriod, storeData);
     return existingPeriod;
   }
 
-  // If not found, a new key has been configured!
+  // If not found anywhere, a new key has been configured!
   // Start a new tracking period with counters starting at zero.
   const allPeriods = await GroqKeyPeriod.find();
-  const nextVersionNumber = allPeriods.length + 1;
+  const allKnown = [...(storeData.periods || []), ...allPeriods];
+  const uniqueFingerprints = new Set(allKnown.map(p => p.keyFingerprint).filter(Boolean));
+  const nextVersionNumber = uniqueFingerprints.size + 1;
   const keyVersion = `key_v${nextVersionNumber}`;
   const keyHint = getMaskedKeyHint(currentKey);
 
@@ -228,8 +340,10 @@ async function getOrCreateActivePeriod(apiKey) {
   });
 
   cachedActivePeriod = newPeriod;
+  syncToLocalStore(newPeriod, storeData);
+
   logger.info(
-    `[GroqUsageTracker] New Groq API key detected (${keyHint}). Started tracking period "${keyVersion}" with counters initialized to 0. Historical records for ${allPeriods.length} previous keys preserved.`
+    `[GroqUsageTracker] New Groq API key detected (${keyHint}). Started tracking period "${keyVersion}" with counters initialized to 0.`
   );
 
   return newPeriod;
@@ -270,7 +384,7 @@ async function recordUsage({
     const keyFingerprint = activePeriod?.keyFingerprint || 'unknown';
 
     // 1. Create Granular Audit Log (prompts and sensitive responses are NOT stored)
-    await GroqUsageLog.create({
+    const logItem = {
       keyVersion,
       keyFingerprint,
       model: model || 'llama-3.3-70b-versatile',
@@ -282,9 +396,13 @@ async function recordUsage({
       usageSource,
       rateLimitInfo,
       createdAt: new Date().toISOString(),
-    });
+    };
 
-    // 2. Increment Active Key Counters (clean and reliable without assuming MongoDB-only $inc)
+    try {
+      await GroqUsageLog.create(logItem);
+    } catch (_) {}
+
+    // 2. Increment Active Key Counters and persist immediately to file store
     if (activePeriod) {
       const periodId = activePeriod.id || activePeriod._id;
       const updatedRequests = (activePeriod.totalRequests || 0) + 1;
@@ -292,22 +410,42 @@ async function recordUsage({
       const updatedOutput = (activePeriod.totalOutputTokens || 0) + safeOutputTokens;
       const updatedTotal = (activePeriod.totalTokens || 0) + safeTotalTokens;
 
-      const updatedPeriod = await GroqKeyPeriod.findByIdAndUpdate(
-        periodId,
-        {
-          totalRequests: updatedRequests,
-          totalInputTokens: updatedInput,
-          totalOutputTokens: updatedOutput,
-          totalTokens: updatedTotal,
-          lastUsedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        { new: true }
-      );
+      const updatePayload = {
+        totalRequests: updatedRequests,
+        totalInputTokens: updatedInput,
+        totalOutputTokens: updatedOutput,
+        totalTokens: updatedTotal,
+        lastUsedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-      if (updatedPeriod) {
-        cachedActivePeriod = updatedPeriod;
+      try {
+        const updatedPeriod = await GroqKeyPeriod.findByIdAndUpdate(
+          periodId,
+          updatePayload,
+          { new: true }
+        );
+        if (updatedPeriod) {
+          cachedActivePeriod = updatedPeriod;
+        } else {
+          Object.assign(activePeriod, updatePayload);
+          cachedActivePeriod = activePeriod;
+        }
+      } catch (_) {
+        Object.assign(activePeriod, updatePayload);
+        cachedActivePeriod = activePeriod;
       }
+
+      // Write updated counters and latest log to persistent local file store
+      const storeData = readLocalStore();
+      if (!storeData.logs) storeData.logs = [];
+      storeData.logs.unshift(logItem);
+      if (storeData.logs.length > 50) storeData.logs = storeData.logs.slice(0, 50);
+
+      if (latestRateLimits) {
+        storeData.latestRateLimits = latestRateLimits;
+      }
+      syncToLocalStore(cachedActivePeriod, storeData);
     }
   } catch (err) {
     logger.warn(`[GroqUsageTracker] Failed to record usage: ${err.message}`);
@@ -324,9 +462,9 @@ async function onApiKeyChanged(newApiKey) {
 
 /**
  * Retrieve complete usage summary for active key and historical previous keys
- * (Backend-only reporting endpoint for admin debugging / audit)
  */
 async function getUsageSummary(apiKeyOverride = null) {
+  const storeData = readLocalStore();
   const currentKey = apiKeyOverride || env.groqApiKey || process.env.GROQ_API_KEY;
   let activePeriod = null;
   if (currentKey) {
@@ -335,9 +473,46 @@ async function getUsageSummary(apiKeyOverride = null) {
   if (!activePeriod) {
     activePeriod = await GroqKeyPeriod.findOne({ isActive: true });
   }
-  const allPeriods = await GroqKeyPeriod.find().sort({ createdAt: -1 });
+  if (!activePeriod) {
+    const localActive = storeData.periods?.find(p => p.isActive) || storeData.periods?.[0];
+    if (localActive) {
+      activePeriod = localActive;
+    }
+  }
 
-  // Sanitize periods: NEVER expose key fingerprints in output
+  if (!latestRateLimits && storeData.latestRateLimits) {
+    latestRateLimits = storeData.latestRateLimits;
+  }
+
+  // Merge database periods and local persistent file periods
+  const mergedPeriodsMap = new Map();
+  (storeData.periods || []).forEach(p => {
+    if (p.keyFingerprint) mergedPeriodsMap.set(p.keyFingerprint, p);
+  });
+
+  try {
+    const allDbPeriods = await GroqKeyPeriod.find().sort({ createdAt: -1 });
+    allDbPeriods.forEach(p => {
+      if (p.keyFingerprint) {
+        const existing = mergedPeriodsMap.get(p.keyFingerprint);
+        if (existing) {
+          mergedPeriodsMap.set(p.keyFingerprint, {
+            ...existing,
+            ...p,
+            totalRequests: Math.max(p.totalRequests || 0, existing.totalRequests || 0),
+            totalInputTokens: Math.max(p.totalInputTokens || 0, existing.totalInputTokens || 0),
+            totalOutputTokens: Math.max(p.totalOutputTokens || 0, existing.totalOutputTokens || 0),
+            totalTokens: Math.max(p.totalTokens || 0, existing.totalTokens || 0),
+          });
+        } else {
+          mergedPeriodsMap.set(p.keyFingerprint, p);
+        }
+      }
+    });
+  } catch (_) {}
+
+  const allMergedPeriods = [...mergedPeriodsMap.values()];
+
   const sanitizePeriod = (p) => ({
     id: p.id || p._id,
     keyVersion: p.keyVersion,
@@ -353,20 +528,23 @@ async function getUsageSummary(apiKeyOverride = null) {
   });
 
   const active = activePeriod ? sanitizePeriod(activePeriod) : null;
-  const activeId = activePeriod ? (activePeriod.id || activePeriod._id) : null;
   const activeFingerprint = activePeriod ? activePeriod.keyFingerprint : null;
 
-  const historical = allPeriods
+  const historical = allMergedPeriods
     .filter((p) => {
-      const pid = p.id || p._id;
-      if (activeId && pid === activeId) return false;
       if (activeFingerprint && p.keyFingerprint === activeFingerprint) return false;
       return true;
     })
     .map(sanitizePeriod);
 
   // Recent 15 logs
-  const recentLogs = await GroqUsageLog.find().sort({ createdAt: -1 }).limit(15);
+  let recentLogs = [];
+  try {
+    recentLogs = await GroqUsageLog.find().sort({ createdAt: -1 }).limit(15);
+  } catch {
+    recentLogs = (storeData.logs || []).slice(0, 15);
+  }
+
   const sanitizedLogs = recentLogs.map((l) => ({
     id: l.id || l._id,
     keyVersion: l.keyVersion,

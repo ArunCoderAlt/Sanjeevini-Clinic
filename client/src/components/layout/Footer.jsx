@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, MapPin, Phone, Mail, Clock, Youtube, Instagram, Facebook } from 'lucide-react';
 import Container from '../common/Container';

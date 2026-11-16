@@ -1,4 +1,3 @@
-import React from 'react';
 
 const tabs = ['All', 'Clinic', 'Treatment', 'Team', 'Events'];
 

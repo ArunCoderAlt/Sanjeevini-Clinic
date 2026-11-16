@@ -7,6 +7,7 @@ const path = require('path');
 
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 const { apiLimiter } = require('./middleware/rateLimitMiddleware');
+const { cacheControl, noCache } = require('./middleware/cacheMiddleware');
 
 // Route files
 const authRoutes = require('./routes/authRoutes');
@@ -104,21 +105,25 @@ app.get('/api/health', (req, res) => {
 // Rate limiting
 app.use('/api', apiLimiter);
 
-// Mount routers
-app.use('/api/auth', authRoutes);
-app.use('/api/doctors', doctorRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/treatments', treatmentRoutes);
-app.use('/api/appointments', appointmentRoutes);
-app.use('/api/gallery', galleryRoutes);
-app.use('/api/reels', reelRoutes);
-app.use('/api/testimonials', testimonialRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/newsletter', newsletterRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/upload', uploadRoutes);
+// High-performance HTTP caching: 60s browser, 300s CDN edge, 600s background revalidation
+const publicCache = cacheControl(60, 300, 600);
+const privateNoCache = noCache();
+
+// Mount routers with optimized cache controls
+app.use('/api/auth', privateNoCache, authRoutes);
+app.use('/api/doctors', publicCache, doctorRoutes);
+app.use('/api/services', publicCache, serviceRoutes);
+app.use('/api/treatments', publicCache, treatmentRoutes);
+app.use('/api/appointments', privateNoCache, appointmentRoutes);
+app.use('/api/gallery', publicCache, galleryRoutes);
+app.use('/api/reels', publicCache, reelRoutes);
+app.use('/api/testimonials', publicCache, testimonialRoutes);
+app.use('/api/contact', privateNoCache, contactRoutes);
+app.use('/api/newsletter', privateNoCache, newsletterRoutes);
+app.use('/api/settings', publicCache, settingsRoutes);
+app.use('/api/upload', privateNoCache, uploadRoutes);
 app.use('/api/bot', botRoutes);
-app.use('/api/swarna-bindu', swarnaBinduRoutes);
+app.use('/api/swarna-bindu', publicCache, swarnaBinduRoutes);
 
 // Static uploads folder with aggressive CDN and browser caching (1 year immutable)
 app.use(

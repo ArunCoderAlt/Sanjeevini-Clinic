@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
 import { classNames } from '../../utils/helpers';

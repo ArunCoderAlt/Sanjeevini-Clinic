@@ -1,4 +1,3 @@
-import React from 'react';
 import { Award, BookOpen, Clock } from 'lucide-react';
 import Button from '../common/Button';
 

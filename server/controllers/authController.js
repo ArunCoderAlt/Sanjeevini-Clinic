@@ -7,8 +7,9 @@ exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && (await user.matchPassword(password))) {
-    const token = generateToken(user._id);
-    return success(res, { user: { id: user._id, name: user.name, email: user.email, role: user.role }, token });
+    const userId = user._id || user.id;
+    const token = generateToken(userId);
+    return success(res, { user: { id: userId, _id: userId, name: user.name, email: user.email, role: user.role }, token });
   } else {
     return error(res, 'Invalid credentials', 401);
   }

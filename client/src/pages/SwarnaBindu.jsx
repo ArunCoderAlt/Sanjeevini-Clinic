@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
@@ -13,28 +13,16 @@ import {
 import Container from '../components/common/Container';
 import PageTransition from '../components/common/PageTransition';
 import { defaultPushyaSchedule } from '../data/swarnaBinduData';
-import { getSwarnaBinduSchedule } from '../services/swarnaBinduService';
-import { useAppContext } from '../context/AppContext';
+import { useSwarnaBindu } from '../hooks/useQueries';
 
 const SwarnaBindu = () => {
-  const [schedule, setSchedule] = useState(defaultPushyaSchedule);
-  const [loading, setLoading] = useState(true);
+  const { data: rawEvents, isLoading } = useSwarnaBindu();
+  const schedule = useMemo(() => {
+    if (Array.isArray(rawEvents) && rawEvents.length > 0) return rawEvents;
+    return defaultPushyaSchedule;
+  }, [rawEvents]);
+  const loading = isLoading && (!rawEvents || rawEvents.length === 0);
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'completed'
-  const { dataVersion } = useAppContext();
-
-  useEffect(() => {
-    getSwarnaBinduSchedule()
-      .then((res) => {
-        const data = res.data?.data;
-        if (Array.isArray(data) && data.length > 0) {
-          setSchedule(data);
-        }
-      })
-      .catch((err) => {
-        console.warn('Loading fallback Swarna Bindu schedule:', err);
-      })
-      .finally(() => setLoading(false));
-  }, [dataVersion]);
 
   const filteredSchedule = schedule.filter((item) => {
     if (filter === 'upcoming') {

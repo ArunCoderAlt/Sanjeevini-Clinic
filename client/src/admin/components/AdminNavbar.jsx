@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Menu, Bell, ExternalLink, Activity, Trash2, CheckCircle2, Clock } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';

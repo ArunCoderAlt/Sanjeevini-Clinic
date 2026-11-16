@@ -1,4 +1,3 @@
-import React from 'react';
 
 const statusConfig = {
   pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending' },

@@ -1,0 +1,21 @@
+{
+  "periods": [
+    {
+      "id": "3e34208d-dd3f-40ab-9b63-9955d8296626",
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "keyHint": "gsk_...2m5v",
+      "isActive": true,
+      "totalRequests": 0,
+      "totalInputTokens": 0,
+      "totalOutputTokens": 0,
+      "totalTokens": 0,
+      "firstSeenAt": "2026-11-16T03:35:00.000Z",
+      "lastUsedAt": "2026-11-16T03:35:00.000Z",
+      "createdAt": "2026-11-16T03:35:00.000Z",
+      "updatedAt": "2026-11-16T03:35:00.000Z"
+    }
+  ],
+  "latestRateLimits": null,
+  "logs": []
+}

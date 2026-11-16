@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Pill, Activity, Apple, Heart } from 'lucide-react';
 import Container from '../common/Container';

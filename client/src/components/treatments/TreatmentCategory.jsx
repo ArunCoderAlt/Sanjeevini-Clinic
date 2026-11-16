@@ -1,4 +1,3 @@
-import React from 'react';
 
 const categories = [
   'All', 'Gastrointestinal', 'Dermatology', "Women's Health", 'Kidney', 

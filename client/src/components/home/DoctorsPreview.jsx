@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
-import { getDoctors } from '../../services/doctorService';
-import { useAppContext } from '../../context/AppContext';
+import { useDoctors } from '../../hooks/useQueries';
 
 const defaultDoctors = [
   {
@@ -26,39 +25,31 @@ const defaultDoctors = [
 ];
 
 const DoctorsPreview = () => {
-  const [team, setTeam] = useState(defaultDoctors);
-  const { dataVersion } = useAppContext();
+  const { data: rawDoctors } = useDoctors();
 
-  useEffect(() => {
-    getDoctors()
-      .then((res) => {
-        const data = res.data.data || res.data || [];
-        if (Array.isArray(data) && data.length > 0) {
-          const mapped = data.map(d => {
-            let img = d.image;
-            if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
-              img = '/images/doctors/dr-thiagarajan.jpg';
-            } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
-              img = '/images/doctors/dr-subashini.jpg';
-            } else if (!img || img.includes('unsplash.com')) {
-              img = '/images/doctors/dr-thiagarajan.jpg';
-            }
-            return {
-              id: d._id || d.id || d.slug,
-              slug: d.slug || d.id,
-              name: d.name,
-              qual: d.qualification || d.qual,
-              spec: d.specialization || d.spec,
-              img
-            };
-          });
-          setTeam(mapped);
-        }
-      })
-      .catch(() => {
-        // Fallback on error
-      });
-  }, [dataVersion]);
+  const team = useMemo(() => {
+    if (!Array.isArray(rawDoctors) || rawDoctors.length === 0) {
+      return defaultDoctors;
+    }
+    return rawDoctors.map((d) => {
+      let img = d.image;
+      if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
+        img = '/images/doctors/dr-thiagarajan.jpg';
+      } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
+        img = '/images/doctors/dr-subashini.jpg';
+      } else if (!img || img.includes('unsplash.com')) {
+        img = '/images/doctors/dr-thiagarajan.jpg';
+      }
+      return {
+        id: d._id || d.id || d.slug,
+        slug: d.slug || d.id,
+        name: d.name,
+        qual: d.qualification || d.qual,
+        spec: d.specialization || d.spec,
+        img
+      };
+    });
+  }, [rawDoctors]);
 
   return (
     <section className="py-24 bg-dark-section">

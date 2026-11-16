@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import Loading from '../components/common/Loading';
 
 const AdminApp = lazy(() => import('../admin/AdminApp'));

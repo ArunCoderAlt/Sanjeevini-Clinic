@@ -1,4 +1,3 @@
-import React from 'react';
 import { classNames } from '../../utils/helpers';
 
 export default function Container({ children, className = '' }) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Trash2, Edit2, Upload, Plus } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';

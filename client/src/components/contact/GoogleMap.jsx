@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapPin, ExternalLink, Navigation, Compass } from 'lucide-react';
 import { clinicInfo } from '../../data/clinicInfo';
 

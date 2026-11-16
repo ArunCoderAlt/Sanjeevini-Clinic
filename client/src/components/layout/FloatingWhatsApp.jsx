@@ -1,4 +1,3 @@
-import React from 'react';
 import { clinicInfo } from '../../data/clinicInfo';
 import { MessageCircle } from 'lucide-react';
 import { getWhatsAppUrl, handleWhatsAppClick, DEFAULT_WHATSAPP_MESSAGE } from '../../utils/helpers';

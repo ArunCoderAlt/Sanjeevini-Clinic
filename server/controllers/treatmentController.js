@@ -12,25 +12,20 @@ exports.getTreatments = asyncHandler(async (req, res) => {
   return success(res, treatments);
 });
 
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 exports.getTreatmentBySlug = asyncHandler(async (req, res) => {
-  let treatment = await Treatment.findOne({ slug: req.params.slug, isActive: true });
-  if (!treatment) {
-    treatment = await Treatment.findOne({ slug: req.params.slug });
+  const param = req.params.slug;
+  if (!param) return error(res, 'Treatment slug or ID required', 400);
+
+  // 1. If param is a UUID, perform indexed direct primary key lookup
+  if (isUUID(param)) {
+    const treatment = await Treatment.findById(param);
+    if (treatment) return success(res, treatment);
   }
-  if (!treatment) {
-    try {
-      treatment = await Treatment.findById(req.params.slug);
-    } catch (_) {}
-  }
-  if (!treatment) {
-    const all = await Treatment.find({});
-    treatment = all.find(
-      (t) =>
-        t.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
-        t.id?.toString() === req.params.slug ||
-        t._id?.toString() === req.params.slug
-    );
-  }
+
+  // 2. Direct indexed slug query
+  const treatment = await Treatment.findOne({ slug: param });
   if (!treatment) return error(res, 'Treatment not found', 404);
   return success(res, treatment);
 });

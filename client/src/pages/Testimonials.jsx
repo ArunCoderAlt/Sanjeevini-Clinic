@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/common/PageTransition';
 import Container from '../components/common/Container';
 import TestimonialCard from '../components/testimonials/TestimonialCard';
 import TestimonialForm from '../components/testimonials/TestimonialForm';
 import Loading from '../components/common/Loading';
-import { getTestimonials } from '../services/testimonialService';
-import { useAppContext } from '../context/AppContext';
+import { useTestimonials } from '../hooks/useQueries';
 
 const TestimonialsPage = () => {
-  const [testimonials, setTestimonials] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { dataVersion } = useAppContext();
-
-  useEffect(() => {
-    setLoading(true);
-    getTestimonials()
-      .then((res) => {
-        const data = res.data.data || res.data || [];
-        setTestimonials(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {
-        setError('Unable to load testimonials.');
-      })
-      .finally(() => setLoading(false));
-  }, [dataVersion]);
+  const { data: testimonials = [], isLoading, isError } = useTestimonials();
+  const loading = isLoading && (!testimonials || testimonials.length === 0);
+  const error = isError ? 'Unable to load testimonials.' : null;
 
   return (
     <PageTransition>

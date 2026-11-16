@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
 import { 
   getAdminActions, 
@@ -15,6 +15,16 @@ export const AppProvider = ({ children }) => {
   const [settings, setSettings] = useState(null);
   const [dataVersion, setDataVersion] = useState(0);
   const [actionsHistory, setActionsHistory] = useState(() => getAdminActions());
+
+  // Fetch site settings once globally (benefiting from client & server query cache)
+  useEffect(() => {
+    api.get('/settings')
+      .then((res) => {
+        const data = res.data?.data || res.data;
+        if (data) setSettings(data);
+      })
+      .catch(() => {});
+  }, [dataVersion]);
 
   // Subscribe to real-time data changes across tabs and current window
   useEffect(() => {

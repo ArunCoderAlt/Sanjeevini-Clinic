@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import TreatmentCard from './TreatmentCard';
-import { getTreatments } from '../../services/treatmentService';
-import { useAppContext } from '../../context/AppContext';
+import { useTreatments } from '../../hooks/useQueries';
 
 // Comprehensive clinic treatments catalog
 const defaultTreatments = [
@@ -19,36 +18,25 @@ const defaultTreatments = [
 ];
 
 const TreatmentGrid = ({ searchTerm, activeCategory }) => {
-  const [items, setItems] = useState(defaultTreatments);
-  const { dataVersion } = useAppContext();
+  const { data: rawTreatments } = useTreatments(activeCategory);
 
-  useEffect(() => {
-    const categoryParam = activeCategory === 'All' ? undefined : activeCategory;
-    getTreatments(categoryParam)
-      .then((res) => {
-        const data = res.data.data || res.data || [];
-        if (Array.isArray(data) && data.length > 0) {
-          const mapped = data.map(t => {
-            const def = defaultTreatments.find(d => d.slug === t.slug || d.category?.toLowerCase() === t.category?.toLowerCase() || d.name.toLowerCase() === t.name.toLowerCase()) || {};
-            return {
-              id: t._id || t.id || t.slug || def.id,
-              slug: t.slug || def.slug || t._id,
-              name: t.name || def.name,
-              category: t.category || def.category,
-              desc: t.description || t.desc || def.desc,
-              icon: t.icon || def.icon || '🌿',
-              image: t.image || def.image || null,
-            };
-          });
-          setItems(mapped);
-        } else {
-          setItems(defaultTreatments);
-        }
-      })
-      .catch(() => {
-        setItems(defaultTreatments);
-      });
-  }, [activeCategory, dataVersion]);
+  const items = useMemo(() => {
+    if (!Array.isArray(rawTreatments) || rawTreatments.length === 0) {
+      return defaultTreatments;
+    }
+    return rawTreatments.map((t) => {
+      const def = defaultTreatments.find(d => d.slug === t.slug || d.category?.toLowerCase() === t.category?.toLowerCase() || d.name?.toLowerCase() === t.name?.toLowerCase()) || {};
+      return {
+        id: t._id || t.id || t.slug || def.id,
+        slug: t.slug || def.slug || t._id,
+        name: t.name || def.name,
+        category: t.category || def.category,
+        desc: t.description || t.desc || def.desc,
+        icon: t.icon || def.icon || '🌿',
+        image: t.image || def.image || null,
+      };
+    });
+  }, [rawTreatments]);
 
   const filtered = items.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase()) || (t.desc && t.desc.toLowerCase().includes(searchTerm.toLowerCase()));

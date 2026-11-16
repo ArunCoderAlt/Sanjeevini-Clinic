@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -19,7 +19,7 @@ import {
   Check
 } from 'lucide-react';
 import { clinicInfo } from '../../data/clinicInfo';
-import { getReels } from '../../services/reelService';
+import { useReels } from '../../hooks/useQueries';
 import { defaultClinicReels } from '../home/InstagramSection';
 
 import 'swiper/css';
@@ -252,28 +252,12 @@ const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
 };
 
 const InstagramReels = () => {
-  const [reels, setReels] = useState(defaultClinicReels);
+  const { data: rawReels } = useReels();
+  const reels = useMemo(() => {
+    if (Array.isArray(rawReels) && rawReels.length > 0) return rawReels;
+    return defaultClinicReels;
+  }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchAllReels = async () => {
-      try {
-        const res = await getReels();
-        const items = res.data?.data;
-        if (Array.isArray(items) && items.length > 0 && isMounted) {
-          setReels(items);
-        }
-      } catch (err) {
-        // Fallback remains active
-      }
-    };
-
-    fetchAllReels();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   return (
     <div className="relative">

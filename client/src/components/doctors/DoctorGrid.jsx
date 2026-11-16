@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import DoctorCard from './DoctorCard';
-import { getDoctors } from '../../services/doctorService';
-import { useAppContext } from '../../context/AppContext';
+import { useDoctors } from '../../hooks/useQueries';
 import Loading from '../common/Loading';
 
 const defaultDoctors = [
@@ -24,39 +23,29 @@ const defaultDoctors = [
 ];
 
 const DoctorGrid = () => {
-  const [doctors, setDoctors] = useState(defaultDoctors);
-  const [loading, setLoading] = useState(true);
-  const { dataVersion } = useAppContext();
+  const { data: rawDoctors, isLoading } = useDoctors();
 
-  useEffect(() => {
-    getDoctors()
-      .then((res) => {
-        const data = res.data.data || [];
-        if (data.length > 0) {
-          const mapped = data.map(d => {
-            let image = d.image;
-            if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
-              image = '/images/doctors/dr-thiagarajan.jpg';
-            } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
-              image = '/images/doctors/dr-subashini.jpg';
-            } else if (!image || image.includes('unsplash.com')) {
-              image = '/images/doctors/dr-thiagarajan.jpg';
-            }
-            return {
-              ...d,
-              image
-            };
-          });
-          setDoctors(mapped);
-        }
-      })
-      .catch(() => {
-        // Keep default doctors on API failure
-      })
-      .finally(() => setLoading(false));
-  }, [dataVersion]);
+  const doctors = useMemo(() => {
+    if (!Array.isArray(rawDoctors) || rawDoctors.length === 0) {
+      return defaultDoctors;
+    }
+    return rawDoctors.map((d) => {
+      let image = d.image;
+      if (d.name?.includes('Thiagarajan') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
+        image = '/images/doctors/dr-thiagarajan.jpg';
+      } else if (d.name?.includes('Subashini') && (!d.image || d.image.includes('ui-avatars') || d.image.includes('unsplash.com'))) {
+        image = '/images/doctors/dr-subashini.jpg';
+      } else if (!image || image.includes('unsplash.com')) {
+        image = '/images/doctors/dr-thiagarajan.jpg';
+      }
+      return {
+        ...d,
+        image
+      };
+    });
+  }, [rawDoctors]);
 
-  if (loading) return <Loading />;
+  if (isLoading && (!rawDoctors || rawDoctors.length === 0)) return <Loading />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto items-stretch">

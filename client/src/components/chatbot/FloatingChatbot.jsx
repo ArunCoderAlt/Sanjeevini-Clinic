@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bot, 
@@ -175,7 +175,7 @@ export default function FloatingChatbot() {
 
   // Text-to-speech speaker toggle with Tamil & English auto-voice selection
   const toggleSpeech = (msgId, text) => {
-    if (!('speechSynthesis' in window)) {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance === 'undefined') {
       toast.error('Speech synthesis not supported in this browser.');
       return;
     }
@@ -189,7 +189,7 @@ export default function FloatingChatbot() {
     window.speechSynthesis.cancel();
     // Clean markdown asterisks for smoother TTS voice output
     const cleanSpeechText = text.replace(/[*_#]/g, '');
-    const utterance = new SpeechSynthesisUtterance(cleanSpeechText);
+    const utterance = new window.SpeechSynthesisUtterance(cleanSpeechText);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
 

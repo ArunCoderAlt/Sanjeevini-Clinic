@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ImageOff } from 'lucide-react';
-import { getGallery } from '../../services/galleryService';
+import { useGallery } from '../../hooks/useQueries';
 import { getImageUrl } from '../../utils/helpers';
-import { useAppContext } from '../../context/AppContext';
 
 const isMockImage = (url) => {
   if (!url || typeof url !== 'string') return true;
@@ -38,43 +37,24 @@ const authenticDefaultGallery = [
 ];
 
 const GalleryGrid = ({ activeTab }) => {
-  const [images, setImages] = useState(authenticDefaultGallery);
-  const [loading, setLoading] = useState(true);
-  const { dataVersion } = useAppContext();
+  const { data: rawData, isLoading } = useGallery(activeTab);
 
-  useEffect(() => {
-    setLoading(true);
-    const categoryParam = activeTab === 'All' ? undefined : activeTab.toLowerCase();
-    getGallery(categoryParam)
-      .then((res) => {
-        const data = res.data.data || res.data || [];
-        if (Array.isArray(data) && data.length > 0) {
-          // Filter out any mock/stock AI images
-          const validRealImages = data
-            .filter((item) => item.image && !isMockImage(item.image))
-            .map((item) => ({
-              id: item._id || item.id,
-              src: getImageUrl(item.image),
-              category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
-              alt: item.title || item.description || 'Clinic photo'
-            }));
+  const images = useMemo(() => {
+    if (Array.isArray(rawData) && rawData.length > 0) {
+      const validRealImages = rawData
+        .filter((item) => item.image && !isMockImage(item.image))
+        .map((item) => ({
+          id: item._id || item.id,
+          src: getImageUrl(item.image),
+          category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
+          alt: item.title || item.description || 'Clinic photo'
+        }));
+      if (validRealImages.length > 0) return validRealImages;
+    }
+    return authenticDefaultGallery;
+  }, [rawData]);
 
-          if (validRealImages.length > 0) {
-            setImages(validRealImages);
-          } else {
-            setImages(authenticDefaultGallery);
-          }
-        } else {
-          setImages(authenticDefaultGallery);
-        }
-      })
-      .catch(() => {
-        setImages(authenticDefaultGallery);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [activeTab, dataVersion]);
+  const loading = isLoading && (!rawData || rawData.length === 0);
 
   const filteredImages = images.filter(
     (img) => activeTab === 'All' || img.category.toLowerCase() === activeTab.toLowerCase()

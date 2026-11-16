@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -21,8 +21,7 @@ import {
 } from 'lucide-react';
 import Container from '../common/Container';
 import { clinicInfo } from '../../data/clinicInfo';
-import { getReels } from '../../services/reelService';
-import { useAppContext } from '../../context/AppContext';
+import { useReels } from '../../hooks/useQueries';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -396,30 +395,12 @@ const ReelLightboxModal = ({ reel, onClose }) => {
 };
 
 const InstagramSection = () => {
-  const [reels, setReels] = useState(defaultClinicReels);
+  const { data: rawReels } = useReels();
+  const reels = useMemo(() => {
+    if (Array.isArray(rawReels) && rawReels.length > 0) return rawReels;
+    return defaultClinicReels;
+  }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
-  const { dataVersion } = useAppContext();
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchAllReels = async () => {
-      try {
-        const res = await getReels();
-        const items = res.data?.data;
-        if (Array.isArray(items) && items.length > 0 && isMounted) {
-          // Items from API are already sorted by createdAt DESC (newest first)
-          setReels(items);
-        }
-      } catch (err) {
-        // Fallback remains active
-      }
-    };
-
-    fetchAllReels();
-    return () => {
-      isMounted = false;
-    };
-  }, [dataVersion]);
 
   return (
     <section

@@ -11,6 +11,8 @@ exports.getServices = asyncHandler(async (req, res) => {
   return success(res, services);
 });
 
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 exports.getServiceById = asyncHandler(async (req, res) => {
   const service = await Service.findById(req.params.id);
   if (!service) return error(res, 'Service not found', 404);
@@ -18,24 +20,17 @@ exports.getServiceById = asyncHandler(async (req, res) => {
 });
 
 exports.getServiceBySlug = asyncHandler(async (req, res) => {
-  let service = await Service.findOne({ slug: req.params.slug, isActive: true });
-  if (!service) {
-    service = await Service.findOne({ slug: req.params.slug });
+  const param = req.params.slug;
+  if (!param) return error(res, 'Service slug or ID required', 400);
+
+  // 1. If param is a UUID, perform indexed direct primary key lookup
+  if (isUUID(param)) {
+    const service = await Service.findById(param);
+    if (service) return success(res, service);
   }
-  if (!service) {
-    try {
-      service = await Service.findById(req.params.slug);
-    } catch (_) {}
-  }
-  if (!service) {
-    const all = await Service.find({});
-    service = all.find(
-      (s) =>
-        s.slug?.toLowerCase() === req.params.slug?.toLowerCase() ||
-        s.id?.toString() === req.params.slug ||
-        s._id?.toString() === req.params.slug
-    );
-  }
+
+  // 2. Direct indexed slug query
+  const service = await Service.findOne({ slug: param });
   if (!service) return error(res, 'Service not found', 404);
   return success(res, service);
 });

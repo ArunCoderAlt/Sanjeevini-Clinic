@@ -1,4 +1,3 @@
-import React from 'react';
 import { Award, Users, Heart, Shield, Sparkles } from 'lucide-react';
 import Container from '../common/Container';
 import CountUp from '../common/CountUp';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft } from 'lucide-react';
@@ -7,7 +7,7 @@ import Container from '../components/common/Container';
 import TreatmentDetailsComponent from '../components/treatments/TreatmentDetails';
 import Button from '../components/common/Button';
 import Loading from '../components/common/Loading';
-import { getTreatmentBySlug } from '../services/treatmentService';
+import { useTreatment } from '../hooks/useQueries';
 
 const fallbackTreatments = {
   'gastrointestinal': {
@@ -85,49 +85,28 @@ const fallbackTreatments = {
 const TreatmentDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [treatment, setTreatment] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: rawTreatment, isLoading } = useTreatment(slug);
 
-  useEffect(() => {
-    if (!slug) return;
-    setLoading(true);
-    setError(null);
+  const treatment = useMemo(() => {
+    if (rawTreatment && rawTreatment.name) {
+      return {
+        ...rawTreatment,
+        symptoms: rawTreatment.symptoms?.length ? rawTreatment.symptoms : ['Discomfort & Persistent Irritation', 'Digestive or Bodily Imbalance', 'Fatigue or Disrupted Wellness'],
+        approaches: rawTreatment.approaches?.length ? rawTreatment.approaches : ['Holistic Siddha & Ayurveda diagnosis', 'Customized herbal formulations', 'Targeted therapy and dietary care']
+      };
+    }
+    if (!slug) return null;
+    const key = slug.toLowerCase();
+    return fallbackTreatments[key] || {
+      name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      category: 'General Healthcare',
+      symptoms: ['Individualized symptom assessment', 'Elemental Dosha imbalance', 'Physical discomfort or fatigue'],
+      approaches: ['Pulse examination (Nadi Parikshai)', 'Authentic herbal therapies', 'Lifestyle and dietary adjustments']
+    };
+  }, [rawTreatment, slug]);
 
-    getTreatmentBySlug(slug)
-      .then((res) => {
-        const data = res.data.data || res.data;
-        if (data && data.name) {
-          setTreatment({
-            ...data,
-            symptoms: data.symptoms?.length ? data.symptoms : ['Discomfort & Persistent Irritation', 'Digestive or Bodily Imbalance', 'Fatigue or Disrupted Wellness'],
-            approaches: data.approaches?.length ? data.approaches : ['Holistic Siddha & Ayurveda diagnosis', 'Customized herbal formulations', 'Targeted therapy and dietary care']
-          });
-        } else {
-          // Check fallback
-          const key = slug.toLowerCase();
-          const fallback = fallbackTreatments[key] || {
-            name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-            category: 'General Healthcare',
-            symptoms: ['Individualized symptom assessment', 'Elemental Dosha imbalance', 'Physical discomfort or fatigue'],
-            approaches: ['Pulse examination (Nadi Parikshai)', 'Authentic herbal therapies', 'Lifestyle and dietary adjustments']
-          };
-          setTreatment(fallback);
-        }
-      })
-      .catch(() => {
-        // Fallback
-        const key = slug.toLowerCase();
-        const fallback = fallbackTreatments[key] || {
-          name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          category: 'General Healthcare',
-          symptoms: ['Individualized symptom assessment', 'Elemental Dosha imbalance', 'Physical discomfort or fatigue'],
-          approaches: ['Pulse examination (Nadi Parikshai)', 'Authentic herbal therapies', 'Lifestyle and dietary adjustments']
-        };
-        setTreatment(fallback);
-      })
-      .finally(() => setLoading(false));
-  }, [slug]);
+  const loading = isLoading && !treatment;
+  const error = !loading && !treatment ? 'Treatment not found' : null;
 
   if (loading) return <PageTransition><Loading fullPage /></PageTransition>;
 

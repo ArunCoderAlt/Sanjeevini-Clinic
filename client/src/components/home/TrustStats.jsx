@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Users, Award, HeartPulse } from 'lucide-react';
 import Container from '../common/Container';

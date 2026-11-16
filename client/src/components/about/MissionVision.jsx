@@ -1,4 +1,3 @@
-import React from 'react';
 import { Target, Eye } from 'lucide-react';
 import Container from '../common/Container';
 

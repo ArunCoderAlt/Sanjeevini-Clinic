@@ -1,11 +1,89 @@
 import axios from 'axios';
 import { getToken, removeToken } from '../utils/helpers';
 import { API_URL } from '../utils/constants';
-import { broadcastDataChange, recordAdminAction } from '../utils/realtimeSync';
+import { broadcastDataChange, recordAdminAction, subscribeToDataChanges } from '../utils/realtimeSync';
+import { getBrowserCache, setBrowserCache, invalidateBrowserCache, clearAllBrowserCache } from '../utils/browserCache';
+
+// ==============================================================================
+// DUAL-LAYER IN-MEMORY & BROWSER STORAGE CACHE + PROMISE DEDUPLICATOR
+// Eliminates duplicate HTTP queries and gives instant 0ms page navigation & reload
+// ==============================================================================
+const inFlightRequests = new Map();
+const BROWSER_CACHE_TTL = 15 * 60 * 1000; // 15 minutes persistent browser cache
+
+export const clearClientApiCache = (urlPrefix = '') => {
+  if (!urlPrefix) {
+    clearAllBrowserCache();
+    return;
+  }
+  invalidateBrowserCache(urlPrefix);
+};
+
+// Auto-purge browser cache when real-time updates are received across tabs
+if (typeof window !== 'undefined') {
+  subscribeToDataChanges(() => {
+    clearClientApiCache();
+  });
+}
 
 const api = axios.create({
   baseURL: API_URL
 });
+
+// Intercept api.get to provide instant In-Memory + Browser Storage caching and request deduplication
+const originalGet = api.get.bind(api);
+
+api.get = async function (url, config = {}) {
+  const token = getToken();
+  const isAdminPath = typeof url === 'string' && (
+    url.startsWith('/appointments') || 
+    url.startsWith('/contact') || 
+    url.startsWith('/auth') || 
+    url.startsWith('/bot') ||
+    url.startsWith('/settings/admin')
+  );
+
+  // Never cache authenticated admin queries, sensitive admin endpoints, or explicit no-cache
+  if (token || isAdminPath || config.skipCache || config.params?.all === 'true' || config.params?.nocache === 'true') {
+    return originalGet(url, config);
+  }
+
+  const cacheKey = `api_get:${url}:${config.params ? JSON.stringify(config.params) : ''}`;
+
+  // 1. Check L1 In-Memory & L2 Browser Persistent Storage (survives reloads)
+  const cachedData = getBrowserCache(cacheKey);
+  if (cachedData) {
+    return Promise.resolve({
+      data: cachedData,
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+      fromClientCache: true,
+    });
+  }
+
+  // 2. In-flight request deduplication: reuse active promise for simultaneous component mounts
+  if (inFlightRequests.has(cacheKey)) {
+    return inFlightRequests.get(cacheKey);
+  }
+
+  // 3. Dispatch network request
+  const requestPromise = originalGet(url, config)
+    .then((response) => {
+      // Store in L1 In-Memory + L2 Browser Storage
+      if (response && response.data) {
+        setBrowserCache(cacheKey, response.data, BROWSER_CACHE_TTL);
+      }
+      return response;
+    })
+    .finally(() => {
+      inFlightRequests.delete(cacheKey);
+    });
+
+  inFlightRequests.set(cacheKey, requestPromise);
+  return requestPromise;
+};
 
 api.interceptors.request.use((config) => {
   const token = getToken();
@@ -79,6 +157,9 @@ api.interceptors.response.use(
     const url = response.config?.url || '';
 
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      // Clear client-side memory cache immediately upon data mutation
+      clearClientApiCache();
+
       // Don't auto-log normal login query here as AuthContext handles it with user credentials
       if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
         const actionInfo = deduceActionInfo(url, method, response.config?.data ? (() => {

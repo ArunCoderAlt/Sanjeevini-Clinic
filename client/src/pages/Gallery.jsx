@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Camera, Instagram } from 'lucide-react';
 import PageTransition from '../components/common/PageTransition';

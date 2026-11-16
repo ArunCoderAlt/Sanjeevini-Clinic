@@ -1,4 +1,3 @@
-import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, Clock, Phone, Navigation, MessageCircle } from 'lucide-react';
 import PageTransition from '../components/common/PageTransition';

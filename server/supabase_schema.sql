@@ -244,18 +244,22 @@ CREATE TRIGGER trg_testimonials_updated_at
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ==============================================================================
--- INDEXES
+-- INDEXES & PERFORMANCE OPTIMIZATIONS
 -- ==============================================================================
 CREATE INDEX IF NOT EXISTS idx_doctors_slug ON public.doctors (slug);
-CREATE INDEX IF NOT EXISTS idx_doctors_active ON public.doctors (is_active, order_index);
+CREATE INDEX IF NOT EXISTS idx_doctors_active ON public.doctors (is_active, order_index ASC);
 CREATE INDEX IF NOT EXISTS idx_services_slug ON public.services (slug);
-CREATE INDEX IF NOT EXISTS idx_services_active ON public.services (is_active, order_index);
+CREATE INDEX IF NOT EXISTS idx_services_active ON public.services (is_active, order_index ASC);
 CREATE INDEX IF NOT EXISTS idx_treatments_slug ON public.treatments (slug);
 CREATE INDEX IF NOT EXISTS idx_treatments_category ON public.treatments (category);
-CREATE INDEX IF NOT EXISTS idx_treatments_active ON public.treatments (is_active, order_index);
+CREATE INDEX IF NOT EXISTS idx_treatments_active ON public.treatments (is_active, order_index ASC);
+CREATE INDEX IF NOT EXISTS idx_treatments_active_category_order ON public.treatments (is_active, category, order_index ASC);
 CREATE INDEX IF NOT EXISTS idx_appointments_status ON public.appointments (status, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_gallery_category ON public.gallery (category, is_active);
+CREATE INDEX IF NOT EXISTS idx_gallery_category ON public.gallery (category, is_active, order_index ASC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_gallery_active_order ON public.gallery (is_active, order_index ASC, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_testimonials_approved ON public.testimonials (is_approved, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_testimonials_featured_approved ON public.testimonials (is_featured, is_approved, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_read_created ON public.contact_messages (is_read, created_at DESC);
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
@@ -465,5 +469,54 @@ CREATE TABLE IF NOT EXISTS public.bot_knowledge_chunks (
 );
 
 CREATE INDEX IF NOT EXISTS idx_bot_chunks_doc_id ON public.bot_knowledge_chunks(document_id);
+
+-- ------------------------------------------------------------------------------
+-- 12. GROQ KEY TRACKING PERIODS TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.groq_key_periods (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key_version TEXT NOT NULL,
+  key_fingerprint TEXT UNIQUE NOT NULL,
+  key_hint TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  total_requests INTEGER DEFAULT 0 NOT NULL,
+  total_input_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_output_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_tokens INTEGER DEFAULT 0 NOT NULL,
+  first_seen_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  last_used_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+DROP TRIGGER IF EXISTS trg_groq_key_periods_updated_at ON public.groq_key_periods;
+CREATE TRIGGER trg_groq_key_periods_updated_at
+  BEFORE UPDATE ON public.groq_key_periods
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE INDEX IF NOT EXISTS idx_groq_key_periods_fingerprint ON public.groq_key_periods(key_fingerprint);
+CREATE INDEX IF NOT EXISTS idx_groq_key_periods_active ON public.groq_key_periods(is_active);
+
+-- ------------------------------------------------------------------------------
+-- 13. GROQ USAGE LOGS TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.groq_usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key_version TEXT NOT NULL,
+  key_fingerprint TEXT NOT NULL,
+  model TEXT DEFAULT 'llama-3.3-70b-versatile',
+  input_tokens INTEGER DEFAULT 0 NOT NULL,
+  output_tokens INTEGER DEFAULT 0 NOT NULL,
+  total_tokens INTEGER DEFAULT 0 NOT NULL,
+  status TEXT DEFAULT 'success',
+  http_status INTEGER DEFAULT 200,
+  usage_source TEXT DEFAULT 'bot_chat',
+  rate_limit_info JSONB,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_created ON public.groq_usage_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_groq_usage_logs_key_version ON public.groq_usage_logs(key_version);
+
 
 
