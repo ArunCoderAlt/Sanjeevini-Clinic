@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { getServices, createService, updateService, deleteService } from '../../services/serviceService';
 import { uploadImage } from '../../services/uploadService';
 import { getImageUrl } from '../../utils/helpers';
+import { purgeAndInvalidateQuery } from '../../queryClient';
 
 const initialServiceForm = {
   title: '',
@@ -120,6 +121,7 @@ const Services = () => {
         toast.success('Service added successfully');
       }
 
+      purgeAndInvalidateQuery(['services', 'service']);
       setModalOpen(false);
       fetchServices();
     } catch (err) {
@@ -138,6 +140,7 @@ const Services = () => {
     try {
       await deleteService(deleteDialog.id);
       setServices((prev) => prev.filter((s) => (s._id || s.id) !== deleteDialog.id));
+      purgeAndInvalidateQuery(['services', 'service']);
       toast.success('Service deleted successfully');
       fetchServices();
     } catch (err) {

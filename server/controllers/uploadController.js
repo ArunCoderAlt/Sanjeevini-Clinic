@@ -3,7 +3,7 @@ const path = require('path');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
 const { getSupabase } = require('../config/supabase');
-const { isImageKitConfigured, uploadToImageKit } = require('../services/imagekitService');
+const { isImageKitConfigured, uploadToImageKit, deleteImageByUrl } = require('../services/imagekitService');
 const logger = require('../utils/logger');
 
 exports.uploadImage = asyncHandler(async (req, res) => {
@@ -39,7 +39,7 @@ exports.uploadImage = asyncHandler(async (req, res) => {
         fileBuffer,
         fileName: req.file.filename || req.file.originalname,
         folder: isGallery ? '/gallery' : `/${targetFolder || 'clinic'}`,
-        tags: isGallery ? ['gallery', 'clinic'] : ['clinic'],
+        tags: isGallery ? ['gallery', 'clinic'] : ['clinic', targetFolder].filter(Boolean),
       });
 
       if (ikResult.success && ikResult.url) {
@@ -121,4 +121,14 @@ exports.uploadImage = asyncHandler(async (req, res) => {
     `Image uploaded successfully (${storageProvider})`,
     201
   );
+});
+
+exports.deleteUploadedImage = asyncHandler(async (req, res) => {
+  const target = req.body?.url || req.query?.url || req.params?.fileId;
+  if (!target) {
+    return error(res, 'Please provide an image url or fileId to delete', 400);
+  }
+
+  const result = await deleteImageByUrl(target);
+  return success(res, result, 'Image deleted successfully');
 });

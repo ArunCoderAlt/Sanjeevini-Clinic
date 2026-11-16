@@ -1,6 +1,8 @@
 const Gallery = require('../models/Gallery');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
+const { deleteImageByUrl } = require('../services/imagekitService');
+const logger = require('../utils/logger');
 
 exports.getGalleryItems = asyncHandler(async (req, res) => {
   const filter = {};
@@ -20,16 +22,38 @@ exports.createGalleryItem = asyncHandler(async (req, res) => {
 });
 
 exports.updateGalleryItem = asyncHandler(async (req, res) => {
+  const existing = await Gallery.findById(req.params.id);
+  if (!existing) return error(res, 'Gallery item not found', 404);
+
+  const oldImage = existing.image || existing.url || existing.image_url;
+  const newImage = req.body.image || req.body.url || req.body.image_url;
+
   const item = await Gallery.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!item) return error(res, 'Gallery item not found', 404);
+
+  if (oldImage && ((newImage !== undefined && newImage !== oldImage) || newImage === '' || newImage === null)) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete replaced gallery image from ImageKit: ${err.message}`);
+    });
+  }
+
   return success(res, item, 'Gallery item updated');
 });
 
 exports.deleteGalleryItem = asyncHandler(async (req, res) => {
+  const existing = await Gallery.findById(req.params.id);
+  if (!existing) return error(res, 'Gallery item not found', 404);
+
+  const oldImage = existing.image || existing.url || existing.image_url;
   const item = await Gallery.findByIdAndDelete(req.params.id);
-  if (!item) return error(res, 'Gallery item not found', 404);
+
+  if (oldImage) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete gallery image from ImageKit on delete: ${err.message}`);
+    });
+  }
+
   return success(res, null, 'Gallery item deleted');
 });

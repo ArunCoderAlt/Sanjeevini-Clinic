@@ -115,6 +115,15 @@ const ImageUploader = ({
         </div>
       </div>
 
+      {/* Always render hidden file input so Change Image works in all modes */}
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        accept="image/*"
+        onChange={handleChange}
+      />
+
       {!preview ? (
         mode === 'file' ? (
           <div
@@ -134,13 +143,6 @@ const ImageUploader = ({
               <span className="font-semibold text-[#0C2B4B]">Click to upload</span> or drag and drop
             </p>
             <p className="text-xs text-gray-400">PNG, JPG, WebP, GIF, SVG (Up to 10MB)</p>
-            <input
-              ref={inputRef}
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={handleChange}
-            />
           </div>
         ) : (
           <div className="flex gap-2">
@@ -157,23 +159,58 @@ const ImageUploader = ({
           </div>
         )
       ) : (
-        <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center p-2 group max-w-sm">
-          <img
-            src={preview}
-            alt="Preview"
-            className="max-h-44 w-auto object-contain rounded"
-            onError={() => {
-              // fallback if invalid url
-            }}
-          />
-          <button
-            type="button"
-            onClick={removeImage}
-            className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 p-1.5 rounded-full text-red-600 transition-colors shadow-sm cursor-pointer"
-            title="Remove image"
-          >
-            <X size={16} />
-          </button>
+        <div className="space-y-2">
+          <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center p-2 group max-w-sm">
+            <img
+              src={preview}
+              alt="Preview"
+              className="max-h-44 w-auto object-contain rounded"
+              onError={() => {
+                // fallback if invalid url
+              }}
+            />
+            <button
+              type="button"
+              onClick={removeImage}
+              className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 p-1.5 rounded-full text-red-600 transition-colors shadow-sm cursor-pointer"
+              title="Remove image"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {mode === 'url' ? (
+            <div className="flex gap-2 max-w-sm">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <input
+                  type="url"
+                  value={urlInput}
+                  onChange={(e) => handleUrlSubmit(e.target.value)}
+                  placeholder="https://example.com/photo.jpg or /images/..."
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#144979] focus:border-[#144979]"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#0C2B4B] bg-[#E2EEF8] hover:bg-[#D0E4F5] rounded-lg transition-colors cursor-pointer"
+              >
+                <Upload size={14} />
+                Change Image
+              </button>
+              <button
+                type="button"
+                onClick={removeImage}
+                className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

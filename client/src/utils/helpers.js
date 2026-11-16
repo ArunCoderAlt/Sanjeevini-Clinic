@@ -22,27 +22,38 @@ export const removeToken = () => localStorage.removeItem('token');
 export const getImageUrl = (url) => {
   if (!url || typeof url !== 'string') return null;
 
+  const trimmed = url.trim().replace(/\\/g, '/');
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '[object Object]') {
+    return null;
+  }
+
+  // Prepend domain if stored as an ImageKit endpoint path e.g. /npodwfrx7/...
+  let resolvedUrl = trimmed;
+  if (/^\/?npodwfrx7\//i.test(resolvedUrl)) {
+    resolvedUrl = `https://ik.imagekit.io/${resolvedUrl.replace(/^\//, '')}`;
+  }
+
   // Auto-optimize ImageKit CDN assets (auto WebP/AVIF format + 80% lossless compression)
-  if (url.includes('ik.imagekit.io') || url.includes('imagekit.io')) {
-    if (!url.includes('tr=')) {
-      const sep = url.includes('?') ? '&' : '?';
-      return `${url}${sep}tr=q-80,f-auto`;
+  if (resolvedUrl.includes('ik.imagekit.io') || resolvedUrl.includes('imagekit.io')) {
+    if (!resolvedUrl.includes('tr=') && !resolvedUrl.includes('tr:')) {
+      const sep = resolvedUrl.includes('?') ? '&' : '?';
+      return `${resolvedUrl}${sep}tr=q-80,f-auto`;
     }
-    return url;
+    return resolvedUrl;
   }
 
   // Supabase CDN, full HTTP/HTTPS URL, or data/blob URI
   if (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('data:') ||
-    url.startsWith('blob:')
+    resolvedUrl.startsWith('http://') ||
+    resolvedUrl.startsWith('https://') ||
+    resolvedUrl.startsWith('data:') ||
+    resolvedUrl.startsWith('blob:')
   ) {
-    return url;
+    return resolvedUrl;
   }
 
   // Normalize path if missing leading slash
-  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  const cleanPath = resolvedUrl.startsWith('/') ? resolvedUrl : `/${resolvedUrl}`;
 
   // If stored as local backend uploads
   if (cleanPath.startsWith('/uploads/')) {
@@ -54,7 +65,7 @@ export const getImageUrl = (url) => {
     return cleanPath;
   }
 
-  return url;
+  return resolvedUrl;
 };
 
 export const DEFAULT_WHATSAPP_MESSAGE = 'Hello Sanjeevini Siddha & Ayurveda Medical Centre, I would like to inquire about consultation and treatments.';
@@ -82,3 +93,46 @@ export const handleWhatsAppClick = (e, phone = '919486838368', message = DEFAULT
     }, 700);
   }
 };
+
+/**
+ * Checks whether an image string is valid and not a placeholder/null representation
+ */
+export const isValidImage = (img) => {
+  if (!img || typeof img !== 'string') return false;
+  const lower = img.trim().toLowerCase();
+  return Boolean(
+    lower &&
+    lower !== 'null' &&
+    lower !== 'undefined' &&
+    lower !== '[object object]' &&
+    !lower.includes('placeholder')
+  );
+};
+
+export const defaultServiceImages = {
+  varmam: '/images/hero/slide-4.png',
+  'varmam-therapy': '/images/hero/slide-4.png',
+  thokkanam: '/images/hero/slide-3.png',
+  'thokkanam-therapy': '/images/hero/slide-3.png',
+  wellness: '/images/hero/slide-1.png',
+  'wellness-support': '/images/hero/slide-1.png',
+};
+
+/**
+ * Resolves a reliable default preview image for any service
+ */
+export const getDefaultServiceImage = (serviceOrSlug) => {
+  if (!serviceOrSlug) return '/images/hero/slide-4.png';
+  let str = '';
+  if (typeof serviceOrSlug === 'string') {
+    str = serviceOrSlug.toLowerCase().trim();
+  } else if (typeof serviceOrSlug === 'object') {
+    str = `${serviceOrSlug.slug || ''} ${serviceOrSlug.id || ''} ${serviceOrSlug.title || ''}`.toLowerCase();
+  }
+  if (str.includes('varmam')) return '/images/hero/slide-4.png';
+  if (str.includes('thokkanam')) return '/images/hero/slide-3.png';
+  if (str.includes('wellness') || str.includes('holistic')) return '/images/hero/slide-1.png';
+  if (str.includes('consultation')) return '/images/hero/slide-7.png';
+  return '/images/hero/slide-2.png';
+};
+

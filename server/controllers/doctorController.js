@@ -1,6 +1,8 @@
 const Doctor = require('../models/Doctor');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
+const { deleteImageByUrl } = require('../services/imagekitService');
+const logger = require('../utils/logger');
 
 exports.getDoctors = asyncHandler(async (req, res) => {
   const filter = {};
@@ -61,16 +63,38 @@ exports.createDoctor = asyncHandler(async (req, res) => {
 });
 
 exports.updateDoctor = asyncHandler(async (req, res) => {
+  const existing = await Doctor.findById(req.params.id);
+  if (!existing) return error(res, 'Doctor not found', 404);
+
+  const oldImage = existing.image;
+  const newImage = req.body.image;
+
   const doctor = await Doctor.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!doctor) return error(res, 'Doctor not found', 404);
+
+  if (oldImage && ((newImage !== undefined && newImage !== oldImage) || req.body.image === '' || req.body.image === null)) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete replaced doctor image from ImageKit: ${err.message}`);
+    });
+  }
+
   return success(res, doctor, 'Doctor updated successfully');
 });
 
 exports.deleteDoctor = asyncHandler(async (req, res) => {
+  const existing = await Doctor.findById(req.params.id);
+  if (!existing) return error(res, 'Doctor not found', 404);
+
+  const oldImage = existing.image;
   const doctor = await Doctor.findByIdAndDelete(req.params.id);
-  if (!doctor) return error(res, 'Doctor not found', 404);
+
+  if (oldImage) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete doctor image from ImageKit on delete: ${err.message}`);
+    });
+  }
+
   return success(res, null, 'Doctor deleted successfully');
 });

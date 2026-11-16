@@ -33,7 +33,7 @@ const authenticDefaultGallery = [
   { id: 'g-5', src: '/images/hero/slide-5.png', category: 'Treatment', alt: 'Ayush Certified Traditional Medicines' },
   { id: 'g-6', src: '/images/hero/slide-6.png', category: 'Treatment', alt: 'Traditional Herbal Preparations & Care' },
   { id: 'g-7', src: '/images/about/samc-philosophy.jpg', category: 'Philosophy', alt: 'SAMC Philosophy Emblem' },
-  { id: 'g-8', src: '/images/about/clinic-building.jpg', category: 'Clinic', alt: 'Sanjeevini Clinic Campus' },
+  { id: 'g-8', src: '/images/about/clinic-building.jpg?v=2', category: 'Clinic', alt: 'Sanjeevini Clinic Campus' },
 ];
 
 const GalleryGrid = ({ activeTab }) => {
@@ -43,10 +43,10 @@ const GalleryGrid = ({ activeTab }) => {
     if (!rawData) return authenticDefaultGallery;
     if (Array.isArray(rawData) && rawData.length === 0) return [];
     return rawData
-      .filter((item) => item.image && !isMockImage(item.image))
+      .filter((item) => (item.image || item.url) && !isMockImage(item.image || item.url))
       .map((item) => ({
         id: item._id || item.id,
-        src: getImageUrl(item.image),
+        src: getImageUrl(item.image || item.url),
         category: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Clinic',
         alt: item.title || item.description || 'Clinic photo'
       }));

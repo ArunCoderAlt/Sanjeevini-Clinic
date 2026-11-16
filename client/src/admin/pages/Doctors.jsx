@@ -95,7 +95,7 @@ const Doctors = () => {
       let finalImageUrl = formData.image;
       if (selectedFile instanceof File) {
         toast.loading('Uploading doctor image...', { id: 'upload-toast' });
-        finalImageUrl = await uploadImage(selectedFile);
+        finalImageUrl = await uploadImage(selectedFile, 'doctors');
         toast.dismiss('upload-toast');
       }
 

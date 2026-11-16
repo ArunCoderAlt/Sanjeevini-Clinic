@@ -17,11 +17,11 @@ const AboutPreview = () => {
             <div className="relative">
               <div className="aspect-[4/5] bg-sage rounded-2xl overflow-hidden shadow-lg">
                 <img 
-                  src="/images/about/clinic-building.jpg" 
+                  src="/images/about/clinic-building.jpg?v=2" 
                   alt="Sanjeevini Siddha & Ayurveda Medical Centre" 
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-[center_28%]"
                 />
               </div>
               <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-primary-700 rounded-full flex items-center justify-center p-6 text-center shadow-xl border-4 border-cream hidden md:flex">

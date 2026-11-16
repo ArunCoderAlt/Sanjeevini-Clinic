@@ -159,7 +159,22 @@ api.interceptors.response.use(
 
     return response;
   },
-  (error) => {
+  async (error) => {
+    const config = error.config;
+
+    // Auto-retry transient network errors and server waking 502/503/504 for read-only GET requests
+    if (
+      config &&
+      config.method?.toLowerCase() === 'get' &&
+      !config._retry &&
+      (!error.response || [502, 503, 504].includes(error.response.status))
+    ) {
+      config._retry = true;
+      // Wait 1.5 seconds for Render backend cold-start
+      await new Promise((r) => setTimeout(r, 1500));
+      return api(config);
+    }
+
     if (error.response?.status === 401) {
       removeToken();
       if (typeof window !== 'undefined') {

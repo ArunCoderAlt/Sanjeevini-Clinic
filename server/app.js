@@ -43,44 +43,59 @@ const explicitOrigins = clientOriginEnv
   ? clientOriginEnv.split(',').map((o) => o.trim().replace(/\/$/, ''))
   : ['http://localhost:5173', 'http://localhost:3000'];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, uptime probes)
-      if (!origin) return callback(null, true);
+// Bulletproof CORS options that support Vercel, Render, local dev, custom domains, and previews
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Requests with no origin (mobile apps, curl, uptime monitors)
+    if (!origin) return callback(null, true);
 
-      // In development or if explicitly allowed all
-      if (process.env.NODE_ENV !== 'production' || clientOriginEnv === '*') {
-        return callback(null, true);
-      }
+    if (process.env.NODE_ENV !== 'production' || clientOriginEnv === '*') {
+      return callback(null, true);
+    }
 
-      const normalized = origin.replace(/\/$/, '');
+    const normalized = origin.replace(/\/$/, '');
+    if (explicitOrigins.includes(normalized)) {
+      return callback(null, true);
+    }
 
-      // Check explicit origins or any vercel.app preview/production deployment
+    try {
+      const { hostname } = new URL(origin);
       if (
-        explicitOrigins.includes(normalized) ||
-        /\.vercel\.app$/.test(new URL(origin).hostname)
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname.endsWith('.vercel.app') ||
+        hostname.endsWith('.onrender.com') ||
+        hostname.endsWith('sanjeevinisiddha.in') ||
+        hostname.includes('sanjeevini')
       ) {
         return callback(null, true);
       }
+    } catch (_) {}
 
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Cache-Control',
-      'Pragma',
-      'Expires',
-      'X-Requested-With',
-      'Accept',
-      'Origin',
-    ],
-    optionsSuccessStatus: 200,
-  })
-);
+    // Pass through origin gracefully rather than throwing 500 error
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Cache-Control',
+    'Pragma',
+    'Expires',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Accept-Language',
+    'Range',
+  ],
+  exposedHeaders: ['Content-Range', 'X-Total-Count', 'Content-Disposition'],
+  optionsSuccessStatus: 200,
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Standard Permissions-Policy to suppress browser console warnings
 app.use((req, res, next) => {

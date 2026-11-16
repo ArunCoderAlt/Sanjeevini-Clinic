@@ -241,6 +241,12 @@ const toDbRow = (data, tableName = '') => {
     result[snakeKey] = value;
   }
 
+  // Universal order -> order_index mapping and removal of non-existent 'order' column
+  if (result['order'] !== undefined) {
+    result['order_index'] = Number(result['order']) || 0;
+    delete result['order'];
+  }
+
   // Model-specific normalization to prevent column mismatch in PostgreSQL/Supabase
   if (tableName === 'reels') {
     if (result['start'] !== undefined || result['start_time'] !== undefined) {
@@ -255,9 +261,11 @@ const toDbRow = (data, tableName = '') => {
     }
   }
 
-  if (tableName === 'swarna_bindu') {
-    if (result['order'] !== undefined) {
-      result['order_index'] = Number(result['order']) || 0;
+  if (tableName === 'treatments') {
+    if (result['short_description'] !== undefined || result['full_description'] !== undefined) {
+      result['description'] = result['description'] || result['short_description'] || result['full_description'] || '';
+      delete result['short_description'];
+      delete result['full_description'];
     }
   }
 
@@ -277,6 +285,18 @@ const toDbRow = (data, tableName = '') => {
       result['description'] = result['caption'];
     }
     delete result['caption'];
+    const gImg = result['image'] || result['url'] || result['image_url'];
+    if (gImg !== undefined) {
+      result['image'] = typeof gImg === 'string' ? gImg.trim() : gImg;
+    }
+    delete result['image_url'];
+    delete result['url'];
+  }
+
+  if (tableName === 'services' || tableName === 'treatments' || tableName === 'doctors') {
+    if (result['image'] !== undefined && typeof result['image'] === 'string') {
+      result['image'] = result['image'].trim();
+    }
   }
 
   return result;
@@ -312,6 +332,10 @@ const formatRow = (row, tableName, customMethods = {}) => {
   }
 
   if (tableName === 'gallery') {
+    const galleryImg = row.image || row.image_url || row.url || '';
+    formatted.image = galleryImg;
+    formatted.url = galleryImg;
+    formatted.imageUrl = galleryImg;
     formatted.caption = row.caption || row.description || '';
     formatted.description = row.description || row.caption || '';
   }

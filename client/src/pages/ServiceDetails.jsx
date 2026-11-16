@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Clock, MapPin, ShieldCheck, HeartHandshake, Sparkles, CheckCircle2 } from 'lucide-react';
@@ -7,7 +7,7 @@ import PageTransition from '../components/common/PageTransition';
 import Container from '../components/common/Container';
 import Loading from '../components/common/Loading';
 import { clinicInfo } from '../data/clinicInfo';
-import { getImageUrl } from '../utils/helpers';
+import { getImageUrl, getDefaultServiceImage, isValidImage } from '../utils/helpers';
 
 const serviceCatalog = {
   'varmam-therapy': {
@@ -19,7 +19,20 @@ const serviceCatalog = {
       'Neuromuscular stimulation for stroke rehabilitation',
       'Migraine and tension headache relief',
       'Joint mobility restoration without invasive procedures'
-    ]
+    ],
+    image: '/images/hero/slide-4.png'
+  },
+  'varmam': {
+    title: 'Varmam Therapy',
+    shortDescription: 'Traditional therapeutic vital point stimulation for rapid pain relief, neuromuscular restoration, and energy balance.',
+    fullDescription: `Varmam is a specialized, ancient Tamil healing science that targets vital points where physical and subtle energy pathways converge. When these points are blocked or traumatized by stress, injury, or wear-and-tear, severe musculoskeletal and nervous disorders arise.\n\nOur expert practitioners apply measured, precise manual pressure to specific Varmam points to release trapped energy, restore nervous conductivity, and provide fast, lasting relief from spinal, joint, and nerve pain without surgery.`,
+    benefits: [
+      'Relief from chronic spinal, back, and neck pain',
+      'Neuromuscular stimulation for stroke rehabilitation',
+      'Migraine and tension headache relief',
+      'Joint mobility restoration without invasive procedures'
+    ],
+    image: '/images/hero/slide-4.png'
   },
   'thokkanam-therapy': {
     title: 'Thokkanam Therapy',
@@ -30,7 +43,20 @@ const serviceCatalog = {
       'Nourishment of arthritic and stiff joints',
       'Re-establishment of healthy blood and lymphatic flow',
       'Balancing of Vatha humor across the nervous system'
-    ]
+    ],
+    image: '/images/hero/slide-3.png'
+  },
+  'thokkanam': {
+    title: 'Thokkanam Therapy',
+    shortDescription: 'Traditional Siddha physical manipulation and medicated oil massage for neuromuscular rehabilitation.',
+    fullDescription: `Thokkanam is the physical manipulation therapy of the Siddha medicine system. Employing nine distinct therapeutic manual techniques—including kneading, tapping, gliding, and passive stretching—alongside warm medicated herbal oils.\n\nThokkanam effectively penetrates deep muscular layers to disperse lactic acid, nourish dry joints, reduce inflammatory stiffness, and re-establish harmonious blood and lymph circulation throughout the body.`,
+    benefits: [
+      'Alleviation of deep muscle fatigue and spasm',
+      'Nourishment of arthritic and stiff joints',
+      'Re-establishment of healthy blood and lymphatic flow',
+      'Balancing of Vatha humor across the nervous system'
+    ],
+    image: '/images/hero/slide-3.png'
   },
   'wellness-support': {
     title: 'Holistic Wellness Support',
@@ -41,14 +67,21 @@ const serviceCatalog = {
       'Customized dietary counseling (Pathya Aaharam)',
       'Seasonal detox and Rasayana rejuvenation protocols',
       'Long-term natural disease resistance building'
-    ]
+    ],
+    image: '/images/hero/slide-1.png'
+  },
+  'wellness': {
+    title: 'Holistic Wellness Support',
+    shortDescription: 'Personalized preventive care programs, dietary counseling, and customized herbal regimens.',
+    fullDescription: `True wellness extends beyond treating illness—it is the continuous preservation of vitality, immunity, and inner calm. Our wellness support programs harmonize your daily routine with nature’s rhythms.\n\nWe provide personalized dietary guidelines (Pathya Aaharam), seasonal cleansing regimens, stress management practices, and rejuvenative herbal tonics (Rasayana Chikitsa) designed to build natural disease resistance.`,
+    benefits: [
+      'Personalized constitution analysis (Vatha, Pitha, Kapha balance)',
+      'Customized dietary counseling (Pathya Aaharam)',
+      'Seasonal detox and Rasayana rejuvenation protocols',
+      'Long-term natural disease resistance building'
+    ],
+    image: '/images/hero/slide-1.png'
   }
-};
-
-const isValidImage = (img) => {
-  if (!img || typeof img !== 'string' || !img.trim()) return false;
-  const lower = img.toLowerCase().trim();
-  return !lower.includes('placeholder') && lower !== 'null' && lower !== 'undefined';
 };
 
 export default function ServiceDetails() {
@@ -62,9 +95,18 @@ export default function ServiceDetails() {
   const { data: rawService, isLoading } = useService(slug);
 
   const service = useMemo(() => {
-    const fallback = serviceCatalog[slug?.toLowerCase()] || 
-      serviceCatalog[slug?.toLowerCase().replace('-therapy', '').replace('-support', '')] ||
+    const slugKey = slug?.toLowerCase() || '';
+    const fallback = serviceCatalog[slugKey] || 
+      serviceCatalog[slugKey.replace('-therapy', '').replace('-support', '')] ||
+      serviceCatalog[`${slugKey}-therapy`] ||
+      serviceCatalog[`${slugKey}-support`] ||
       null;
+
+    const previewDefaultImg = getDefaultServiceImage(slugKey);
+
+    const baseImage = isValidImage(rawService?.image)
+      ? rawService.image
+      : (isValidImage(fallback?.image) ? fallback.image : previewDefaultImg);
 
     if (rawService && rawService.title) {
       return {
@@ -72,15 +114,25 @@ export default function ServiceDetails() {
         shortDescription: rawService.shortDescription || fallback?.shortDescription,
         fullDescription: rawService.fullDescription || fallback?.fullDescription,
         benefits: rawService.benefits?.length ? rawService.benefits : fallback?.benefits,
-        image: isValidImage(rawService.image) ? rawService.image : (isValidImage(fallback?.image) ? fallback.image : null)
+        image: baseImage
       };
     }
-    return fallback;
+    if (fallback) {
+      return {
+        ...fallback,
+        image: fallback.image || previewDefaultImg
+      };
+    }
+    return null;
   }, [rawService, slug]);
 
-  const displayImage = service?.image && !imgError && isValidImage(service.image)
-    ? getImageUrl(service.image)
-    : null;
+  useEffect(() => {
+    setImgError(false);
+  }, [slug, rawService?.image]);
+
+  const previewDefaultImg = getDefaultServiceImage(slug);
+  const resolvedImage = !imgError && isValidImage(service?.image) ? service.image : previewDefaultImg;
+  const displayImage = resolvedImage ? getImageUrl(resolvedImage) : null;
 
   const loading = isLoading && !service;
   const error = !loading && !service ? 'Service not found' : null;
@@ -132,13 +184,12 @@ export default function ServiceDetails() {
                     </p>
 
                     {displayImage && (
-                      <div className="aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden mb-8 shadow-md border border-slate-200/80 bg-slate-100">
+                      <div className="aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden mb-8 shadow-md border border-slate-200/90 bg-slate-100 relative group">
                         <img
                           src={displayImage}
                           alt={service.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-102"
+                          loading="eager"
                           onError={() => setImgError(true)}
                         />
                       </div>
@@ -169,19 +220,6 @@ export default function ServiceDetails() {
 
                 {/* Right Panel */}
                 <div className="lg:col-span-2 bg-[#EAF2F8] p-8 md:p-10 flex flex-col gap-6 justify-between border-t lg:border-t-0 lg:border-l border-slate-200/80">
-                  {displayImage && (
-                    <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200/70 bg-white">
-                      <img
-                        src={displayImage}
-                        alt={service.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-48 object-cover"
-                        onError={() => setImgError(true)}
-                      />
-                    </div>
-                  )}
-
                   <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-200">
                     <div className="w-12 h-12 rounded-xl bg-[#E8F2FA] text-[#144979] flex items-center justify-center mb-4">
                       <Sparkles className="w-6 h-6" />

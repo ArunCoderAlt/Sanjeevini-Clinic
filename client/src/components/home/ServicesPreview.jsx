@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, Activity, HeartHandshake, ArrowRight, HeartPulse, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,7 @@ import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
 import { useServices } from '../../hooks/useQueries';
-import { getImageUrl } from '../../utils/helpers';
+import { getImageUrl, getDefaultServiceImage, isValidImage } from '../../utils/helpers';
 
 const defaultServices = [
   { 
@@ -23,7 +23,7 @@ const defaultServices = [
     icon: HeartHandshake, 
     title: 'Thokkanam Therapy', 
     desc: 'Classical physical manipulation and traditional medicated herbal oil body therapy for neurological recovery, joint mobility, and musculoskeletal restoration.',
-    image: '/images/hero/slide-6.png'
+    image: '/images/hero/slide-3.png'
   },
   { 
     id: 'wellness', 
@@ -50,6 +50,10 @@ const ServicesPreview = () => {
   const { data: rawServices } = useServices();
   const [imgErrors, setImgErrors] = useState({});
 
+  useEffect(() => {
+    setImgErrors({});
+  }, [rawServices]);
+
   const services = useMemo(() => {
     if (!rawServices) return defaultServices;
     if (Array.isArray(rawServices) && rawServices.length === 0) return [];
@@ -58,15 +62,25 @@ const ServicesPreview = () => {
     if (filtered.length === 0) return [];
 
     return filtered.slice(0, 3).map((s) => {
-      const def = defaultServices.find(d => d.slug === s.slug) || {};
+      const slugKey = String(s.slug || '').toLowerCase();
+      const def = defaultServices.find(d => 
+        d.slug === slugKey || 
+        d.id === slugKey || 
+        slugKey.includes(d.id) || 
+        d.slug.includes(slugKey) ||
+        s.title?.toLowerCase().includes(d.id)
+      ) || {};
       const IconComponent = iconMap[s.icon] || iconMap[s.slug] || def.icon || Activity;
+      const fallbackImg = def.image || getDefaultServiceImage(s);
+      const validImage = isValidImage(s.image) ? s.image : fallbackImg;
+
       return {
         id: s._id || s.id || def.id,
         slug: s.slug || def.slug,
         icon: IconComponent,
         title: s.title,
         desc: s.shortDescription || s.description || def.desc,
-        image: s.image || def.image || null,
+        image: validImage,
       };
     });
   }, [rawServices]);
@@ -86,9 +100,12 @@ const ServicesPreview = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-12 max-w-5xl mx-auto">
             {services.map((service, idx) => {
-              const Icon = service.icon;
-              const serviceImg = service.image ? getImageUrl(service.image) : null;
+              const fallbackImg = getDefaultServiceImage(service);
               const hasError = imgErrors[service.id || idx];
+              const displayImg = !hasError && isValidImage(service.image)
+                ? (getImageUrl(service.image) || fallbackImg)
+                : fallbackImg;
+
               return (
                 <motion.div
                   key={service.slug || service.id || idx}
@@ -99,22 +116,21 @@ const ServicesPreview = () => {
                   className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full overflow-hidden"
                 >
                   <div>
-                    {serviceImg && !hasError ? (
-                      <div className="aspect-[16/10] -mx-8 -mt-8 mb-6 overflow-hidden bg-slate-100">
-                        <img
-                          src={serviceImg}
-                          alt={service.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                          decoding="async"
-                          onError={() => setImgErrors(prev => ({ ...prev, [service.id || idx]: true }))}
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
-                        <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
-                      </div>
-                    )}
+                    <div className="aspect-[16/10] -mx-8 -mt-8 mb-6 overflow-hidden bg-slate-100 relative">
+                      <img
+                        src={displayImg}
+                        alt={service.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => {
+                          if (!hasError) {
+                            setImgErrors(prev => ({ ...prev, [service.id || idx]: true }));
+                          }
+                        }}
+                      />
+                    </div>
+
                     <h3 className="text-2xl font-serif text-[#0C2B4B] font-bold mb-3.5 group-hover:text-[#144979] transition-colors">
                       {service.title}
                     </h3>

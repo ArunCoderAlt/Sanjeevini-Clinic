@@ -15,7 +15,7 @@ exports.apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   // High ceiling so normal client browsing never hits 429
   limit: isDev ? 50000 : 2500,
-  skip: (req) => isDev || isLoopback(req.ip) || req.path === '/auth/me',
+  skip: (req) => req.method === 'OPTIONS' || isDev || isLoopback(req.ip) || req.path === '/auth/me',
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -27,7 +27,7 @@ exports.apiLimiter = rateLimit({
 exports.authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: isDev ? 500 : 20,
-  skip: (req) => isDev && isLoopback(req.ip),
+  skip: (req) => req.method === 'OPTIONS' || (isDev && isLoopback(req.ip)),
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -39,6 +39,7 @@ exports.authLimiter = rateLimit({
 exports.contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: isDev ? 200 : 20,
+  skip: (req) => req.method === 'OPTIONS' || (isDev && isLoopback(req.ip)),
   standardHeaders: true,
   legacyHeaders: false,
   message: {

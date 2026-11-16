@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import ServiceCard from './ServiceCard';
 import { useServices } from '../../hooks/useQueries';
 import Loading from '../common/Loading';
+import { getDefaultServiceImage, isValidImage } from '../../utils/helpers';
 
 const defaultServices = [
   { id: 'varmam', slug: 'varmam-therapy', iconName: 'Activity', title: 'Varmam Therapy', desc: 'A traditional therapeutic technique targeting vital energy points (Varmam points) to relieve pain, balance energy, and stimulate healing.', image: '/images/hero/slide-4.png' },
-  { id: 'thokkanam', slug: 'thokkanam-therapy', iconName: 'HeartHandshake', title: 'Thokkanam Therapy', desc: 'A physical manipulation therapy and traditional massage using medicated oils to treat neuromuscular and musculoskeletal disorders.', image: '/images/hero/slide-6.png' },
-  { id: 'wellness', slug: 'wellness-support', iconName: 'Leaf', title: 'Wellness Support', desc: 'Holistic wellness programs including dietary counseling, lifestyle modifications, and customized herbal regimens for preventive care.', image: '/images/hero/slide-1.png' }
+  { id: 'thokkanam', slug: 'thokkanam-therapy', iconName: 'HeartHandshake', title: 'Thokkanam Therapy', desc: 'A physical manipulation therapy and traditional massage using medicated oils to treat neuromuscular and musculoskeletal disorders.', image: '/images/hero/slide-3.png' },
+  { id: 'wellness', slug: 'wellness-support', iconName: 'Leaf', title: 'Holistic Wellness Support', desc: 'Holistic wellness programs including dietary counseling, lifestyle modifications, and customized herbal regimens for preventive care.', image: '/images/hero/slide-1.png' }
 ];
 
 const ServiceGrid = () => {
@@ -18,14 +19,25 @@ const ServiceGrid = () => {
 
     const filtered = rawServices.filter(item => item.slug !== 'consultation');
     return filtered.map(item => {
-      const def = defaultServices.find(d => d.slug === item.slug) || {};
+      const slugKey = String(item.slug || '').toLowerCase();
+      const def = defaultServices.find(d => 
+        d.slug === slugKey || 
+        d.id === slugKey || 
+        slugKey.includes(d.id) || 
+        d.slug.includes(slugKey) ||
+        item.title?.toLowerCase().includes(d.id)
+      ) || {};
+
+      const fallbackImage = def.image || getDefaultServiceImage(item);
+      const resolvedImage = isValidImage(item.image) ? item.image : fallbackImage;
+
       return {
         id: item._id || item.id || def.id,
         slug: item.slug || def.slug,
         title: item.title,
-        desc: item.shortDescription || def.desc,
+        desc: item.shortDescription || item.desc || def.desc,
         iconName: item.icon || def.iconName || 'Activity',
-        image: item.image || def.image || null,
+        image: resolvedImage,
       };
     });
   }, [rawServices]);

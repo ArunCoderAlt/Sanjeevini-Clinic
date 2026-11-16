@@ -100,9 +100,9 @@ const SwarnaBindu = () => {
               <div className="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <div>
-                <p className="text-[11px] text-slate-400 font-medium">Formulation</p>
-                <p className="text-xs sm:text-sm font-semibold text-white">24K Swarna Bhasma</p>
+              <div className="min-w-0">
+                <p className="text-[11px] text-slate-400 font-medium leading-tight mb-0.5">Formulation</p>
+                <p className="text-xs sm:text-sm font-semibold text-white leading-tight">Swarna Bhasma</p>
               </div>
             </div>
 
@@ -110,9 +110,9 @@ const SwarnaBindu = () => {
               <div className="w-9 h-9 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
                 <Calendar className="w-4 h-4" />
               </div>
-              <div>
-                <p className="text-[11px] text-slate-400 font-medium">Frequency</p>
-                <p className="text-xs sm:text-sm font-semibold text-white">Pushya Nakshatra</p>
+              <div className="min-w-0">
+                <p className="text-[11px] text-slate-400 font-medium leading-tight mb-0.5">Frequency</p>
+                <p className="text-xs sm:text-sm font-semibold text-white leading-tight">Pushya Nakshatra</p>
               </div>
             </div>
 
@@ -120,9 +120,9 @@ const SwarnaBindu = () => {
               <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
                 <Baby className="w-4 h-4" />
               </div>
-              <div>
-                <p className="text-[11px] text-slate-400 font-medium">Beneficiaries</p>
-                <p className="text-xs sm:text-sm font-semibold text-white">Age 0 to 16 Years</p>
+              <div className="min-w-0">
+                <p className="text-[11px] text-slate-400 font-medium leading-tight mb-0.5">Beneficiaries</p>
+                <p className="text-xs sm:text-sm font-semibold text-white leading-tight">Age 0 to 16 Years</p>
               </div>
             </div>
 
@@ -130,9 +130,9 @@ const SwarnaBindu = () => {
               <div className="w-9 h-9 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
                 <ShieldCheck className="w-4 h-4" />
               </div>
-              <div>
-                <p className="text-[11px] text-slate-400 font-medium">Supervision</p>
-                <p className="text-xs sm:text-sm font-semibold text-white">Expert Physicians</p>
+              <div className="min-w-0">
+                <p className="text-[11px] text-slate-400 font-medium leading-tight mb-0.5">Supervision</p>
+                <p className="text-xs sm:text-sm font-semibold text-white leading-tight">Expert Physicians</p>
               </div>
             </div>
           </motion.div>

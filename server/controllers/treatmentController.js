@@ -1,6 +1,8 @@
 const Treatment = require('../models/Treatment');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
+const { deleteImageByUrl } = require('../services/imagekitService');
+const logger = require('../utils/logger');
 
 exports.getTreatments = asyncHandler(async (req, res) => {
   const filter = {};
@@ -62,16 +64,39 @@ exports.createTreatment = asyncHandler(async (req, res) => {
 });
 
 exports.updateTreatment = asyncHandler(async (req, res) => {
+  const existing = await Treatment.findById(req.params.id);
+  if (!existing) return error(res, 'Treatment not found', 404);
+
+  const oldImage = existing.image;
+  const newImage = req.body.image;
+
   const treatment = await Treatment.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!treatment) return error(res, 'Treatment not found', 404);
+
+  // If image was replaced or cleared, remove old image from ImageKit / storage
+  if (oldImage && ((newImage !== undefined && newImage !== oldImage) || req.body.image === '' || req.body.image === null)) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete replaced treatment image from ImageKit: ${err.message}`);
+    });
+  }
+
   return success(res, treatment, 'Treatment updated successfully');
 });
 
 exports.deleteTreatment = asyncHandler(async (req, res) => {
+  const existing = await Treatment.findById(req.params.id);
+  if (!existing) return error(res, 'Treatment not found', 404);
+
+  const oldImage = existing.image;
   const treatment = await Treatment.findByIdAndDelete(req.params.id);
-  if (!treatment) return error(res, 'Treatment not found', 404);
+
+  if (oldImage) {
+    deleteImageByUrl(oldImage).catch((err) => {
+      logger.warn(`Could not delete treatment image from ImageKit on delete: ${err.message}`);
+    });
+  }
+
   return success(res, null, 'Treatment deleted successfully');
 });

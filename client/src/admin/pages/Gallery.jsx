@@ -283,11 +283,11 @@ const Gallery = () => {
             >
               <div className="relative h-48 bg-gray-100">
                 <img
-                  src={getImageUrl(img.url)}
+                  src={getImageUrl(img.image || img.url || img.imageUrl)}
                   alt={img.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = '/images/about/clinic-building.jpg';
+                    e.currentTarget.src = '/images/about/clinic-building.jpg?v=2';
                   }}
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
