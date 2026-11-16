@@ -436,8 +436,8 @@ const ReelLightboxModal = ({ reel, onClose }) => {
 const InstagramSection = () => {
   const { data: rawReels } = useReels();
   const reels = useMemo(() => {
-    const list = Array.isArray(rawReels) && rawReels.length > 0 ? rawReels : (!rawReels ? defaultClinicReels : []);
-    if (!Array.isArray(list) || list.length === 0) return [];
+    const list = Array.isArray(rawReels) && rawReels.length > 0 ? rawReels : defaultClinicReels;
+    if (!Array.isArray(list) || list.length === 0) return defaultClinicReels;
 
     // Always sort newest / latest reels first so the latest reel is displayed first
     return [...list].sort((a, b) => {

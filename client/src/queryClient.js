@@ -41,7 +41,7 @@ if (typeof window !== 'undefined') {
       queryClient,
       persister,
       maxAge: 2 * 60 * 60 * 1000, // 2 hours storage persistence
-      buster: 'v2.2',
+      buster: 'v2.4',
     });
   } catch (err) {
     console.warn('React Query browser storage persistence notice:', err);
