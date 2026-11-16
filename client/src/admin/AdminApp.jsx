@@ -59,7 +59,7 @@ const AdminApp = () => {
           <Routes>
             <Route path="" element={<Dashboard />} />
             <Route path="ai-bot" element={<AiBotKnowledge />} />
-            <Route path="appointments" element={<Appointments />} />
+            <Route path="appointments" element={<Navigate to="/admin/messages" replace />} />
             <Route path="doctors" element={<Doctors />} />
             <Route path="services" element={<Services />} />
             <Route path="treatments" element={<Treatments />} />

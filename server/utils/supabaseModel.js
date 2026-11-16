@@ -261,6 +261,24 @@ const toDbRow = (data, tableName = '') => {
     }
   }
 
+  if (tableName === 'appointments') {
+    if (result['date'] !== undefined && result['preferred_date'] === undefined) {
+      result['preferred_date'] = result['date'];
+    }
+    delete result['date'];
+    if (result['time'] !== undefined && result['preferred_time'] === undefined) {
+      result['preferred_time'] = result['time'];
+    }
+    delete result['time'];
+  }
+
+  if (tableName === 'gallery') {
+    if (result['caption'] !== undefined && result['description'] === undefined) {
+      result['description'] = result['caption'];
+    }
+    delete result['caption'];
+  }
+
   return result;
 };
 
@@ -291,6 +309,16 @@ const formatRow = (row, tableName, customMethods = {}) => {
     formatted.start = row.start !== undefined ? row.start : (row.start_time !== undefined ? row.start_time : 0);
     formatted.desc = row.desc || row.description || '';
     formatted.description = row.description || row.desc || '';
+  }
+
+  if (tableName === 'gallery') {
+    formatted.caption = row.caption || row.description || '';
+    formatted.description = row.description || row.caption || '';
+  }
+
+  if (tableName === 'appointments') {
+    formatted.date = row.date || row.preferred_date || '';
+    formatted.preferredDate = row.preferred_date || row.date || '';
   }
 
   formatted.save = async function () {

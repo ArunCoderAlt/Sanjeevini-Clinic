@@ -52,7 +52,7 @@ const DoctorGrid = () => {
         <UserX className="w-12 h-12 mx-auto text-slate-400 mb-3" />
         <h3 className="text-xl font-serif text-slate-800 font-semibold mb-2">No Doctors Currently Listed</h3>
         <p className="text-slate-500 text-sm leading-relaxed">
-          Doctor profiles will be updated shortly. Please contact the clinic directly for consultation appointments.
+          Doctor profiles will be updated shortly. Please contact the clinic directly for consultations.
         </p>
       </div>
     );

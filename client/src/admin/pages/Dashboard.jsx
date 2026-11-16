@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Mail, MessageSquare, Stethoscope } from 'lucide-react';
+import { Mail, MessageSquare, Stethoscope, Heart, Pill } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StatsCard from '../components/StatsCard';
 import DataTable from '../components/DataTable';
@@ -7,42 +7,27 @@ import api from '../../services/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    appointments: 0,
-    pendingAppointments: 0,
     messages: 0,
     unreadMessages: 0,
-    testimonials: 0,
-    doctors: 0
+    services: 0,
+    treatments: 0,
+    doctors: 0,
+    testimonials: 0
   });
-  const [recentAppointments, setRecentAppointments] = useState([]);
   const [recentMessages, setRecentMessages] = useState([]);
+  const [recentTestimonials, setRecentTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [apptRes, msgRes, testRes, docRes] = await Promise.allSettled([
-          api.get('/appointments'),
+        const [msgRes, srvRes, trtRes, docRes, testRes] = await Promise.allSettled([
           api.get('/contact'),
-          api.get('/testimonials'),
+          api.get('/services'),
+          api.get('/treatments'),
           api.get('/doctors'),
+          api.get('/testimonials'),
         ]);
-
-        // Appointments
-        if (apptRes.status === 'fulfilled') {
-          const appts = apptRes.value.data.data || [];
-          const pending = appts.filter(a => a.status === 'pending').length;
-          setStats(prev => ({ ...prev, appointments: appts.length, pendingAppointments: pending }));
-          setRecentAppointments(
-            appts.slice(0, 5).map(a => ({
-              id: a._id || a.id,
-              name: a.name,
-              date: a.preferredDate ? new Date(a.preferredDate).toLocaleDateString('en-IN') : '—',
-              time: a.preferredTime || '—',
-              status: a.status ? a.status.charAt(0).toUpperCase() + a.status.slice(1) : '—',
-            }))
-          );
-        }
 
         // Messages
         if (msgRes.status === 'fulfilled') {
@@ -53,22 +38,43 @@ const Dashboard = () => {
             msgs.slice(0, 5).map(m => ({
               id: m._id || m.id,
               name: m.name,
-              subject: m.subject || '(No subject)',
+              subject: m.message ? (m.message.slice(0, 45) + (m.message.length > 45 ? '...' : '')) : '(No message)',
               date: m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-IN') : '—',
             }))
           );
         }
 
-        // Testimonials
-        if (testRes.status === 'fulfilled') {
-          const tests = testRes.value.data.data || [];
-          setStats(prev => ({ ...prev, testimonials: tests.length }));
+        // Services
+        if (srvRes.status === 'fulfilled') {
+          const srvs = srvRes.value.data.data || [];
+          setStats(prev => ({ ...prev, services: srvs.length }));
+        }
+
+        // Treatments
+        if (trtRes.status === 'fulfilled') {
+          const trts = trtRes.value.data.data || [];
+          setStats(prev => ({ ...prev, treatments: trts.length }));
         }
 
         // Doctors
         if (docRes.status === 'fulfilled') {
           const docs = docRes.value.data.data || [];
           setStats(prev => ({ ...prev, doctors: docs.length }));
+        }
+
+        // Testimonials
+        if (testRes.status === 'fulfilled') {
+          const tests = testRes.value.data.data || [];
+          setStats(prev => ({ ...prev, testimonials: tests.length }));
+          setRecentTestimonials(
+            tests.slice(0, 5).map(t => ({
+              id: t._id || t.id,
+              name: t.name,
+              rating: `${t.rating || 5} ★`,
+              review: t.review ? (t.review.slice(0, 45) + (t.review.length > 45 ? '...' : '')) : '—',
+              date: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN') : '—',
+            }))
+          );
         }
       } catch (err) {
         console.error('Dashboard fetch error:', err);
@@ -80,30 +86,16 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const appointmentCols = [
-    { key: 'name', label: 'Patient Name' },
-    { key: 'date', label: 'Date' },
-    { key: 'time', label: 'Time' },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (val) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium
-          ${val === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-            val === 'Confirmed' ? 'bg-sky-100 text-[#0C2B4B]' :
-            val === 'Completed' ? 'bg-blue-100 text-blue-800' :
-            'bg-gray-100 text-gray-800'}`}
-        >
-          {val}
-        </span>
-      )
-    },
-  ];
-
   const messageCols = [
     { key: 'name', label: 'Sender' },
-    { key: 'subject', label: 'Subject' },
+    { key: 'subject', label: 'Inquiry' },
     { key: 'date', label: 'Date' },
+  ];
+
+  const testimonialCols = [
+    { key: 'name', label: 'Patient' },
+    { key: 'rating', label: 'Rating' },
+    { key: 'review', label: 'Review' },
   ];
 
   return (
@@ -111,30 +103,29 @@ const Dashboard = () => {
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Appointments"
-          value={stats.appointments}
-          icon={Calendar}
-          color="blue"
-          change={`+${stats.pendingAppointments} pending`}
-        />
-        <StatsCard
-          title="Total Messages"
+          title="Patient Inquiries"
           value={stats.messages}
           icon={Mail}
-          color="orange"
+          color="blue"
           change={`+${stats.unreadMessages} unread`}
         />
         <StatsCard
-          title="Testimonials"
-          value={stats.testimonials}
-          icon={MessageSquare}
+          title="Clinical Services"
+          value={stats.services}
+          icon={Heart}
+          color="blue"
+        />
+        <StatsCard
+          title="Specialized Treatments"
+          value={stats.treatments}
+          icon={Pill}
           color="purple"
         />
         <StatsCard
           title="Active Doctors"
           value={stats.doctors}
           icon={Stethoscope}
-          color="blue"
+          color="orange"
         />
       </div>
 
@@ -142,24 +133,24 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Appointments</h3>
-            <Link to="/admin/appointments" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
+            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Patient Inquiries</h3>
+            <Link to="/admin/messages" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
           </div>
           <DataTable
-            columns={appointmentCols}
-            data={recentAppointments}
+            columns={messageCols}
+            data={recentMessages}
             loading={loading}
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Messages</h3>
-            <Link to="/admin/messages" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
+            <h3 className="text-lg font-bold text-slate-800" style={{ color: '#0F172A' }}>Recent Testimonials</h3>
+            <Link to="/admin/testimonials" className="text-sm font-semibold text-[#144979] hover:underline">View All</Link>
           </div>
           <DataTable
-            columns={messageCols}
-            data={recentMessages}
+            columns={testimonialCols}
+            data={recentTestimonials}
             loading={loading}
           />
         </div>

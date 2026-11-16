@@ -23,7 +23,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { name: 'AI Bot Knowledge', path: '/admin/ai-bot', icon: Bot },
-    { name: 'Appointments', path: '/admin/appointments', icon: Calendar },
     { name: 'Doctors', path: '/admin/doctors', icon: Stethoscope },
     { name: 'Services', path: '/admin/services', icon: Heart },
     { name: 'Treatments', path: '/admin/treatments', icon: Pill },
