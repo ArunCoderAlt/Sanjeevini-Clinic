@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
@@ -27,7 +27,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenModal }) => {
+const GalleryReelCard = ({ reel, isFirstItem, onOpenModal }) => {
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(parseInt(reel.likes) || 2400);
@@ -35,7 +36,7 @@ const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenMod
 
   const togglePlay = (e) => {
     e.stopPropagation();
-    onTogglePlay();
+    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = (e) => {
@@ -63,7 +64,7 @@ const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenMod
       <div className="relative bg-neutral-950 rounded-2xl overflow-hidden shadow-xl h-full border border-white/10 transition-all duration-300 group-hover:shadow-2xl group-hover:border-gold/40">
         {/* 9:16 Vertical Reel Aspect */}
         <div className="relative aspect-[9/16] min-h-[460px] max-h-[520px] overflow-hidden bg-neutral-900">
-          {/* Autoplaying Video - Only mounted when active to conserve memory */}
+          {/* Autoplaying Video */}
           {isPlaying ? (
             <div className="absolute inset-0 w-full h-full overflow-hidden">
               <iframe
@@ -79,23 +80,15 @@ const GalleryReelCard = ({ reel, isFirstItem, isPlaying, onTogglePlay, onOpenMod
               />
             </div>
           ) : (
-            <div 
-              className="absolute inset-0 w-full h-full cursor-pointer group/thumb"
-              onClick={togglePlay}
-              role="button"
-              tabIndex={0}
-              aria-label={`Play reel: ${reel.title}`}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') togglePlay(e); }}
-            >
+            <div className="absolute inset-0 w-full h-full">
               <img
                 src={reel.thumbnail || `https://i.ytimg.com/vi/${reel.videoId}/hq720.jpg`}
                 alt={reel.title}
-                className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover"
                 loading="lazy"
-                decoding="async"
               />
-              <div className="absolute inset-0 bg-black/40 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white/20 group-hover/thumb:bg-white/30 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl group-hover/thumb:scale-110 transition-transform">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/40 shadow-xl">
                   <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
                 </div>
               </div>
@@ -274,27 +267,6 @@ const InstagramReels = () => {
     });
   }, [rawReels]);
   const [selectedModalReel, setSelectedModalReel] = useState(null);
-  const [swiperInstance, setSwiperInstance] = useState(null);
-  const [activePlayingId, setActivePlayingId] = useState(() => {
-    return defaultClinicReels[0]?.id || 'default-1';
-  });
-
-  // Automatically activate latest first reel on mount or dynamic load
-  useEffect(() => {
-    if (reels.length > 0) {
-      setActivePlayingId(reels[0].id || reels[0]._id || 'default-1');
-    }
-  }, [reels]);
-
-  // Synchronize playing reel with Swiper autoplay slide transition
-  const handleSlideChange = (swiper) => {
-    const idx = swiper.realIndex ?? swiper.activeIndex;
-    const currentReel = reels[idx];
-    if (currentReel) {
-      const reelKey = currentReel.id || currentReel._id || `gallery-reel-${idx}`;
-      setActivePlayingId(reelKey);
-    }
-  };
 
   if (Array.isArray(rawReels) && reels.length === 0) {
     return (
@@ -351,12 +323,10 @@ const InstagramReels = () => {
           slidesPerView={1.2}
           loop={reels.length > 3}
           autoplay={{
-            delay: 5000,
+            delay: 4500,
             disableOnInteraction: false,
             pauseOnMouseEnter: true,
           }}
-          onSwiper={setSwiperInstance}
-          onSlideChange={handleSlideChange}
           navigation={{
             nextEl: '.gallery-reels-next',
             prevEl: '.gallery-reels-prev',
@@ -381,21 +351,7 @@ const InstagramReels = () => {
                 <GalleryReelCard
                   reel={reel}
                   isFirstItem={index === 0}
-                  isPlaying={activePlayingId === reelKey}
-                  onTogglePlay={() => {
-                    setActivePlayingId(reelKey);
-                    if (swiperInstance) {
-                      if (typeof swiperInstance.slideToLoop === 'function') {
-                        swiperInstance.slideToLoop(index);
-                      } else {
-                        swiperInstance.slideTo(index);
-                      }
-                    }
-                  }}
-                  onOpenModal={(r) => {
-                    setActivePlayingId(null);
-                    setSelectedModalReel(r);
-                  }}
+                  onOpenModal={(r) => setSelectedModalReel(r)}
                 />
               </SwiperSlide>
             );
