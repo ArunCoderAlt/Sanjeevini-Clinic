@@ -175,8 +175,15 @@ export const clearAllBrowserCache = () => {
     const keysToRemove = [];
     for (let i = 0; i < storage.length; i++) {
       const k = storage.key(i);
-      if (k && (k.startsWith(CACHE_PREFIX) || k.startsWith('sanjeevini_'))) {
-        keysToRemove.push(k);
+      if (
+        k &&
+        (k.startsWith(CACHE_PREFIX) ||
+          k.startsWith('sanjeevini_cache') ||
+          k.startsWith('sanjeevini_react_query_cache'))
+      ) {
+        if (k !== 'token' && k !== 'clinic_admin_user' && k !== 'clinic_admin_actions') {
+          keysToRemove.push(k);
+        }
       }
     }
     keysToRemove.forEach((k) => storage.removeItem(k));
@@ -194,7 +201,7 @@ export const pruneExpiredBrowserCache = () => {
     const keysToRemove = [];
     for (let i = 0; i < storage.length; i++) {
       const k = storage.key(i);
-      if (k && k.startsWith(CACHE_PREFIX)) {
+      if (k && (k.startsWith(CACHE_PREFIX) || k.startsWith('sanjeevini_react_query_cache'))) {
         try {
           const item = JSON.parse(storage.getItem(k));
           if (!item || !item.expiresAt || Date.now() >= item.expiresAt) {
@@ -209,8 +216,11 @@ export const pruneExpiredBrowserCache = () => {
   } catch {}
 };
 
-// Auto-prune on startup and periodically (every 5 mins) to keep memory & storage lean
+// Auto-prune on startup and periodically (every 60s) to keep memory & storage lean
 if (typeof window !== 'undefined') {
+  try {
+    window.localStorage.removeItem('sanjeevini_react_query_cache');
+  } catch {}
   pruneExpiredBrowserCache();
   setInterval(() => {
     const now = Date.now();
@@ -218,5 +228,5 @@ if (typeof window !== 'undefined') {
       if (now >= v.expiresAt) L1_MEMORY_CACHE.delete(k);
     }
     pruneExpiredBrowserCache();
-  }, 5 * 60 * 1000);
+  }, 60 * 1000);
 }

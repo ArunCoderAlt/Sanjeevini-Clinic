@@ -86,7 +86,7 @@ const SwarnaBindu = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light leading-relaxed mb-8"
           >
-            An ancient pediatric Rasayana mentioned in <em>Kashyapa Samhita</em>, prepared with 24K purified Swarna Bhasma, Medhya herbs, cow ghee, and honey. Administered exclusively on auspicious <strong>Pushya Nakshatra</strong> days for children from birth to 16 years.
+            An ancient pediatric Rasayana mentioned in <em>Kashyapa Samhita</em>, prepared with purified Swarna Bhasma, Medhya herbs, cow ghee, and honey. Administered exclusively on auspicious <strong>Pushya Nakshatra</strong> days for children from birth to 16 years.
           </motion.p>
 
           {/* Quick Feature Badges */}

@@ -154,6 +154,7 @@ const Treatments = () => {
       await deleteTreatment(deleteDialog.id);
       setTreatments((prev) => prev.filter((t) => (t._id || t.id) !== deleteDialog.id));
       toast.success('Treatment deleted successfully');
+      fetchTreatments();
     } catch (err) {
       toast.error('Failed to delete treatment.');
     } finally {

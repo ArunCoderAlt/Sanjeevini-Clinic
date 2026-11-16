@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, Activity, HeartHandshake, ArrowRight, HeartPulse, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import Container from '../common/Container';
 import SectionTitle from '../common/SectionTitle';
 import Button from '../common/Button';
 import { useServices } from '../../hooks/useQueries';
+import { getImageUrl } from '../../utils/helpers';
 
 const defaultServices = [
   { 
@@ -13,21 +14,24 @@ const defaultServices = [
     slug: 'varmam-therapy', 
     icon: Activity, 
     title: 'Varmam Therapy', 
-    desc: 'Traditional Siddha therapeutic technique targeting vital energy points (Varmam) to release trapped energy, restore neuromuscular pathways, and relieve chronic pain.' 
+    desc: 'Traditional Siddha therapeutic technique targeting vital energy points (Varmam) to release trapped energy, restore neuromuscular pathways, and relieve chronic pain.',
+    image: '/images/hero/slide-4.png'
   },
   { 
     id: 'thokkanam', 
     slug: 'thokkanam-therapy', 
     icon: HeartHandshake, 
     title: 'Thokkanam Therapy', 
-    desc: 'Classical physical manipulation and traditional medicated herbal oil body therapy for neurological recovery, joint mobility, and musculoskeletal restoration.' 
+    desc: 'Classical physical manipulation and traditional medicated herbal oil body therapy for neurological recovery, joint mobility, and musculoskeletal restoration.',
+    image: '/images/hero/slide-6.png'
   },
   { 
     id: 'wellness', 
     slug: 'wellness-support', 
     icon: Leaf, 
     title: 'Holistic Wellness Support', 
-    desc: 'Comprehensive preventive health programs including personalized dietary counseling (Pathya Aaharam), seasonal cleansing regimens, and herbal rejuvenatives.' 
+    desc: 'Comprehensive preventive health programs including personalized dietary counseling (Pathya Aaharam), seasonal cleansing regimens, and herbal rejuvenatives.',
+    image: '/images/hero/slide-1.png'
   }
 ];
 
@@ -44,6 +48,7 @@ const iconMap = {
 
 const ServicesPreview = () => {
   const { data: rawServices } = useServices();
+  const [imgErrors, setImgErrors] = useState({});
 
   const services = useMemo(() => {
     if (!rawServices) return defaultServices;
@@ -60,7 +65,8 @@ const ServicesPreview = () => {
         slug: s.slug || def.slug,
         icon: IconComponent,
         title: s.title,
-        desc: s.shortDescription || s.description || def.desc
+        desc: s.shortDescription || s.description || def.desc,
+        image: s.image || def.image || null,
       };
     });
   }, [rawServices]);
@@ -81,6 +87,8 @@ const ServicesPreview = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 mb-12 max-w-5xl mx-auto">
             {services.map((service, idx) => {
               const Icon = service.icon;
+              const serviceImg = service.image ? getImageUrl(service.image) : null;
+              const hasError = imgErrors[service.id || idx];
               return (
                 <motion.div
                   key={service.slug || service.id || idx}
@@ -88,16 +96,29 @@ const ServicesPreview = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full"
+                  className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/80 hover:border-[#144979]/40 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group h-full overflow-hidden"
                 >
                   <div>
-                    <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
-                      <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
-                    </div>
+                    {serviceImg && !hasError ? (
+                      <div className="aspect-[16/10] -mx-8 -mt-8 mb-6 overflow-hidden bg-slate-100">
+                        <img
+                          src={serviceImg}
+                          alt={service.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                          decoding="async"
+                          onError={() => setImgErrors(prev => ({ ...prev, [service.id || idx]: true }))}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 bg-[#E8F2FA] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#144979] transition-colors">
+                        <Icon className="w-8 h-8 text-[#144979] group-hover:text-white transition-colors" />
+                      </div>
+                    )}
                     <h3 className="text-2xl font-serif text-[#0C2B4B] font-bold mb-3.5 group-hover:text-[#144979] transition-colors">
                       {service.title}
                     </h3>
-                    <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
+                    <p className="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed line-clamp-3">
                       {service.desc}
                     </p>
                   </div>

@@ -2,7 +2,9 @@ import api from './api';
 
 export const getTreatments = (category, params = {}) => {
   const query = { ...params };
-  if (category) query.category = category;
+  if (category && category.trim().toLowerCase() !== 'all') {
+    query.category = category.trim();
+  }
   return api.get('/treatments', { params: query });
 };
 export const getTreatmentBySlug = (slug) => api.get(`/treatments/slug/${slug}`);

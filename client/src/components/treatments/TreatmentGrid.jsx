@@ -17,17 +17,22 @@ const defaultTreatments = [
   { id: 'other', slug: 'other', name: 'Other Treatments', category: 'Other', icon: '🌿', desc: 'Holistic treatments for general wellness.' }
 ];
 
-const TreatmentGrid = ({ searchTerm, activeCategory }) => {
-  const { data: rawTreatments } = useTreatments(activeCategory);
+const TreatmentGrid = ({ searchTerm = '', activeCategory = 'All' }) => {
+  const { data: rawTreatments } = useTreatments();
 
   const items = useMemo(() => {
-    if (!rawTreatments) return defaultTreatments;
-    if (Array.isArray(rawTreatments) && rawTreatments.length === 0) return [];
+    if (!rawTreatments || (Array.isArray(rawTreatments) && rawTreatments.length === 0)) {
+      return defaultTreatments;
+    }
     return rawTreatments.map((t) => {
-      const def = defaultTreatments.find(d => d.slug === t.slug || d.category?.toLowerCase() === t.category?.toLowerCase() || d.name?.toLowerCase() === t.name?.toLowerCase()) || {};
+      const def = defaultTreatments.find(d => 
+        (t.slug && d.slug === t.slug) || 
+        (t.category && d.category?.toLowerCase() === t.category?.toLowerCase()) || 
+        (t.name && d.name?.toLowerCase() === t.name?.toLowerCase())
+      ) || {};
       return {
         id: t._id || t.id || t.slug || def.id,
-        slug: t.slug || def.slug || t._id,
+        slug: t.slug || def.slug || t._id || t.id,
         name: t.name || def.name,
         category: t.category || def.category,
         desc: t.description || t.desc || def.desc,
@@ -37,11 +42,22 @@ const TreatmentGrid = ({ searchTerm, activeCategory }) => {
     });
   }, [rawTreatments]);
 
-  const filtered = items.filter(t => {
-    const matchesSearch = t.name.toLowerCase().includes(searchTerm.toLowerCase()) || (t.desc && t.desc.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = activeCategory === 'All' || t.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filtered = useMemo(() => {
+    const cleanSearch = (searchTerm || '').trim().toLowerCase();
+    const isAll = !activeCategory || activeCategory.toLowerCase() === 'all';
+
+    return items.filter(t => {
+      const matchesSearch = !cleanSearch ||
+        (t.name && t.name.toLowerCase().includes(cleanSearch)) ||
+        (t.desc && t.desc.toLowerCase().includes(cleanSearch)) ||
+        (t.category && t.category.toLowerCase().includes(cleanSearch));
+
+      const matchesCategory = isAll ||
+        (t.category && t.category.toLowerCase() === activeCategory.toLowerCase());
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [items, searchTerm, activeCategory]);
 
   if (filtered.length === 0) {
     return (

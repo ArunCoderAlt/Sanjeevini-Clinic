@@ -13,6 +13,7 @@ const initialServiceForm = {
   title: '',
   shortDescription: '',
   fullDescription: '',
+  benefits: '',
   image: '',
   icon: 'Leaf',
   order: 0,
@@ -60,6 +61,7 @@ const Services = () => {
       title: service.title || '',
       shortDescription: service.shortDescription || '',
       fullDescription: service.fullDescription || '',
+      benefits: Array.isArray(service.benefits) ? service.benefits.join('\n') : (service.benefits || ''),
       image: service.image || '',
       icon: service.icon || 'Leaf',
       order: service.order ?? 0,
@@ -87,9 +89,16 @@ const Services = () => {
       let finalImageUrl = formData.image;
       if (selectedFile instanceof File) {
         toast.loading('Uploading service banner...', { id: 'upload-toast' });
-        finalImageUrl = await uploadImage(selectedFile);
+        finalImageUrl = await uploadImage(selectedFile, 'services');
         toast.dismiss('upload-toast');
       }
+
+      const parsedBenefits = typeof formData.benefits === 'string'
+        ? formData.benefits
+            .split('\n')
+            .map((b) => b.trim())
+            .filter(Boolean)
+        : (Array.isArray(formData.benefits) ? formData.benefits : (editingService?.benefits || []));
 
       const payload = {
         title: formData.title.trim(),
@@ -99,8 +108,8 @@ const Services = () => {
         icon: formData.icon.trim() || 'Leaf',
         order: Number(formData.order) || 0,
         isActive: Boolean(formData.isActive),
-        benefits: [],
-        procedures: [],
+        benefits: parsedBenefits,
+        procedures: editingService?.procedures || [],
       };
 
       if (editingService) {
@@ -130,6 +139,7 @@ const Services = () => {
       await deleteService(deleteDialog.id);
       setServices((prev) => prev.filter((s) => (s._id || s.id) !== deleteDialog.id));
       toast.success('Service deleted successfully');
+      fetchServices();
     } catch (err) {
       toast.error('Failed to delete service.');
     } finally {
@@ -251,9 +261,23 @@ const Services = () => {
             </div>
 
             <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clinical Highlights & Benefits (one per line)
+              </label>
+              <textarea
+                name="benefits"
+                rows="3"
+                value={formData.benefits}
+                onChange={handleFormChange}
+                placeholder="Relief from joint and nerve pain&#10;Improved mobility&#10;Revitalized energy pathways"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#0C2B4B] focus:border-[#0C2B4B]"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
               <ImageUploader
-                label="Service Image"
-                currentImage={getImageUrl(formData.image)}
+                label="Service Image / Banner"
+                currentImage={formData.image ? getImageUrl(formData.image) : ''}
                 onImageSelect={(fileOrUrl) => {
                   if (fileOrUrl instanceof File) {
                     setSelectedFile(fileOrUrl);

@@ -3,7 +3,7 @@ import { getToken, removeToken } from '../utils/helpers';
 import { API_URL } from '../utils/constants';
 import { broadcastDataChange, recordAdminAction, subscribeToDataChanges } from '../utils/realtimeSync';
 import { getBrowserCache, setBrowserCache, invalidateBrowserCache, clearAllBrowserCache } from '../utils/browserCache';
-import { queryClient } from '../queryClient';
+import { queryClient, purgeAndInvalidateQuery, purgeAllQueriesAndCache } from '../queryClient';
 
 // ==============================================================================
 // DUAL-LAYER IN-MEMORY & BROWSER STORAGE CACHE + PROMISE DEDUPLICATOR
@@ -30,61 +30,6 @@ if (typeof window !== 'undefined') {
 const api = axios.create({
   baseURL: API_URL
 });
-
-// Intercept api.get to provide instant In-Memory + Browser Storage caching and request deduplication
-const originalGet = api.get.bind(api);
-
-api.get = async function (url, config = {}) {
-  const token = getToken();
-  const isAdminPath = typeof url === 'string' && (
-    url.startsWith('/appointments') || 
-    url.startsWith('/contact') || 
-    url.startsWith('/auth') || 
-    url.startsWith('/bot') ||
-    url.startsWith('/settings/admin')
-  );
-
-  // Never cache authenticated admin queries, sensitive admin endpoints, or explicit no-cache
-  if (token || isAdminPath || config.skipCache || config.params?.all === 'true' || config.params?.nocache === 'true') {
-    return originalGet(url, config);
-  }
-
-  const cacheKey = `api_get:${url}:${config.params ? JSON.stringify(config.params) : ''}`;
-
-  // 1. Check L1 In-Memory & L2 Browser Persistent Storage (survives reloads)
-  const cachedData = getBrowserCache(cacheKey);
-  if (cachedData) {
-    return Promise.resolve({
-      data: cachedData,
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      fromClientCache: true,
-    });
-  }
-
-  // 2. In-flight request deduplication: reuse active promise for simultaneous component mounts
-  if (inFlightRequests.has(cacheKey)) {
-    return inFlightRequests.get(cacheKey);
-  }
-
-  // 3. Dispatch network request
-  const requestPromise = originalGet(url, config)
-    .then((response) => {
-      // Store in L1 In-Memory + L2 Browser Storage
-      if (response && response.data) {
-        setBrowserCache(cacheKey, response.data, BROWSER_CACHE_TTL);
-      }
-      return response;
-    })
-    .finally(() => {
-      inFlightRequests.delete(cacheKey);
-    });
-
-  inFlightRequests.set(cacheKey, requestPromise);
-  return requestPromise;
-};
 
 api.interceptors.request.use((config) => {
   const token = getToken();
@@ -161,40 +106,27 @@ api.interceptors.response.use(
       // Clear client-side memory cache immediately upon data mutation
       clearClientApiCache();
 
-      // Immediately invalidate matching React Query caches for 0-latency UI updates
+      // Immediately purge and garbage collect matching React Query caches
       try {
         const cleanUrl = url.toLowerCase();
         if (cleanUrl.includes('/doctors')) {
-          queryClient.invalidateQueries({ queryKey: ['doctors'] });
-          queryClient.invalidateQueries({ queryKey: ['doctor'] });
-          invalidateBrowserCache('doctors');
+          purgeAndInvalidateQuery(['doctors', 'doctor']);
         } else if (cleanUrl.includes('/services')) {
-          queryClient.invalidateQueries({ queryKey: ['services'] });
-          queryClient.invalidateQueries({ queryKey: ['service'] });
-          invalidateBrowserCache('services');
+          purgeAndInvalidateQuery(['services', 'service']);
         } else if (cleanUrl.includes('/treatments')) {
-          queryClient.invalidateQueries({ queryKey: ['treatments'] });
-          queryClient.invalidateQueries({ queryKey: ['treatment'] });
-          queryClient.invalidateQueries({ queryKey: ['treatment-categories'] });
-          invalidateBrowserCache('treatments');
+          purgeAndInvalidateQuery(['treatments', 'treatment', 'treatment-categories']);
         } else if (cleanUrl.includes('/gallery')) {
-          queryClient.invalidateQueries({ queryKey: ['gallery'] });
-          invalidateBrowserCache('gallery');
+          purgeAndInvalidateQuery(['gallery']);
         } else if (cleanUrl.includes('/reels')) {
-          queryClient.invalidateQueries({ queryKey: ['reels'] });
-          invalidateBrowserCache('reels');
+          purgeAndInvalidateQuery(['reels']);
         } else if (cleanUrl.includes('/testimonials')) {
-          queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-          invalidateBrowserCache('testimonials');
+          purgeAndInvalidateQuery(['testimonials']);
         } else if (cleanUrl.includes('/swarna-bindu')) {
-          queryClient.invalidateQueries({ queryKey: ['swarna-bindu'] });
-          invalidateBrowserCache('swarna-bindu');
+          purgeAndInvalidateQuery(['swarna-bindu']);
         } else if (cleanUrl.includes('/settings')) {
-          queryClient.invalidateQueries({ queryKey: ['settings'] });
-          invalidateBrowserCache('settings');
+          purgeAndInvalidateQuery(['settings']);
         } else {
-          queryClient.invalidateQueries();
-          clearAllBrowserCache();
+          purgeAllQueriesAndCache();
         }
       } catch (_) {}
 

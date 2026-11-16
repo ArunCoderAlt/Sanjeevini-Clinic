@@ -148,6 +148,7 @@ const Gallery = () => {
       await deleteGalleryItem(deleteDialog.id);
       setImages((prev) => prev.filter((img) => img.id !== deleteDialog.id));
       toast.success('Image deleted from gallery');
+      fetchGallery();
     } catch (err) {
       toast.error('Failed to delete image.');
     } finally {

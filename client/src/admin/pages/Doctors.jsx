@@ -142,6 +142,7 @@ const Doctors = () => {
       await deleteDoctor(deleteDialog.id);
       setDoctors((prev) => prev.filter((d) => (d._id || d.id) !== deleteDialog.id));
       toast.success('Doctor deleted successfully');
+      fetchDoctors();
     } catch (err) {
       toast.error('Failed to delete doctor.');
     } finally {

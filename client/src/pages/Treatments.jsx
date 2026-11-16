@@ -17,12 +17,14 @@ const Treatments = () => {
   useEffect(() => {
     if (categoryParam) {
       setActiveCategory(categoryParam);
+    } else {
+      setActiveCategory('All');
     }
   }, [categoryParam]);
 
   const handleCategoryChange = (cat) => {
     setActiveCategory(cat);
-    if (cat === 'All') {
+    if (!cat || cat.toLowerCase() === 'all') {
       searchParams.delete('category');
       setSearchParams(searchParams, { replace: true });
     } else {

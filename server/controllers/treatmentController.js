@@ -7,7 +7,9 @@ exports.getTreatments = asyncHandler(async (req, res) => {
   if (req.query.all !== 'true') {
     filter.isActive = true;
   }
-  if (req.query.category) filter.category = req.query.category;
+  if (req.query.category && req.query.category.trim().toLowerCase() !== 'all') {
+    filter.category = req.query.category.trim();
+  }
   const treatments = await Treatment.find(filter).sort({ order: 1 });
   return success(res, treatments);
 });

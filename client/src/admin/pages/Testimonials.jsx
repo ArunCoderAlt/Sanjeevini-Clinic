@@ -105,6 +105,7 @@ const Testimonials = () => {
       await deleteTestimonial(deleteDialog.id);
       setTestimonials((prev) => prev.filter((t) => (t._id || t.id) !== deleteDialog.id));
       toast.success('Testimonial deleted successfully');
+      fetchTestimonials();
     } catch (err) {
       toast.error('Failed to delete testimonial.');
     } finally {

@@ -4,9 +4,9 @@ import { useServices } from '../../hooks/useQueries';
 import Loading from '../common/Loading';
 
 const defaultServices = [
-  { id: 'varmam', slug: 'varmam-therapy', iconName: 'Activity', title: 'Varmam Therapy', desc: 'A traditional therapeutic technique targeting vital energy points (Varmam points) to relieve pain, balance energy, and stimulate healing.' },
-  { id: 'thokkanam', slug: 'thokkanam-therapy', iconName: 'HeartHandshake', title: 'Thokkanam Therapy', desc: 'A physical manipulation therapy and traditional massage using medicated oils to treat neuromuscular and musculoskeletal disorders.' },
-  { id: 'wellness', slug: 'wellness-support', iconName: 'Leaf', title: 'Wellness Support', desc: 'Holistic wellness programs including dietary counseling, lifestyle modifications, and customized herbal regimens for preventive care.' }
+  { id: 'varmam', slug: 'varmam-therapy', iconName: 'Activity', title: 'Varmam Therapy', desc: 'A traditional therapeutic technique targeting vital energy points (Varmam points) to relieve pain, balance energy, and stimulate healing.', image: '/images/hero/slide-4.png' },
+  { id: 'thokkanam', slug: 'thokkanam-therapy', iconName: 'HeartHandshake', title: 'Thokkanam Therapy', desc: 'A physical manipulation therapy and traditional massage using medicated oils to treat neuromuscular and musculoskeletal disorders.', image: '/images/hero/slide-6.png' },
+  { id: 'wellness', slug: 'wellness-support', iconName: 'Leaf', title: 'Wellness Support', desc: 'Holistic wellness programs including dietary counseling, lifestyle modifications, and customized herbal regimens for preventive care.', image: '/images/hero/slide-1.png' }
 ];
 
 const ServiceGrid = () => {
@@ -24,7 +24,8 @@ const ServiceGrid = () => {
         slug: item.slug || def.slug,
         title: item.title,
         desc: item.shortDescription || def.desc,
-        iconName: item.icon || def.iconName || 'Activity'
+        iconName: item.icon || def.iconName || 'Activity',
+        image: item.image || def.image || null,
       };
     });
   }, [rawServices]);

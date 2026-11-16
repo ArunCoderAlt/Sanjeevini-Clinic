@@ -1,87 +1,81 @@
 import { QueryClient } from '@tanstack/react-query';
-import { persistQueryClient } from '@tanstack/react-query-persist-client';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { subscribeToDataChanges } from './utils/realtimeSync';
 import { invalidateBrowserCache, clearAllBrowserCache } from './utils/browserCache';
 
 /**
- * Global TanStack React Query Client with Browser Storage Persistence
+ * Global TanStack React Query Client
  *
- * Configured with aggressive dual-layer caching to eliminate repeated network calls:
- * - staleTime (5 mins): Data is considered fresh for 5 minutes. Repeated mounts or
- *   navigation between pages render instantly from cache with 0 network calls.
- * - gcTime (24 hours): Query cache is retained for 24 hours.
- * - Browser Storage Persister: Serializes the React Query cache into localStorage so
- *   page reloads and returning visitors render the website with 0ms first-paint latency!
- * - Automatic Real-Time Invalidation: When any admin creates/edits/deletes items or
- *   when realtimeSync fires, matching query keys and browser storage entries are immediately flushed.
+ * Configured with active Garbage Collection and 0-latency cache invalidation:
+ * - staleTime (0): Data is always checked against the server, guaranteeing fresh data on refresh and navigation.
+ * - gcTime (60s): Inactive/unmounted queries are garbage-collected and evicted after 60 seconds to keep memory lean.
+ * - Real-Time Cache Purge: When any mutation occurs, old data is purged from memory immediately.
  */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000, // 10 mins: Automatically garbage-collect inactive queries from RAM
-      refetchOnWindowFocus: false,
+      staleTime: 0, // Immediately consider data stale so reloads and mounts always fetch latest updates
+      gcTime: 60 * 1000, // 60s garbage collection for inactive queries
+      refetchOnWindowFocus: true,
       refetchOnReconnect: 'always',
       retry: 1,
     },
   },
 });
 
-// Configure Browser Storage Persistence for React Query (Survives page reloads & browser restarts)
+// Clean up any legacy localStorage persistent query caches to prevent stale data
 if (typeof window !== 'undefined') {
   try {
-    const persister = createSyncStoragePersister({
-      storage: window.localStorage,
-      key: 'sanjeevini_react_query_cache',
-      throttleTime: 1000,
-    });
-
-    persistQueryClient({
-      queryClient,
-      persister,
-      maxAge: 2 * 60 * 60 * 1000, // 2 hours storage persistence
-      buster: 'v2.4',
-    });
-  } catch (err) {
-    console.warn('React Query browser storage persistence notice:', err);
-  }
+    window.localStorage.removeItem('sanjeevini_react_query_cache');
+  } catch (_) {}
 }
 
-// Auto-invalidate matching query keys and browser cache when real-time updates happen across tabs
+/**
+ * Immediately purges stale data from React Query and browser cache,
+ * then triggers a fresh refetch for all active views.
+ */
+export const purgeAndInvalidateQuery = (keys) => {
+  const queryKeys = Array.isArray(keys) ? keys : [keys];
+  for (const k of queryKeys) {
+    // 1. Immediately delete cached data from React Query cache (instant garbage collection)
+    queryClient.removeQueries({ queryKey: [k], exact: false });
+    // 2. Trigger fresh network refetch for any active components observing this key
+    queryClient.invalidateQueries({ queryKey: [k], refetchType: 'all' });
+    // 3. Purge matching entries from browser persistent & RAM cache
+    invalidateBrowserCache(k);
+  }
+};
+
+/**
+ * Completely purges all cached queries and storage entries across the application
+ */
+export const purgeAllQueriesAndCache = () => {
+  queryClient.clear();
+  queryClient.invalidateQueries({ refetchType: 'all' });
+  clearAllBrowserCache();
+};
+
+// Auto-purge matching query keys and browser cache when real-time updates happen across tabs
 if (typeof window !== 'undefined') {
   subscribeToDataChanges((event) => {
     const url = event?.url?.toLowerCase() || '';
     if (url.includes('/doctors')) {
-      queryClient.invalidateQueries({ queryKey: ['doctors'] });
-      queryClient.invalidateQueries({ queryKey: ['doctor'] });
-      invalidateBrowserCache('doctors');
+      purgeAndInvalidateQuery(['doctors', 'doctor']);
     } else if (url.includes('/services')) {
-      queryClient.invalidateQueries({ queryKey: ['services'] });
-      queryClient.invalidateQueries({ queryKey: ['service'] });
-      invalidateBrowserCache('services');
+      purgeAndInvalidateQuery(['services', 'service']);
     } else if (url.includes('/treatments')) {
-      queryClient.invalidateQueries({ queryKey: ['treatments'] });
-      queryClient.invalidateQueries({ queryKey: ['treatment'] });
-      invalidateBrowserCache('treatments');
+      purgeAndInvalidateQuery(['treatments', 'treatment', 'treatment-categories']);
     } else if (url.includes('/gallery')) {
-      queryClient.invalidateQueries({ queryKey: ['gallery'] });
-      invalidateBrowserCache('gallery');
+      purgeAndInvalidateQuery(['gallery']);
     } else if (url.includes('/reels')) {
-      queryClient.invalidateQueries({ queryKey: ['reels'] });
-      invalidateBrowserCache('reels');
+      purgeAndInvalidateQuery(['reels']);
     } else if (url.includes('/testimonials')) {
-      queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      invalidateBrowserCache('testimonials');
+      purgeAndInvalidateQuery(['testimonials']);
     } else if (url.includes('/swarna-bindu')) {
-      queryClient.invalidateQueries({ queryKey: ['swarna-bindu'] });
-      invalidateBrowserCache('swarna-bindu');
+      purgeAndInvalidateQuery(['swarna-bindu']);
     } else if (url.includes('/settings')) {
-      queryClient.invalidateQueries({ queryKey: ['settings'] });
-      invalidateBrowserCache('settings');
+      purgeAndInvalidateQuery(['settings']);
     } else {
-      queryClient.invalidateQueries();
-      clearAllBrowserCache();
+      purgeAllQueriesAndCache();
     }
   });
 }

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Clock, MapPin, ShieldCheck, HeartHandshake, Sparkles, CheckCircle2 } from 'lucide-react';
@@ -45,23 +45,15 @@ const serviceCatalog = {
   }
 };
 
-const isMockImage = (img) => {
-  if (!img || typeof img !== 'string') return true;
-  if (img.startsWith('/uploads/') || img.includes('supabase.co') || img.startsWith('data:') || img.startsWith('blob:')) {
-    return false;
-  }
-  const lower = img.toLowerCase();
-  return (
-    lower.includes('unsplash.com') ||
-    lower.includes('varmam.jpg') ||
-    lower.includes('thokkanam.jpg') ||
-    lower.includes('wellness.jpg') ||
-    lower.includes('consultation.jpg')
-  );
+const isValidImage = (img) => {
+  if (!img || typeof img !== 'string' || !img.trim()) return false;
+  const lower = img.toLowerCase().trim();
+  return !lower.includes('placeholder') && lower !== 'null' && lower !== 'undefined';
 };
 
 export default function ServiceDetails() {
   const { slug } = useParams();
+  const [imgError, setImgError] = useState(false);
 
   if (slug?.toLowerCase() === 'consultation') {
     return <Navigate to="/services" replace />;
@@ -79,12 +71,16 @@ export default function ServiceDetails() {
         ...rawService,
         shortDescription: rawService.shortDescription || fallback?.shortDescription,
         fullDescription: rawService.fullDescription || fallback?.fullDescription,
-        benefits: rawService.benefits || fallback?.benefits,
-        image: !isMockImage(rawService.image) ? rawService.image : null
+        benefits: rawService.benefits?.length ? rawService.benefits : fallback?.benefits,
+        image: isValidImage(rawService.image) ? rawService.image : (isValidImage(fallback?.image) ? fallback.image : null)
       };
     }
     return fallback;
   }, [rawService, slug]);
+
+  const displayImage = service?.image && !imgError && isValidImage(service.image)
+    ? getImageUrl(service.image)
+    : null;
 
   const loading = isLoading && !service;
   const error = !loading && !service ? 'Service not found' : null;
@@ -131,9 +127,22 @@ export default function ServiceDetails() {
                     <h1 className="text-3xl md:text-5xl font-serif text-[#0C2B4B] font-bold mb-5 leading-tight">
                       {service.title}
                     </h1>
-                    <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-8 font-normal">
+                    <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-6 font-normal">
                       {service.shortDescription}
                     </p>
+
+                    {displayImage && (
+                      <div className="aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden mb-8 shadow-md border border-slate-200/80 bg-slate-100">
+                        <img
+                          src={displayImage}
+                          alt={service.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          onError={() => setImgError(true)}
+                        />
+                      </div>
+                    )}
                     
                     {service.fullDescription && (
                       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm md:text-base mb-8 whitespace-pre-line">
@@ -160,9 +169,16 @@ export default function ServiceDetails() {
 
                 {/* Right Panel */}
                 <div className="lg:col-span-2 bg-[#EAF2F8] p-8 md:p-10 flex flex-col gap-6 justify-between border-t lg:border-t-0 lg:border-l border-slate-200/80">
-                  {service.image && !isMockImage(service.image) && (
-                    <div className="rounded-2xl overflow-hidden shadow-md">
-                      <img src={getImageUrl(service.image)} alt={service.title} loading="lazy" decoding="async" className="w-full h-48 object-cover" />
+                  {displayImage && (
+                    <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200/70 bg-white">
+                      <img
+                        src={displayImage}
+                        alt={service.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-48 object-cover"
+                        onError={() => setImgError(true)}
+                      />
                     </div>
                   )}
 
@@ -177,10 +193,10 @@ export default function ServiceDetails() {
                       Consult with Dr. Thiagarajan Saminadane (MD Siddha) and Dr. Subashini Ganesan (BAMS Ayurveda) for an individualized treatment plan.
                     </p>
                     <Link 
-                      to="/contact#contact-form" 
+                      to="/contact" 
                       className="block w-full text-center bg-[#144979] text-white px-6 py-3.5 rounded-full font-bold hover:bg-[#0C2B4B] transition-colors shadow-sm text-sm"
                     >
-                      Book Consultation
+                      Contact Us
                     </Link>
                   </div>
 

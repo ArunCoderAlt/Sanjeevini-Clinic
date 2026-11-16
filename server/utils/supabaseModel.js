@@ -75,12 +75,38 @@ if (!savedStores) {
   saveFallbackStore(memoryStores);
 }
 
-const isSupabaseLive = () => {
+let supabaseIsHealthy = false;
+let lastSupabaseHealthCheck = 0;
+const HEALTH_CHECK_INTERVAL = 30 * 1000;
+
+const checkSupabaseLive = async () => {
   const url = env.supabaseUrl;
   const key = env.supabaseKey;
-  if (!url || !key) return false;
-  if (url.includes('your-project-id.supabase.co')) return false;
-  return true;
+  if (!url || !key || url.includes('your-project-id.supabase.co')) {
+    supabaseIsHealthy = false;
+    return false;
+  }
+  try {
+    const client = getSupabase();
+    const query = client.from('users').select('id').limit(1);
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500));
+    const { data, error } = await Promise.race([query, timeout]);
+    supabaseIsHealthy = !error;
+  } catch {
+    supabaseIsHealthy = false;
+  }
+  lastSupabaseHealthCheck = Date.now();
+  return supabaseIsHealthy;
+};
+
+// Initial non-blocking probe
+checkSupabaseLive().catch(() => {});
+
+const isSupabaseLive = () => {
+  if (Date.now() - lastSupabaseHealthCheck > HEALTH_CHECK_INTERVAL) {
+    checkSupabaseLive().catch(() => {});
+  }
+  return supabaseIsHealthy;
 };
 
 // ==============================================================================
@@ -88,21 +114,22 @@ const isSupabaseLive = () => {
 // Delivers sub-millisecond data serving (<1ms vs 300-800ms) with instant invalidation
 // ==============================================================================
 const queryCache = new Map();
+const MAX_SERVER_CACHE_ENTRIES = 300;
 
 const TABLE_TTLS = {
-  doctors: 10 * 60 * 1000,       // 10 minutes
-  services: 10 * 60 * 1000,      // 10 minutes
-  treatments: 10 * 60 * 1000,    // 10 minutes
-  site_settings: 10 * 60 * 1000, // 10 minutes
-  gallery: 10 * 60 * 1000,       // 10 minutes
-  testimonials: 5 * 60 * 1000,   // 5 minutes
-  reels: 10 * 60 * 1000,         // 10 minutes
-  swarna_bindu: 10 * 60 * 1000,  // 10 minutes
-  appointments: 30 * 1000,       // 30 seconds
-  contact_messages: 30 * 1000,   // 30 seconds
-  users: 0,                      // Never cache user auth queries
-  groq_key_periods: 0,           // Real-time API token usage tracking (never cache)
-  groq_usage_logs: 0,            // Real-time API usage telemetry (never cache)
+  doctors: 30 * 1000,          // 30 seconds
+  services: 30 * 1000,         // 30 seconds
+  treatments: 30 * 1000,       // 30 seconds
+  site_settings: 30 * 1000,    // 30 seconds
+  gallery: 30 * 1000,          // 30 seconds
+  testimonials: 30 * 1000,     // 30 seconds
+  reels: 30 * 1000,            // 30 seconds
+  swarna_bindu: 30 * 1000,     // 30 seconds
+  appointments: 10 * 1000,     // 10 seconds
+  contact_messages: 10 * 1000, // 10 seconds
+  users: 0,                    // Never cache user auth queries
+  groq_key_periods: 0,         // Real-time API token usage tracking (never cache)
+  groq_usage_logs: 0,          // Real-time API usage telemetry (never cache)
 };
 
 const getCacheKey = (tableName, queryType, params) => {
@@ -110,7 +137,7 @@ const getCacheKey = (tableName, queryType, params) => {
 };
 
 const getCachedQuery = (tableName, queryType, params) => {
-  const ttl = TABLE_TTLS[tableName] !== undefined ? TABLE_TTLS[tableName] : 5 * 60 * 1000;
+  const ttl = TABLE_TTLS[tableName] !== undefined ? TABLE_TTLS[tableName] : 30 * 1000;
   if (ttl <= 0) return null;
 
   const key = getCacheKey(tableName, queryType, params);
@@ -125,7 +152,7 @@ const getCachedQuery = (tableName, queryType, params) => {
 };
 
 const setCachedQuery = (tableName, queryType, params, data) => {
-  const ttl = TABLE_TTLS[tableName] !== undefined ? TABLE_TTLS[tableName] : 5 * 60 * 1000;
+  const ttl = TABLE_TTLS[tableName] !== undefined ? TABLE_TTLS[tableName] : 30 * 1000;
   if (ttl <= 0 || !data) return;
 
   const key = getCacheKey(tableName, queryType, params);
@@ -133,12 +160,22 @@ const setCachedQuery = (tableName, queryType, params, data) => {
     data,
     expiresAt: Date.now() + ttl,
   });
+
+  // LRU eviction if cache size exceeds limit
+  if (queryCache.size > MAX_SERVER_CACHE_ENTRIES) {
+    const oldestKey = queryCache.keys().next().value;
+    if (oldestKey) queryCache.delete(oldestKey);
+  }
 };
 
 const invalidateTableCache = (tableName) => {
-  const prefix = `${tableName}:`;
+  if (!tableName) return;
+  const prefixes = [`${tableName}:`];
+  if (tableName === 'swarna_bindu') prefixes.push('swarna_bindu_events:');
+  if (tableName === 'swarna_bindu_events') prefixes.push('swarna_bindu:');
+
   for (const key of queryCache.keys()) {
-    if (key.startsWith(prefix)) {
+    if (prefixes.some((p) => key.startsWith(p))) {
       queryCache.delete(key);
     }
   }
@@ -147,6 +184,29 @@ const invalidateTableCache = (tableName) => {
 const clearAllQueryCache = () => {
   queryCache.clear();
 };
+
+/**
+ * Active Garbage Collection: Periodically sweeps memory cache to purge expired entries
+ */
+const runServerCacheGC = () => {
+  const now = Date.now();
+  for (const [key, entry] of queryCache.entries()) {
+    if (!entry || !entry.expiresAt || now >= entry.expiresAt) {
+      queryCache.delete(key);
+    }
+  }
+  if (queryCache.size > MAX_SERVER_CACHE_ENTRIES) {
+    const overflow = queryCache.size - MAX_SERVER_CACHE_ENTRIES;
+    const keysToRemove = Array.from(queryCache.keys()).slice(0, overflow);
+    for (const k of keysToRemove) queryCache.delete(k);
+  }
+};
+
+// Periodic Garbage Collector running every 30 seconds
+const serverCacheGCInterval = setInterval(runServerCacheGC, 30 * 1000);
+if (serverCacheGCInterval.unref) {
+  serverCacheGCInterval.unref();
+}
 
 /**
  * Convert camelCase string to snake_case.
@@ -269,7 +329,7 @@ const formatRow = (row, tableName, customMethods = {}) => {
 
     // In-memory update
     const store = memoryStores[tableName] || [];
-    const idx = store.findIndex((i) => i.id === targetId || i._id === targetId);
+    const idx = store.findIndex((i) => i.id === targetId || i._id === targetId || String(i.id) === String(targetId) || String(i._id) === String(targetId));
     if (idx !== -1) {
       store[idx] = { ...store[idx], ...updateData };
       saveFallbackStore(memoryStores);
@@ -651,7 +711,7 @@ const createSupabaseModel = (tableName, options = {}) => {
         }
         if (!row) {
           const store = memoryStores[tableName] || [];
-          row = store.find((item) => item.id === id || item._id === id) || null;
+          row = store.find((item) => item.id === id || item._id === id || String(item.id) === String(id) || String(item._id) === String(id)) || null;
         }
 
         if (row) {
@@ -741,7 +801,7 @@ const createSupabaseModel = (tableName, options = {}) => {
       }
 
       const store = memoryStores[tableName] || [];
-      const idx = store.findIndex((i) => i.id === id || i._id === id);
+      const idx = store.findIndex((i) => i.id === id || i._id === id || String(i.id) === String(id) || String(i._id) === String(id));
       if (idx !== -1) {
         store[idx] = { ...store[idx], ...(supabaseUpdated || payload) };
         saveFallbackStore(memoryStores);
@@ -829,7 +889,7 @@ const createSupabaseModel = (tableName, options = {}) => {
       }
 
       const store = memoryStores[tableName] || [];
-      const idx = store.findIndex((i) => i.id === id || i._id === id);
+      const idx = store.findIndex((i) => i.id === id || i._id === id || String(i.id) === String(id) || String(i._id) === String(id));
       if (idx !== -1) {
         const deleted = store.splice(idx, 1)[0];
         saveFallbackStore(memoryStores);
@@ -1007,5 +1067,8 @@ module.exports = {
   memoryStores,
   invalidateTableCache,
   clearAllQueryCache,
+  purgeCache: invalidateTableCache,
+  purgeAllCache: clearAllQueryCache,
+  runServerCacheGC,
   queryCache,
 };

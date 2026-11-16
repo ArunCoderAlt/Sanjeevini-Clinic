@@ -36,11 +36,9 @@ const cacheControl = (maxAge = 60, sMaxAge = 300, staleWhileRevalidate = 600) =>
       return next();
     }
 
-    // Set aggressive, optimized CDN & browser cache headers
-    res.setHeader(
-      'Cache-Control',
-      `public, max-age=${maxAge}, s-maxage=${sMaxAge}, stale-while-revalidate=${staleWhileRevalidate}`
-    );
+    // Dynamic catalog data: Browser always validates with server so changes appear instantly on refresh
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
 
     next();
   };

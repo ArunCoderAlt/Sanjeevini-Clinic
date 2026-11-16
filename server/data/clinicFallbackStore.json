@@ -51,7 +51,7 @@
       "slug": "varmam-therapy",
       "shortDescription": "Traditional therapeutic technique targeting vital energy points to stimulate healing.",
       "fullDescription": "Ancient Siddha vital point manipulation therapy that restores energy flow, alleviates chronic pain, and accelerates neurological recovery.",
-      "image": null,
+      "image": "/images/hero/slide-4.png",
       "icon": "HeartPulse",
       "benefits": [
         "Relief from joint and nerve pain",
@@ -73,7 +73,7 @@
       "slug": "thokkanam-therapy",
       "shortDescription": "Traditional Siddha physical manipulation and medicinal oil massage therapy.",
       "fullDescription": "Nine specialized physical touch techniques combined with medicated herbal oils to rejuvenate muscle tissues and relieve stress.",
-      "image": null,
+      "image": "/images/hero/slide-6.png",
       "icon": "Sparkles",
       "benefits": [
         "Deep muscle relaxation",
@@ -95,7 +95,7 @@
       "slug": "wellness-support",
       "shortDescription": "Holistic wellness, dietetics, and preventive care programs for lasting vitality.",
       "fullDescription": "Customized dietary guidance, seasonal routines, and preventive regimens based on ancient principles for overall vitality.",
-      "image": null,
+      "image": "/images/hero/slide-1.png",
       "icon": "ShieldCheck",
       "benefits": [
         "Immunity enhancement",
@@ -649,20 +649,6 @@
   "newsletters": [],
   "swarna_bindu": [
     {
-      "id": "sb-2026-01",
-      "month": "January",
-      "date": "2026-01-08",
-      "day": "Thursday",
-      "nakshatra": "Pushya (Poosam)",
-      "timings": "All Day",
-      "venue": "Sanjeevini Medical Centre, Karaikal",
-      "status": "Completed",
-      "notes": "Camp completed successfully",
-      "order": 1,
-      "isActive": true,
-      "createdAt": "2026-11-16T04:41:47.497Z"
-    },
-    {
       "id": "sb-2026-02",
       "month": "February",
       "date": "2026-02-04",
@@ -857,6 +843,20 @@
       "order": 15,
       "isActive": true,
       "createdAt": "2026-11-16T04:41:47.497Z"
+    },
+    {
+      "month": "TestMonth_2026",
+      "date": "2026-12-25",
+      "day": "Friday",
+      "nakshatra": "Pushya (Poosam)",
+      "timings": "5:00 PM - 9:30 PM",
+      "status": "Upcoming",
+      "description": "Test Event Description",
+      "order": 999,
+      "isActive": true,
+      "id": "d3447bf6-047c-4810-a443-4ee898744889",
+      "createdAt": "2026-11-16T18:03:17.672Z",
+      "updatedAt": "2026-11-16T18:03:17.672Z"
     }
   ],
   "groq_key_periods": [],

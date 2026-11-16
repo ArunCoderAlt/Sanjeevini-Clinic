@@ -72,11 +72,12 @@ export const useService = (slugOrId, options = {}) => {
  * -----------------------------------------------------------------------------
  */
 export const useTreatments = (category = null, options = {}) => {
-  const params = category && category !== 'all' ? { category } : {};
+  const normalizedCategory = category && category.trim().toLowerCase() !== 'all' ? category.trim() : null;
+  const params = normalizedCategory ? { category: normalizedCategory } : {};
   return useQuery({
     queryKey: ['treatments', params],
     queryFn: async () => {
-      const res = await getTreatments(category);
+      const res = await getTreatments(normalizedCategory);
       return res.data?.data || res.data || [];
     },
     ...options,

@@ -171,6 +171,7 @@ const SwarnaBinduAdmin = () => {
       await deleteSwarnaBinduScheduleItem(deleteDialog.id);
       toast.success('Schedule entry deleted successfully');
       setSchedule((prev) => prev.filter((item) => (item.id || item._id) !== deleteDialog.id));
+      await fetchSchedule();
     } catch (err) {
       toast.error('Failed to delete schedule entry.');
     } finally {
