@@ -54,7 +54,7 @@ const Contact = () => {
           <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-sage">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <span className="text-xs uppercase tracking-wider font-bold text-primary-600 block mb-1">Our Location</span>
+                <span className="text-xs uppercase tracking-wider font-bold text-dark-blue-gradient inline-block mb-1">Our Location</span>
                 <h3 className="text-2xl font-serif text-primary-700 font-bold">Find Us on Google Maps</h3>
                 <p className="text-gray-600 text-sm mt-1">{clinicInfo.address}</p>
               </div>
@@ -64,7 +64,7 @@ const Contact = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-full text-sm font-medium transition-all shadow-md shrink-0 self-start sm:self-auto hover:shadow-lg"
               >
-                <MapPin className="w-4 h-4 text-gold" />
+                <MapPin className="w-4 h-4 text-sky-300" />
                 <span>Get Directions</span>
                 <ExternalLink className="w-4 h-4 ml-1 opacity-80" />
               </a>

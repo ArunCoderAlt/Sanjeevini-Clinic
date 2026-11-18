@@ -57,7 +57,7 @@ const WhyChooseUs = () => {
                     <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-600 transition-colors shadow-xs">
                       <Icon className="w-7 h-7 text-primary-600 group-hover:text-white transition-colors" />
                     </div>
-                    <span className="text-2xl font-serif font-bold text-primary-300 group-hover:text-gold transition-colors">
+                    <span className="text-2xl font-serif font-bold text-dark-blue-gradient opacity-80 group-hover:opacity-100 transition-opacity">
                       {feature.number}
                     </span>
                   </div>

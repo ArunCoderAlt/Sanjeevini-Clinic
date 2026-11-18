@@ -33,7 +33,7 @@ const authenticDefaultGallery = [
   { id: 'g-5', src: '/images/hero/slide-5.png', category: 'Treatment', alt: 'Ayush Certified Traditional Medicines' },
   { id: 'g-6', src: '/images/hero/slide-6.png', category: 'Treatment', alt: 'Traditional Herbal Preparations & Care' },
   { id: 'g-7', src: '/images/about/samc-philosophy.jpg', category: 'Philosophy', alt: 'SAMC Philosophy Emblem' },
-  { id: 'g-8', src: '/images/about/clinic-building.jpg?v=2', category: 'Clinic', alt: 'Sanjeevini Clinic Campus' },
+  { id: 'g-8', src: '/images/about/clinic-building.png?v=3', category: 'Clinic', alt: 'Sanjeevini Clinic Campus' },
 ];
 
 const GalleryGrid = ({ activeTab }) => {

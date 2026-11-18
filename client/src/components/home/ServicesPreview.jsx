@@ -142,7 +142,7 @@ const ServicesPreview = () => {
                   <div className="pt-4 border-t border-slate-100 mt-auto">
                     <Link 
                       to={`/services/${service.slug}`} 
-                      className="text-[#144979] font-semibold hover:text-[#0C2B4B] transition-colors inline-flex items-center text-sm"
+                      className="text-dark-blue-gradient font-semibold hover:opacity-80 transition-opacity inline-flex items-center text-sm"
                     >
                       <span>Learn More</span>
                       <ArrowRight className="ml-1.5 w-4 h-4 group-hover:translate-x-1.5 transition-transform" />

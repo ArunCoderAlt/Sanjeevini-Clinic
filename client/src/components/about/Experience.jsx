@@ -5,9 +5,9 @@ import CountUp from '../common/CountUp';
 const stats = [
   { icon: Award, label: 'Years of Excellence', value: '21+' },
   { icon: Users, label: 'Patients Treated Monthly', value: '500+' },
-  { icon: Heart, label: 'Therapies Performed', value: '500+' },
+  { icon: Heart, label: 'Therapies Performed', value: '700+' },
   { icon: Shield, label: 'Organic Herbs Used', value: '250+' },
-  { icon: Sparkles, label: 'Traditional Systems', value: '2' }
+  { icon: Sparkles, label: 'Traditional Systems', value: '3' }
 ];
 
 const Experience = () => {

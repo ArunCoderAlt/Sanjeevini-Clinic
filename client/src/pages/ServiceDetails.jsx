@@ -144,7 +144,7 @@ export default function ServiceDetails() {
       <Container className="py-20 text-center">
         <h1 className="text-4xl font-serif text-primary-700 mb-4">Service Not Found</h1>
         <p className="text-gray-600 mb-8">The service you are looking for does not exist.</p>
-        <Link to="/services" className="text-gold font-medium hover:text-primary-600">← Back to Services</Link>
+        <Link to="/services" className="text-dark-blue-gradient font-semibold hover:opacity-80">← Back to Services</Link>
       </Container>
     </PageTransition>
   );

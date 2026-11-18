@@ -199,10 +199,76 @@ footer h1, footer h2, footer h3, footer h4,
   color: #07192C !important;
 }
 
-/* High-contrast brand primary texts */
+/* High-contrast brand primary & darker blue gradient texts */
+.text-dark-blue-gradient {
+  background-image: linear-gradient(135deg, #0369A1 0%, #1D4ED8 50%, #1E40AF 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #1E40AF !important;
+}
+
+/* Replace light blue text across the website (on light surfaces) with a slightly darker blue gradient */
+p.text-gold:not([class*="bg-"]),
+span.text-gold:not([class*="bg-"]),
+a.text-gold:not([class*="bg-"]),
+strong.text-gold:not([class*="bg-"]),
+div.text-gold:not([class*="bg-"]),
+.text-sky-400:not(svg):not([class*="bg-"]),
+.text-sky-500:not(svg):not([class*="bg-"]),
+.text-sky-600:not(svg):not([class*="bg-"]),
+.text-sky-700:not(svg):not([class*="bg-"]),
+.text-blue-400:not(svg):not([class*="bg-"]),
+.text-blue-500:not(svg):not([class*="bg-"]),
+.text-blue-600:not(svg):not([class*="bg-"]),
+.text-cyan-500:not(svg):not([class*="bg-"]),
+.text-cyan-600:not(svg):not([class*="bg-"]),
+.text-primary-300:not(svg):not([class*="bg-"]),
+.text-primary-400:not(svg):not([class*="bg-"]),
+.text-primary-500:not(svg):not([class*="bg-"]) {
+  background-image: linear-gradient(135deg, #0369A1 0%, #1D4ED8 50%, #1E40AF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #0369A1;
+}
+
+svg.text-gold,
+svg.text-sky-500,
+svg.text-sky-600,
+svg.text-sky-700,
+svg.text-primary-400,
+svg.text-primary-500 {
+  color: #0369A1;
+}
+
+/* Preserve bright visibility for light-blue accents inside dark surfaces (footer, dark overlays, chatbot header, nav, dark sections) */
+footer .text-gold,
+nav .text-gold,
+.bg-neutral-950 .text-gold,
+.bg-slate-900 .text-gold,
+.bg-primary .text-gold,
+.bg-primary-600 .text-gold,
+.bg-primary-700 .text-gold,
+[class*="from-[#07192C]"] .text-gold,
+[class*="from-[#05121F]"] .text-gold,
+.bg-dark-section .text-gold,
+.bg-dark-section .text-sky-400,
+.bg-dark-section .text-sky-300,
+footer .text-sky-400,
+footer .text-sky-300,
+footer .text-blue-400,
+nav .text-sky-300,
+nav .text-sky-400 {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
 .text-primary,
 .text-primary-600 {
-  color: #0E3F6C !important;
+  color: #0369A1 !important;
 }
 .text-primary-700 {
   color: #0C2B4B !important;
@@ -258,23 +324,23 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ==========================================================================
-   Step 7 — Public Website Navigation (Uniform Light Blue Navbar)
+   Step 7 — Public Website Navigation (Dark Blue Navbar #081d35)
    ========================================================================== */
-.navbar-light-blue,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) {
-  background-image: linear-gradient(180deg, #E6F2FA 0%, #D8ECF8 100%) !important;
-  background-color: #D8ECF8 !important;
-  border-bottom: 1px solid #B8D5ED !important;
-  box-shadow: 0 4px 16px rgba(10, 36, 64, 0.06) !important;
+.navbar-dark-blue,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) {
+  background-image: linear-gradient(180deg, #081d35 0%, #06172b 100%) !important;
+  background-color: #081d35 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
   backdrop-filter: blur(12px) !important;
 }
 
 /* Ensure sub-containers inside public website nav are transparent */
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) > div,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) div,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) .flex,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) .container,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) [class*="Container"] {
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) > div,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) div:not(.nav-button-container),
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) .flex,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) .container,
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) [class*="Container"] {
   background-color: transparent !important;
   background-image: none !important;
 }
@@ -282,7 +348,7 @@ nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) [class*="Conta
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #17548A 0%, #08203B 100%) !important;
+    background-image: linear-gradient(135deg, #0369A1 0%, #1D4ED8 50%, #1E40AF 100%) !important;
   }
   .glass-panel {
     @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-lg;
@@ -415,15 +481,25 @@ section.bg-dark-section {
 /* Section Title Subtitle in Dark Sections */
 .bg-dark-section .text-secondary,
 .bg-dark-section .text-gold {
-  color: #38BDF8 !important;
+  color: #4BA3DC !important;
 }
 
-/* Ensure cards inside dark sections retain clean, crisp white card styles */
+/* Ensure cards inside dark sections retain clean, crisp white card styles and darker blue accents */
 .bg-dark-section [class*="rounded-"].bg-white,
 .bg-dark-section [class*="rounded-"].bg-cream {
   background-image: none !important;
   background-color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.bg-dark-section .bg-white .text-gold:not(svg),
+.bg-dark-section .bg-white .text-secondary:not(svg),
+.bg-dark-section .bg-white .text-dark-blue-gradient {
+  background-image: linear-gradient(135deg, #0369A1 0%, #1D4ED8 50%, #1E40AF 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #1E40AF !important;
 }
 
 /* Swiper pagination inside dark section */

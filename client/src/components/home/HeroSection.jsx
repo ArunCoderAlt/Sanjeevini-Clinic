@@ -110,7 +110,7 @@ const HeroSection = () => {
           poster="/images/hero/slide-1.png"
           className="w-full h-full object-cover object-center"
         >
-          <source src="/videos/hero-bg.mp4" type="video/mp4" />
+          <source src="/videos/hero-bg.mp4?v=2" type="video/mp4" />
         </video>
       </div>
 

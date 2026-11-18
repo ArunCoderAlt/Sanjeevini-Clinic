@@ -4,6 +4,35 @@ const groqUsageTracker = require('./groqUsageTracker');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+// Track last known Groq API error for diagnostics
+let lastGroqError = null;
+let lastGroqErrorTime = null;
+let consecutiveFailures = 0;
+
+function getGroqHealthStatus() {
+  return {
+    lastError: lastGroqError,
+    lastErrorTime: lastGroqErrorTime,
+    consecutiveFailures,
+  };
+}
+
+/**
+ * Re-read the API key from both the env module AND process.env,
+ * ensuring runtime updates from updateGroqConfig() and .env file changes are captured.
+ */
+function getActiveApiKey() {
+  // env.groqApiKey is updated in-memory by updateGroqConfig()
+  // process.env.GROQ_API_KEY is also updated by updateGroqConfig()
+  // Prefer the env module value as it's always the freshest after a settings update
+  const key = env.groqApiKey || process.env.GROQ_API_KEY || '';
+  return key.trim();
+}
+
+function getActiveModel() {
+  return env.groqModel || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+}
+
 /**
  * Generate a strict, grounded response using Groq LLM
  * @param {Object} options
@@ -12,8 +41,8 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
  * @param {Array} options.conversationHistory - Multi-turn conversation messages
  */
 async function generateBotReply({ userMessage, relevantChunks = [], conversationHistory = [] }) {
-  const apiKey = env.groqApiKey || process.env.GROQ_API_KEY;
-  const model = env.groqModel || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  const apiKey = getActiveApiKey();
+  const model = getActiveModel();
 
   // Format retrieved PDF context with relevance scores for transparency
   let contextBlock = '';
@@ -61,9 +90,11 @@ ${contextBlock}
 === END OF KNOWLEDGE BASE ===`;
 
   // If no Groq API Key is configured yet, provide resilient fallback using top matched knowledge
-  if (!apiKey || apiKey.trim() === '' || apiKey.startsWith('gsk_your_groq_api_key')) {
+  if (!apiKey || apiKey === '' || apiKey.startsWith('gsk_your_groq_api_key')) {
     logger.warn('GROQ_API_KEY is not configured in server/.env. Using knowledge-base direct answer fallback.');
-    return generateFallbackAnswer(userMessage, relevantChunks);
+    const fallback = generateFallbackAnswer(userMessage, relevantChunks);
+    fallback.keyStatus = 'not_configured';
+    return fallback;
   }
 
   try {
@@ -75,14 +106,23 @@ ${contextBlock}
         }))
       : [];
 
-    // Remove the last user message from history if it duplicates the current message
+    // Remove ALL duplicate user messages at the end of history that match the current message
     // (frontend sends current message as part of history too)
-    const filteredHistory = recentHistory.filter((m, idx) => {
-      if (idx === recentHistory.length - 1 && m.role === 'user' && m.content.trim() === userMessage.trim()) {
-        return false;
+    const filteredHistory = [];
+    for (let i = 0; i < recentHistory.length; i++) {
+      const m = recentHistory[i];
+      // Skip the last user message(s) that duplicate the current query
+      if (m.role === 'user' && m.content.trim() === userMessage.trim()) {
+        // Only skip if it's the last user entry in the array
+        const hasLaterNonDuplicateUser = recentHistory.slice(i + 1).some(
+          later => later.role === 'user' && later.content.trim() !== userMessage.trim()
+        );
+        if (!hasLaterNonDuplicateUser) {
+          continue; // skip this duplicate
+        }
       }
-      return true;
-    });
+      filteredHistory.push(m);
+    }
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -90,20 +130,29 @@ ${contextBlock}
       { role: 'user', content: userMessage }
     ];
 
-    const response = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey.trim()}`
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature: 0.3,
-        max_tokens: 1200,
-        top_p: 0.95
-      })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+    let response;
+    try {
+      response = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: 0.3,
+          max_tokens: 1200,
+          top_p: 0.95
+        }),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -122,6 +171,27 @@ ${contextBlock}
         headers: response.headers
       });
 
+      // Record the error for health status
+      consecutiveFailures++;
+      lastGroqError = `HTTP ${response.status}: ${errorText.slice(0, 200)}`;
+      lastGroqErrorTime = new Date().toISOString();
+
+      // If key is invalid (401/403), indicate clearly
+      if (response.status === 401 || response.status === 403) {
+        const fallback = generateFallbackAnswer(userMessage, relevantChunks, `API key authentication failed (HTTP ${response.status})`);
+        fallback.keyStatus = 'invalid';
+        fallback.apiError = `Groq API key rejected with HTTP ${response.status}. Please update the API key in Admin > AI Bot Settings.`;
+        return fallback;
+      }
+
+      // If rate limited (429), indicate clearly
+      if (response.status === 429) {
+        const fallback = generateFallbackAnswer(userMessage, relevantChunks, 'Rate limited');
+        fallback.keyStatus = 'rate_limited';
+        fallback.apiError = 'Groq API rate limit reached. Please wait a moment and try again.';
+        return fallback;
+      }
+
       throw new Error(`Groq API returned HTTP ${response.status}: ${errorText}`);
     }
 
@@ -139,6 +209,10 @@ ${contextBlock}
     if (!replyText) {
       throw new Error('Empty response received from Groq LLM.');
     }
+
+    // Success! Reset error tracking
+    consecutiveFailures = 0;
+    lastGroqError = null;
 
     // Record verified token usage and rate limits
     await groqUsageTracker.recordUsage({
@@ -170,13 +244,22 @@ ${contextBlock}
     return {
       reply: replyText,
       modelUsed: model,
+      keyStatus: 'active',
       sourceCount: relevantChunks.length,
       sources: uniqueSources
     };
   } catch (err) {
     logger.error(`Error in generateBotReply with Groq: ${err.message}`);
+    
+    consecutiveFailures++;
+    lastGroqError = err.message;
+    lastGroqErrorTime = new Date().toISOString();
+
     // Fallback to grounded excerpt answer rather than crashing
-    return generateFallbackAnswer(userMessage, relevantChunks, err.message);
+    const fallback = generateFallbackAnswer(userMessage, relevantChunks, err.message);
+    fallback.keyStatus = 'error';
+    fallback.apiError = err.message;
+    return fallback;
   }
 }
 
@@ -352,30 +435,40 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
  * Test Groq API connection with a simple ping and track token usage
  */
 async function testGroqConnection() {
-  const apiKey = env.groqApiKey || process.env.GROQ_API_KEY;
-  const model = env.groqModel || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  const apiKey = getActiveApiKey();
+  const model = getActiveModel();
 
-  if (!apiKey || apiKey.trim() === '' || apiKey.startsWith('gsk_your_groq_api_key')) {
+  if (!apiKey || apiKey === '' || apiKey.startsWith('gsk_your_groq_api_key')) {
     return {
       connected: false,
       message: 'GROQ_API_KEY is not set in server/.env',
-      model
+      model,
+      health: getGroqHealthStatus()
     };
   }
 
   try {
-    const res = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey.trim()}`
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: 'Ping. Respond with "Pong".' }],
-        max_tokens: 60
-      })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout for test
+
+    let res;
+    try {
+      res = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: 'Ping. Respond with "Pong".' }],
+          max_tokens: 60
+        }),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!res.ok) {
       const errText = await res.text();
@@ -391,10 +484,15 @@ async function testGroqConnection() {
         headers: res.headers
       });
 
+      consecutiveFailures++;
+      lastGroqError = `HTTP ${res.status}: ${errText.slice(0, 200)}`;
+      lastGroqErrorTime = new Date().toISOString();
+
       return {
         connected: false,
         message: `Groq error HTTP ${res.status}: ${errText}`,
-        model
+        model,
+        health: getGroqHealthStatus()
       };
     }
 
@@ -411,18 +509,28 @@ async function testGroqConnection() {
       headers: res.headers
     });
 
+    // Success! Reset error tracking
+    consecutiveFailures = 0;
+    lastGroqError = null;
+
     return {
       connected: true,
       message: 'Groq API connection verified successfully!',
       model,
       sampleResponse: data?.choices?.[0]?.message?.content,
-      usage: data?.usage
+      usage: data?.usage,
+      health: getGroqHealthStatus()
     };
   } catch (err) {
+    consecutiveFailures++;
+    lastGroqError = err.message;
+    lastGroqErrorTime = new Date().toISOString();
+
     return {
       connected: false,
       message: `Failed to connect to Groq: ${err.message}`,
-      model
+      model,
+      health: getGroqHealthStatus()
     };
   }
 }
@@ -451,6 +559,11 @@ function updateGroqConfig({ apiKey, model }) {
 
   // Trigger tracker key period transition if key changed
   if (keyChanged) {
+    // Reset error tracking for new key
+    consecutiveFailures = 0;
+    lastGroqError = null;
+    lastGroqErrorTime = null;
+
     groqUsageTracker.onApiKeyChanged(env.groqApiKey).catch(err => {
       logger.warn(`[GroqUsageTracker] Error transitioning key period: ${err.message}`);
     });
@@ -495,5 +608,6 @@ module.exports = {
   generateBotReply,
   generateFallbackAnswer,
   testGroqConnection,
-  updateGroqConfig
+  updateGroqConfig,
+  getGroqHealthStatus
 };

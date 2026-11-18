@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bot, 
@@ -17,6 +17,10 @@ import {
 } from 'lucide-react';
 import { sendChatMessage } from '../../services/botService';
 import { toast } from 'react-hot-toast';
+
+// Session storage key for persisting conversation across page refreshes
+const CHAT_SESSION_KEY = 'sanjeevini_chat_session';
+const CHAT_LANG_KEY = 'sanjeevini_chat_lang';
 
 const SUGGESTED_PROMPTS = {
   en: [
@@ -38,19 +42,73 @@ const WELCOME_MESSAGES = {
   ta: `வணக்கம்! 🙏 **சஞ்சீவினி சித்த & ஆயுர்வேத மருத்துவ மையத்திற்கு** தங்களை அன்புடன் வரவேற்கிறோம்.\n\nநான் உங்கள் AI மருத்துவ உதவியாளர். நமது மருத்துவமனை ஆவணங்களின்படி உங்கள் சந்தேகங்களுக்கு **தமிழ் மற்றும் ஆங்கிலத்தில்** பதிலளிக்கிறேன்.\n\nதங்களுக்கு இன்று எவ்வாறு உதவலாம்? கீழே தட்டச்சு செய்யவும் அல்லது மைக்ரோஃபோன் மூலம் பேசவும்!`
 };
 
+/** Save conversation to sessionStorage so it survives page refresh */
+function saveSession(messages, lang) {
+  try {
+    // Only save last 50 messages to avoid storage overflow
+    const toSave = messages.slice(-50).map(m => ({
+      id: m.id,
+      role: m.role,
+      content: m.content,
+      sources: m.sources,
+      modelUsed: m.modelUsed,
+      keyStatus: m.keyStatus,
+      timestamp: m.timestamp
+    }));
+    sessionStorage.setItem(CHAT_SESSION_KEY, JSON.stringify(toSave));
+    sessionStorage.setItem(CHAT_LANG_KEY, lang);
+  } catch {
+    // sessionStorage may be full or unavailable
+  }
+}
+
+/** Restore conversation from sessionStorage */
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem(CHAT_SESSION_KEY);
+    const lang = sessionStorage.getItem(CHAT_LANG_KEY) || 'en';
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return { messages: parsed, lang };
+      }
+    }
+  } catch {
+    // Invalid or empty
+  }
+  return null;
+}
+
+function clearSession() {
+  try {
+    sessionStorage.removeItem(CHAT_SESSION_KEY);
+    sessionStorage.removeItem(CHAT_LANG_KEY);
+  } catch {}
+}
+
+function createWelcomeMessage(lang = 'en') {
+  return {
+    id: `welcome-${Date.now()}`,
+    role: 'assistant',
+    content: WELCOME_MESSAGES[lang] || WELCOME_MESSAGES.en,
+    sources: [{ document: lang === 'ta' ? 'மருத்துவமனை வழிகாட்டி' : 'Clinic Guide PDF' }],
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+}
+
 export default function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentLang, setCurrentLang] = useState('en'); // 'en' | 'ta'
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome-1',
-      role: 'assistant',
-      content: WELCOME_MESSAGES.en,
-      sources: [{ document: 'Clinic Guide PDF' }],
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  // Restore previous session on mount (survives page refresh)
+  const restored = useRef(loadSession());
+  const [currentLang, setCurrentLang] = useState(restored.current?.lang || 'en');
+  const [messages, setMessages] = useState(() => {
+    if (restored.current?.messages?.length > 0) {
+      return restored.current.messages;
     }
-  ]);
+    return [createWelcomeMessage('en')];
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -61,6 +119,11 @@ export default function FloatingChatbot() {
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
 
+  // Persist messages to sessionStorage whenever they change
+  useEffect(() => {
+    saveSession(messages, currentLang);
+  }, [messages, currentLang]);
+
   // Switch language and update speech recognition & welcome greeting if only greeting exists
   const handleLanguageChange = (lang) => {
     setCurrentLang(lang);
@@ -69,15 +132,8 @@ export default function FloatingChatbot() {
     }
     // If conversation only contains initial greeting, update it to chosen language
     if (messages.length === 1 && messages[0].id.startsWith('welcome-')) {
-      setMessages([
-        {
-          id: `welcome-${Date.now()}`,
-          role: 'assistant',
-          content: WELCOME_MESSAGES[lang] || WELCOME_MESSAGES.en,
-          sources: [{ document: lang === 'ta' ? 'மருத்துவமனை வழிகாட்டி' : 'Clinic Guide PDF' }],
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
+      const newMessages = [createWelcomeMessage(lang)];
+      setMessages(newMessages);
     }
     toast.success(lang === 'ta' ? 'தமிழ் மொழி தேர்ந்தெடுக்கப்பட்டது' : 'Language set to English');
   };
@@ -216,7 +272,7 @@ export default function FloatingChatbot() {
   };
 
   // Send query to backend (auto-detects language)
-  const handleSend = async (textToSend) => {
+  const handleSend = useCallback(async (textToSend) => {
     const query = (textToSend || input).trim();
     if (!query || loading) return;
 
@@ -268,10 +324,27 @@ export default function FloatingChatbot() {
         content: data.reply || defaultFallbackReply,
         sources: data.sources || [],
         modelUsed: data.modelUsed,
+        keyStatus: data.keyStatus,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Show a subtle warning if the AI key is not working (but only once per session)
+      if (data.keyStatus && data.keyStatus !== 'active') {
+        const warningShown = sessionStorage.getItem('sanjeevini_key_warning_shown');
+        if (!warningShown) {
+          if (data.keyStatus === 'invalid') {
+            toast.error('AI engine key needs updating. Answers may be limited.', { duration: 5000 });
+          } else if (data.keyStatus === 'rate_limited') {
+            toast('AI engine is temporarily rate-limited. Please try again shortly.', { icon: '⏳', duration: 4000 });
+          } else if (data.keyStatus === 'error' || data.keyStatus === 'not_configured') {
+            // Don't alarm users, just note limited mode
+            toast('Running in knowledge-base mode. Answers are based on clinic documents.', { icon: '📄', duration: 4000 });
+          }
+          sessionStorage.setItem('sanjeevini_key_warning_shown', '1');
+        }
+      }
     } catch (err) {
       const errorText = err?.response?.data?.message || 'Could not connect to the assistant. Please try again.';
       toast.error(errorText);
@@ -294,20 +367,14 @@ export default function FloatingChatbot() {
       setLoading(false);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  };
+  }, [input, loading, isListening, currentLang, messages]);
 
   // Restart conversation
   const handleResetChat = () => {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    setMessages([
-      {
-        id: `welcome-${Date.now()}`,
-        role: 'assistant',
-        content: WELCOME_MESSAGES[currentLang] || WELCOME_MESSAGES.en,
-        sources: [{ document: currentLang === 'ta' ? 'மருத்துவமனை வழிகாட்டி' : 'Clinic Guide PDF' }],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }
-    ]);
+    clearSession();
+    sessionStorage.removeItem('sanjeevini_key_warning_shown');
+    setMessages([createWelcomeMessage(currentLang)]);
     setInput('');
   };
 
@@ -403,7 +470,7 @@ export default function FloatingChatbot() {
               {/* Subtle pulse aura */}
               <span className="absolute -inset-1 rounded-full bg-primary-500/20 animate-ping opacity-75 pointer-events-none" />
               
-              <Bot className="w-6 h-6 text-gold transition-transform group-hover:rotate-12" />
+              <Bot className="w-6 h-6 text-[#38BDF8] transition-transform group-hover:rotate-12" />
 
               {/* Active online dot */}
               <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#38BDF8] border-2 border-white rounded-full shadow" />
@@ -430,8 +497,8 @@ export default function FloatingChatbot() {
             <div className="bg-gradient-to-r from-[#07192C] via-[#0C294A] to-[#144979] text-white px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-gold/20 shadow-sm shrink-0 gap-3 sm:gap-4">
               {/* Header Left: Avatar & Identity */}
               <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 overflow-hidden">
-                <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center border border-gold/40 shadow-inner shrink-0">
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
+                <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center border border-[#38BDF8]/40 shadow-inner shrink-0">
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-[#38BDF8]" />
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#38BDF8] border-2 border-[#07192C] rounded-full" />
                 </div>
                 <div className="min-w-0">
@@ -439,7 +506,7 @@ export default function FloatingChatbot() {
                     Sanjeevini AI
                   </h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-sans font-medium px-1.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 shrink-0">
+                    <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-sans font-medium px-1.5 py-0.5 rounded-full bg-[#38BDF8]/15 text-[#7DD3FC] border border-[#38BDF8]/30 shrink-0">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] inline-block animate-pulse" />
                       RAG Verified
                     </span>
@@ -453,13 +520,13 @@ export default function FloatingChatbot() {
               {/* Header Right: Language Toggle & Window Controls */}
               <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
                 {/* Language Switcher Pill */}
-                <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-gold/30 shrink-0">
+                <div className="flex items-center bg-white/10 rounded-lg p-0.5 border border-[#38BDF8]/30 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleLanguageChange('en')}
                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'en'
-                        ? 'bg-gold text-[#07192C] shadow-xs'
+                        ? 'bg-[#38BDF8] text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
                     }`}
                     title="Switch to English"
@@ -471,7 +538,7 @@ export default function FloatingChatbot() {
                     onClick={() => handleLanguageChange('ta')}
                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all cursor-pointer ${
                       currentLang === 'ta'
-                        ? 'bg-gold text-[#07192C] shadow-xs'
+                        ? 'bg-[#38BDF8] text-[#07192C] shadow-xs'
                         : 'text-gray-300 hover:text-white'
                     }`}
                     title="தமிழுக்கு மாற்றவும் (Switch to Tamil)"

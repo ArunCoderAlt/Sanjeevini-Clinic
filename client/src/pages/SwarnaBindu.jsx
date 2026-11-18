@@ -50,6 +50,25 @@ const SwarnaBindu = () => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-amber-500/10 via-sky-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
+        {/* Top-Right Decorative Product Bottle (Seamless Transparent Blend) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: -10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="absolute top-10 sm:top-14 md:top-14 lg:top-16 right-3 sm:right-6 md:right-10 lg:right-14 xl:right-20 z-20 pointer-events-none"
+        >
+          <div className="relative">
+            {/* Subtle warm glow behind bottle matching the dark blue website theme */}
+            <div className="absolute -inset-3 sm:-inset-6 bg-gradient-to-br from-amber-400/25 via-amber-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <img
+              src="/images/swarna-bindu-bottle.png"
+              alt="Sanjeevini Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி)"
+              className="relative z-10 w-24 sm:w-36 md:w-44 lg:w-52 xl:w-60 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)]"
+              loading="eager"
+            />
+          </div>
+        </motion.div>
+
         <Container className="relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -241,9 +260,9 @@ const SwarnaBindu = () => {
                           }`}
                         >
                           {/* Month */}
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-bold text-[#144979] flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#144979]/30" />
-                            <span>{row.month}</span>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#0C365E]/40" />
+                            <span className="text-dark-blue-gradient">{row.month}</span>
                           </td>
 
                           {/* Camp Date */}
@@ -281,7 +300,7 @@ const SwarnaBindu = () => {
                                   Next Camp
                                 </span>
                               ) : isUpcoming ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-100 text-sky-800 border border-sky-200">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD]">
                                   Upcoming
                                 </span>
                               ) : (

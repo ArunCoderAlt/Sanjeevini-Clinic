@@ -17,11 +17,11 @@ const AboutPreview = () => {
             <div className="relative">
               <div className="aspect-[4/5] bg-sage rounded-2xl overflow-hidden shadow-lg">
                 <img 
-                  src="/images/about/clinic-building.jpg?v=2" 
+                  src="/images/about/clinic-building.png?v=3" 
                   alt="Sanjeevini Siddha & Ayurveda Medical Centre" 
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover object-[center_28%]"
+                  className="w-full h-full object-cover object-[center_32%]"
                 />
               </div>
               <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-primary-700 rounded-full flex items-center justify-center p-6 text-center shadow-xl border-4 border-cream hidden md:flex">
@@ -44,7 +44,7 @@ const AboutPreview = () => {
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
               Located in the heart of Karaikal, Sanjeevini Siddha & Ayurveda Medical Center (SAMC) is dedicated to preserving the wisdom of traditional Indian Medicine. Under the guidance of Dr. Thiagarajan (Siddha) and Dr. Subashini (Ayurveda), we combine the time - honoured principles of Siddha and Ayurveda with an individualized modern approach to patient's care.
             </p>
-            <p className="text-gray-700 mb-8 leading-relaxed">
+            <p className="text-gray-700 mb-8 text-lg leading-relaxed">
               With over 2 decades of commitment to traditional healthcare, we continue to bring the wisdom of our ancestors to the community.
             </p>
             <Button to="/about" variant="primary">

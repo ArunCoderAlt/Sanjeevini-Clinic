@@ -85,7 +85,7 @@ const TreatmentCard = ({ treatment }) => {
             )}
           </div>
 
-          <div className="pt-3 sm:pt-4 border-t border-slate-100 mt-auto flex items-center text-[#144979] font-semibold text-xs sm:text-sm group-hover:text-[#0C2B4B]">
+          <div className="pt-3 sm:pt-4 border-t border-slate-100 mt-auto flex items-center text-dark-blue-gradient font-semibold text-xs sm:text-sm group-hover:opacity-85">
             <span>Explore Treatment</span>
             <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform" />
           </div>

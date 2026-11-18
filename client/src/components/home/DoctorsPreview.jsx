@@ -86,8 +86,12 @@ const DoctorsPreview = () => {
                 <div className="p-6 sm:p-8 text-center flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="text-xl sm:text-2xl font-serif text-primary-700 mb-2 leading-snug">{doc.name}</h3>
-                    <p className="text-gold font-medium mb-1 text-sm sm:text-base">{doc.qual}</p>
-                    <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-6">{doc.spec}</p>
+                    <p className="text-dark-blue-gradient font-bold mb-2 text-sm sm:text-base tracking-wide">{doc.qual}</p>
+                    <div className="mb-5 sm:mb-6">
+                      <span className="inline-block px-3.5 py-1 rounded-full bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD] font-semibold text-xs sm:text-sm">
+                        {doc.spec}
+                      </span>
+                    </div>
                   </div>
                   <Button to={`/doctors/${doc.slug || doc.id}`} variant="primary" className="w-full mt-auto py-2.5 sm:py-3 text-sm font-semibold">
                     View Profile

@@ -13,18 +13,18 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: '100%' }}
       transition={{ type: "tween", duration: 0.3 }}
-      className="fixed inset-0 z-[60] bg-gradient-to-b from-white via-[#F0F6FC] to-[#E2EEF8] flex flex-col no-bg-pattern"
+      className="mobile-nav-drawer fixed inset-0 z-[60] bg-gradient-to-b from-[#081d35] via-[#0A223B] to-[#06172b] text-white flex flex-col no-bg-pattern"
       aria-label="Mobile Navigation Menu"
     >
-      <div className="flex justify-between items-center p-6 border-b border-[#C2DCF2]">
+      <div className="flex justify-between items-center p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 w-auto object-contain rounded-full shadow-xs" />
+          <img src="/images/logo.png?v=4" alt="Sanjeevini Siddha & Ayurveda Logo" className="h-11 w-auto object-contain rounded-full shadow-xs ring-2 ring-white/10" />
           <div className="flex flex-col">
-            <span className="font-heading font-bold text-2xl text-[#0C2B4B] leading-none">Sanjeevini</span>
-            <span className="text-[10px] font-medium text-[#475E75] tracking-wider mt-1">Since 2005</span>
+            <span className="font-heading font-bold text-2xl text-white leading-none">Sanjeevini</span>
+            <span className="text-[10px] font-medium text-[#93C5FD] tracking-wider mt-1">Since 2005</span>
           </div>
         </div>
-        <button onClick={onClose} className="p-2 text-[#475E75] hover:text-[#0C2B4B]">
+        <button onClick={onClose} className="p-2 text-white/80 hover:text-white" aria-label="Close menu">
           <X className="w-6 h-6" />
         </button>
       </div>
@@ -41,8 +41,8 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
               to={link.path}
               onClick={onClose}
               className={classNames(
-                "block text-lg py-2 font-medium",
-                currentPath === link.path ? "text-[#0C2B4B] font-semibold" : "text-[#243B52]"
+                "block text-lg py-2 font-medium transition-colors",
+                currentPath === link.path ? "text-[#38BDF8] font-semibold" : "text-white/85 hover:text-white"
               )}
             >
               {link.name}
@@ -54,7 +54,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="pt-6 mt-6 border-t border-gray-100"
+          className="pt-6 mt-6 border-t border-white/10"
         >
           <Button 
             to="/contact" 
@@ -72,21 +72,21 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
                 }, 150);
               }
             }} 
-            className="w-full justify-center"
+            className="w-full justify-center bg-gradient-to-r from-[#0284C7] to-[#0369A1] hover:from-[#0369A1] hover:to-[#075985] text-white border border-[#38BDF8]/30 font-semibold"
           >
             Contact Us
           </Button>
         </motion.div>
       </div>
 
-      <div className="p-6 bg-sage/30 mt-auto">
-        <div className="space-y-3 text-sm text-gray-600">
-          <a href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`} className="flex items-center">
-            <Phone className="w-4 h-4 mr-3 text-primary" />
+      <div className="p-6 bg-[#04101e] border-t border-white/10 mt-auto">
+        <div className="space-y-3 text-sm text-gray-300">
+          <a href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`} className="flex items-center hover:text-white">
+            <Phone className="w-4 h-4 mr-3 text-[#38BDF8]" />
             {clinicInfo.phone}
           </a>
-          <a href={`mailto:${clinicInfo.email}`} className="flex items-center">
-            <Mail className="w-4 h-4 mr-3 text-primary" />
+          <a href={`mailto:${clinicInfo.email}`} className="flex items-center hover:text-white">
+            <Mail className="w-4 h-4 mr-3 text-[#38BDF8]" />
             {clinicInfo.email}
           </a>
           <a
@@ -94,7 +94,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
             onClick={(e) => handleWhatsAppClick(e, clinicInfo.whatsapp, DEFAULT_WHATSAPP_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center text-[#25D366] font-medium"
+            className="flex items-center text-[#25D366] hover:text-[#4ade80] font-medium"
           >
             <MessageCircle className="w-4 h-4 mr-3 text-[#25D366]" />
             Chat on WhatsApp

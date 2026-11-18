@@ -42,8 +42,12 @@ const DoctorProfile = ({ doctor }) => {
         {/* Doctor Details */}
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl md:text-4xl font-serif text-primary-700 mb-2">{doctor.name}</h1>
-          <p className="text-xl text-gold font-medium mb-2">{doctor.qualification}</p>
-          <p className="text-gray-500 mb-8">{doctor.specialization}</p>
+          <p className="text-xl text-dark-blue-gradient font-bold mb-2.5 inline-block tracking-wide">{doctor.qualification}</p>
+          <div className="mb-8">
+            <span className="inline-block px-4 py-1 rounded-full bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD] font-semibold text-sm">
+              {doctor.specialization}
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 p-5 bg-slate-50 rounded-2xl border border-slate-200/70">
             <div className="flex items-center">

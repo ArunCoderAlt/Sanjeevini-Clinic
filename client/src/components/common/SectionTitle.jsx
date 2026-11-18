@@ -23,8 +23,8 @@ export default function SectionTitle({
     >
       {subtitle && (
         <span className={classNames(
-          "uppercase tracking-wider text-sm font-semibold mb-2",
-          light ? "text-gold" : "text-secondary"
+          "uppercase tracking-wider text-sm font-bold mb-2",
+          light ? "text-gold" : "text-dark-blue-gradient"
         )}>
           {subtitle}
         </span>
@@ -40,7 +40,12 @@ export default function SectionTitle({
         whileInView={{ width: '80px' }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="h-1 bg-gold mb-6 rounded-full"
+        className={classNames(
+          "h-1 mb-6 rounded-full",
+          light
+            ? "bg-gradient-to-r from-[#4BA3DC] to-[#1D6DA8]"
+            : "bg-gradient-to-r from-[#0369A1] via-[#1D4ED8] to-[#1E40AF]"
+        )}
       />
       {description && (
         <p className={classNames(

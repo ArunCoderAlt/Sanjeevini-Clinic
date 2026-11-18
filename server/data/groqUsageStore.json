@@ -6,16 +6,43 @@
       "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
       "keyHint": "gsk_...2m5v",
       "isActive": true,
-      "totalRequests": 0,
+      "totalRequests": 2,
       "totalInputTokens": 0,
       "totalOutputTokens": 0,
       "totalTokens": 0,
       "firstSeenAt": "2026-11-16T03:35:00.000Z",
-      "lastUsedAt": "2026-11-16T03:35:00.000Z",
+      "lastUsedAt": "2026-11-18T14:04:52.983Z",
       "createdAt": "2026-11-16T03:35:00.000Z",
-      "updatedAt": "2026-11-16T03:35:00.000Z"
+      "updatedAt": "2026-11-18T14:04:52.983Z"
     }
   ],
   "latestRateLimits": null,
-  "logs": []
+  "logs": [
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T14:04:52.464Z"
+    },
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T14:04:35.558Z"
+    }
+  ]
 }

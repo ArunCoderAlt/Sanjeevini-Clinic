@@ -129,7 +129,7 @@ const TreatmentsPreview = () => {
                       </div>
                     </div>
 
-                    <div className="px-6 pb-6 pt-0 flex items-center text-primary-600 font-semibold text-sm group-hover:text-primary-700">
+                    <div className="px-6 pb-6 pt-0 flex items-center text-dark-blue-gradient font-semibold text-sm group-hover:opacity-85">
                       <span>Explore Conditions</span>
                       <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform" />
                     </div>

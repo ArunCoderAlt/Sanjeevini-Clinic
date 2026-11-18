@@ -1,6 +1,6 @@
 const { parsePdf, chunkText } = require('../utils/pdfParser');
 const botKnowledgeService = require('../services/botKnowledgeService');
-const { generateBotReply, testGroqConnection, updateGroqConfig } = require('../services/groqService');
+const { generateBotReply, testGroqConnection, updateGroqConfig, getGroqHealthStatus } = require('../services/groqService');
 const logger = require('../utils/logger');
 
 /**
@@ -39,7 +39,9 @@ exports.chat = async (req, res, next) => {
       data: {
         reply: botResult.reply,
         sources: botResult.sources || [],
-        modelUsed: botResult.modelUsed
+        modelUsed: botResult.modelUsed,
+        keyStatus: botResult.keyStatus || 'unknown',
+        apiError: botResult.apiError || null
       }
     });
   } catch (err) {
@@ -205,12 +207,14 @@ exports.getStatus = async (req, res, next) => {
     const knowledgeStatus = botKnowledgeService.getStatus();
     const groqStatus = await testGroqConnection();
     const usageSummary = await groqUsageTracker.getUsageSummary();
+    const groqHealth = getGroqHealthStatus();
 
     res.status(200).json({
       success: true,
       data: {
         ...knowledgeStatus,
         groq: groqStatus,
+        groqHealth,
         usage: {
           activeKeyUsage: usageSummary.activeKeyUsage,
           latestReportedRateLimits: usageSummary.latestReportedRateLimits,

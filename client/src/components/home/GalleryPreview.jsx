@@ -50,7 +50,7 @@ const GalleryPreview = () => {
       <Container>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 sm:mb-10 gap-4">
           <div>
-            <span className="text-xs uppercase tracking-widest font-bold text-sky-700 mb-2 block">
+            <span className="text-xs uppercase tracking-widest font-bold text-dark-blue-gradient mb-2 inline-block">
               Clinic Campus &amp; Care
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#0C2B4B] font-bold">

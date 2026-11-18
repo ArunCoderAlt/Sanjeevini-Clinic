@@ -28,9 +28,13 @@ const DoctorCard = ({ doctor }) => {
       </div>
       <div className="p-5 sm:p-7 text-center flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="text-xl sm:text-2xl font-serif text-primary-700 mb-1 leading-snug">{doctor.name}</h3>
-          <p className="text-gold font-medium mb-1 text-sm sm:text-base">{qualification}</p>
-          <p className="text-gray-500 text-xs sm:text-sm mb-5 sm:mb-6">{specialization}</p>
+          <h3 className="text-xl sm:text-2xl font-serif text-primary-700 mb-1.5 leading-snug">{doctor.name}</h3>
+          <p className="text-dark-blue-gradient font-bold mb-2 text-sm sm:text-base tracking-wide">{qualification}</p>
+          <div className="mb-5 sm:mb-6">
+            <span className="inline-block px-3.5 py-1 rounded-full bg-[#DBEAFE] text-[#1E40AF] border border-[#93C5FD] font-semibold text-xs sm:text-sm">
+              {specialization}
+            </span>
+          </div>
         </div>
         <Button to={`/doctors/${linkSlug}`} variant="primary" className="w-full mt-auto py-2.5 sm:py-3 text-sm font-semibold">
           View Profile

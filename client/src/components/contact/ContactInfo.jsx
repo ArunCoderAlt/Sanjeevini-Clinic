@@ -26,7 +26,7 @@ const ContactInfo = () => {
             href={clinicInfo.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 font-medium text-xs mt-2 transition-colors group-hover:underline"
+            className="inline-flex items-center gap-1.5 text-dark-blue-gradient font-semibold text-xs mt-2 transition-opacity group-hover:underline"
           >
             <span>Open in Google Maps</span>
             <ExternalLink className="w-3.5 h-3.5" />

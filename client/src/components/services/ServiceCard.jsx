@@ -50,7 +50,7 @@ const ServiceCard = ({ service }) => {
 
         <Link
           to={`/services/${service?.slug || service?.id}`}
-          className="text-gold font-medium hover:text-primary-600 transition-colors mt-auto inline-flex items-center text-base sm:text-lg font-semibold"
+          className="text-dark-blue-gradient font-semibold hover:opacity-80 transition-opacity mt-auto inline-flex items-center text-base sm:text-lg"
         >
           Explore <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
         </Link>
