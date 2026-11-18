@@ -159,7 +159,7 @@ aside *:not([class*="bg-gradient-"]):not([class*="gradient"]) {
   body {
     @apply text-dark font-body antialiased;
     background-color: #E2EEF8;
-    color: #243B52;
+    color: #000000;
   }
   
   /* Headings on light backgrounds */
@@ -187,16 +187,44 @@ footer h1, footer h2, footer h3, footer h4,
   color: #FFFFFF !important;
 }
 
-/* Body Text, Paragraphs, Links */
-.text-gray-600,
-.text-gray-700 {
-  color: #243B52 !important;
+/* Body Text, Paragraphs, Links — Change all light/medium grey text on light backgrounds to pure black */
+.text-gray-400:not(svg),
+.text-gray-500:not(svg),
+.text-gray-600:not(svg),
+.text-gray-700:not(svg),
+.text-slate-400:not(svg),
+.text-slate-500:not(svg),
+.text-slate-600:not(svg),
+.text-slate-700:not(svg),
+.text-neutral-400:not(svg),
+.text-neutral-500:not(svg),
+.text-neutral-600:not(svg),
+.text-zinc-400:not(svg),
+.text-zinc-500:not(svg),
+.text-zinc-600:not(svg),
+.text-stone-400:not(svg),
+.text-stone-500:not(svg),
+.text-stone-600:not(svg) {
+  color: #000000 !important;
 }
-.text-gray-500 {
-  color: #475E75 !important;
+
+/* Preserve light readable grey text inside dark-background cards/overlays */
+.bg-slate-900 .text-slate-400,
+.bg-slate-900\/60 .text-slate-400,
+.bg-neutral-900 .text-neutral-400,
+.bg-neutral-900 .text-neutral-500,
+.bg-neutral-950 .text-neutral-400,
+.bg-neutral-950 .text-gray-400,
+[class*="from-[#0B233D]"] .text-slate-400,
+[class*="from-[#07192C]"] .text-gray-400,
+.mobile-nav-drawer .text-gray-400,
+footer .text-gray-400,
+footer .text-slate-400 {
+  color: #CBD5E1 !important;
 }
+
 .text-dark {
-  color: #07192C !important;
+  color: #000000 !important;
 }
 
 /* High-contrast brand primary & darker blue gradient texts */
@@ -266,9 +294,17 @@ nav .text-sky-400 {
   -webkit-text-fill-color: currentColor !important;
 }
 
+.bg-neutral-950 .text-gold,
+.bg-slate-900 .text-gold {
+  color: #38BDF8 !important;
+}
+
 .text-primary,
 .text-primary-600 {
   color: #0369A1 !important;
+}
+.group:hover .group-hover\:text-white {
+  color: #FFFFFF !important;
 }
 .text-primary-700 {
   color: #0C2B4B !important;
@@ -313,7 +349,8 @@ input, textarea, select {
 }
 
 input::placeholder, textarea::placeholder {
-  color: #64748B !important;
+  color: #000000 !important;
+  opacity: 0.72;
   font-weight: 400;
 }
 

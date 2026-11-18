@@ -902,6 +902,66 @@
       "createdAt": "2026-11-18T14:04:52.464Z",
       "id": "4c18ea69-b390-4608-a1b3-6dffee3cfe04",
       "updatedAt": "2026-11-18T14:04:52.464Z"
+    },
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T17:42:44.288Z",
+      "id": "4b6b8818-eca4-4369-9853-89646fad998c",
+      "updatedAt": "2026-11-18T17:42:44.289Z"
+    },
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T17:42:49.149Z",
+      "id": "4cee3558-5afb-44c8-9c19-9aa57af14641",
+      "updatedAt": "2026-11-18T17:42:49.149Z"
+    },
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T17:43:01.297Z",
+      "id": "d74e5364-7a34-4b44-944b-26a0a8e65dee",
+      "updatedAt": "2026-11-18T17:43:01.297Z"
+    },
+    {
+      "keyVersion": "key_v1",
+      "keyFingerprint": "be272a2c0c773e3095241219b5b2d7e7b8cfc9c824b380ce8245c0eadd580f94",
+      "model": "llama-3.3-70b-versatile",
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "status": "error",
+      "httpStatus": 401,
+      "usageSource": "bot_chat",
+      "rateLimitInfo": null,
+      "createdAt": "2026-11-18T17:43:23.956Z",
+      "id": "aad49e8e-c759-4ee8-8320-ba679bc82a16",
+      "updatedAt": "2026-11-18T17:43:23.956Z"
     }
   ]
 }

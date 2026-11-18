@@ -9,7 +9,7 @@ const defaultSettings = {
   whatsappNumber: '919486838368',
   email: 'sanjeevinisiddha@gmail.com',
   consultationHours: 'Monday – Saturday, 5:00 PM – 9:30 PM',
-  mapUrl: 'https://maps.app.goo.gl/Yt69f1M1mUipkFbi9',
+  mapUrl: 'https://www.google.com/maps/place/Sanjeevini+Siddha+%26+Ayurveda+Medical+centre/@10.9169208,79.8304059,17.43z/data=!4m6!3m5!1s0x3a55114c73bcb10f:0xa87a8127466e42ab!8m2!3d10.9178718!4d79.8337197!16s%2Fg%2F1hf31q_pz',
   socialLinks: {
     twitter: 'https://twitter.com/Sanjeevini_KKL',
     facebook: 'https://www.facebook.com/sanjeevinisiddha/',

@@ -846,12 +846,36 @@ class BotKnowledgeService {
    * Search for top relevant chunks matching user query in English or Tamil
    * Uses BM25-inspired term frequency + phrase matching + cross-lingual expansion + stemming + bigrams
    */
-  searchRelevantChunks(query, limit = 8) {
+  searchRelevantChunks(query, limit = 8, options = {}) {
     if (!query || typeof query !== 'string') return [];
+
+    const isTamilMode = Boolean(options && options.language === 'ta');
 
     const effectiveLimit = typeof limit === 'number' 
       ? Math.max(1, limit) 
       : (limit && typeof limit.topK === 'number' ? Math.max(1, limit.topK) : (parseInt(limit, 10) || 8));
+
+    // Active documents & Tamil document detection (used only when Tamil mode is active)
+    const activeDocs = this.runtimeDocuments.filter(d => d.is_active);
+    const activeDocIds = new Set(activeDocs.map(d => d.id));
+    const activeChunks = this.runtimeChunks.filter(c => activeDocIds.has(c.document_id));
+
+    const tamilDocIds = new Set();
+    if (isTamilMode) {
+      for (const doc of activeDocs) {
+        const nameBlob = `${doc.original_name || ''} ${doc.filename || ''}`;
+        if (/tamil|தமிழ்/i.test(nameBlob)) {
+          tamilDocIds.add(doc.id);
+        }
+      }
+      for (const chunk of activeChunks) {
+        if (/[\u0B80-\u0BFF]/.test(chunk.content || '')) {
+          tamilDocIds.add(chunk.document_id);
+        }
+      }
+    }
+    const isTamilChunk = (chunk) =>
+      isTamilMode && (tamilDocIds.has(chunk.document_id) || /[\u0B80-\u0BFF]/.test(chunk.content || ''));
 
     // Support Unicode letters, marks (combining vowels/virama for Tamil), numbers and whitespace
     const cleanQuery = query.toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, ' ').trim();
@@ -860,12 +884,15 @@ class BotKnowledgeService {
       .filter(t => t.length > 1 && !STOP_WORDS.has(t) && !TAMIL_STOP_WORDS.has(t));
 
     if (rawTerms.length === 0) {
-      // Pure stop-word query — return overview chunks from all active docs
-      const activeDocIds = new Set(
-        this.runtimeDocuments.filter(d => d.is_active).map(d => d.id)
-      );
-      return this.runtimeChunks
-        .filter(c => activeDocIds.has(c.document_id))
+      // Pure stop-word query — in Tamil mode, prioritize uploaded Tamil Q&A PDF chunks first
+      if (isTamilMode && tamilDocIds.size > 0) {
+        const tamilFirst = activeChunks.filter(c => isTamilChunk(c));
+        const others = activeChunks.filter(c => !isTamilChunk(c));
+        return [...tamilFirst, ...others]
+          .slice(0, effectiveLimit)
+          .map(c => ({ ...c, score: 1 }));
+      }
+      return activeChunks
         .slice(0, effectiveLimit)
         .map(c => ({ ...c, score: 1 }));
     }
@@ -879,6 +906,17 @@ class BotKnowledgeService {
           expandedTermSet.add(exp);
         }
       }
+      // In Tamil mode, also match inflected Tamil words by prefix/root against bilingual terms
+      if (isTamilMode && /[\u0B80-\u0BFF]/.test(term) && term.length >= 3) {
+        for (const [tam, engList] of Object.entries(BILINGUAL_CLINIC_TERMS)) {
+          if (term !== tam && (term.startsWith(tam) || (tam.length >= 4 && tam.startsWith(term)))) {
+            expandedTermSet.add(tam);
+            for (const exp of engList) {
+              expandedTermSet.add(exp);
+            }
+          }
+        }
+      }
       // Also check reverse English -> Tamil
       for (const [tam, engList] of Object.entries(BILINGUAL_CLINIC_TERMS)) {
         if (engList.includes(term)) {
@@ -888,10 +926,22 @@ class BotKnowledgeService {
     }
     const queryTerms = [...expandedTermSet];
 
-    // Generate stemmed variants (simple suffix stripping for better recall on English words)
+    // Generate stemmed variants (English suffixes + Tamil inflectional suffixes in Tamil mode)
     const stemTerm = (term) => {
       if (term.length <= 3) return [term];
       const variants = [term];
+      if (isTamilMode && /[\u0B80-\u0BFF]/.test(term)) {
+        const tamilSuffixes = [
+          'களுக்கு', 'களில்', 'களின்', 'களை', 'ங்கள்', 'த்தில்', 'த்திற்கு', 'த்தின்', 'த்தை',
+          'யுடன்', 'யின்', 'யில்', 'யை', 'கள்', 'க்கு', 'இல்', 'உடன்', 'உம்', 'ஆல்', 'ஆக'
+        ];
+        for (const suffix of tamilSuffixes) {
+          if (term.endsWith(suffix) && term.length - suffix.length >= 3) {
+            variants.push(term.slice(0, -suffix.length));
+          }
+        }
+        return [...new Set(variants)];
+      }
       // Strip common English suffixes to find root
       const suffixes = ['tion', 'sion', 'ment', 'ness', 'ous', 'ive', 'ful', 'less', 'able', 'ible', 'ing', 'ings', 'ated', 'ates', 'tion', 'ed', 'er', 'es', 'ly', 's'];
       for (const suffix of suffixes) {
@@ -912,13 +962,7 @@ class BotKnowledgeService {
       queryBigrams.push(rawTerms[i] + ' ' + rawTerms[i + 1]);
     }
 
-    // Get active document IDs
-    const activeDocIds = new Set(
-      this.runtimeDocuments.filter(d => d.is_active).map(d => d.id)
-    );
-
     // Total active chunks count for IDF-like weighting
-    const activeChunks = this.runtimeChunks.filter(c => activeDocIds.has(c.document_id));
     const totalChunks = activeChunks.length || 1;
 
     // Pre-compute document frequency for each stem (how many chunks contain it)
@@ -1002,9 +1046,11 @@ class BotKnowledgeService {
       }
 
       if (score > 0) {
+        // In Tamil mode, strongly boost chunks from the uploaded Tamil Q&A PDF
+        const boostedScore = isTamilChunk(chunk) ? (score * 1.8) + 15 : score;
         scoredChunks.push({
           ...chunk,
-          score: Math.round(score * 100) / 100
+          score: Math.round(boostedScore * 100) / 100
         });
       }
     }
@@ -1013,6 +1059,31 @@ class BotKnowledgeService {
     scoredChunks.sort((a, b) => b.score - a.score);
 
     if (scoredChunks.length > 0) {
+      // In Tamil mode, prioritize uploaded Tamil Q&A PDF chunks first (without artificially capping them)
+      if (isTamilMode && tamilDocIds.size > 0) {
+        const tamilMatches = scoredChunks.filter(c => isTamilChunk(c));
+        const otherMatches = scoredChunks.filter(c => !isTamilChunk(c));
+
+        if (tamilMatches.length > 0) {
+          const result = [...tamilMatches.slice(0, effectiveLimit)];
+          // If space remains, include top supplementary chunks for completeness
+          for (const chunk of otherMatches) {
+            if (result.length >= effectiveLimit) break;
+            result.push(chunk);
+          }
+          return result;
+        }
+
+        // If user asked in English/Tanglish terms that didn't directly match Tamil words,
+        // still include top overview chunks from the uploaded Tamil Q&A PDF alongside matches
+        const tamilOverview = activeChunks
+          .filter(c => isTamilChunk(c))
+          .slice(0, Math.min(3, effectiveLimit))
+          .map(c => ({ ...c, score: 0.5 }));
+        const combined = [...otherMatches.slice(0, Math.max(1, effectiveLimit - tamilOverview.length)), ...tamilOverview];
+        return combined.slice(0, effectiveLimit);
+      }
+
       // Ensure diversity: don't return only chunks from one document
       const result = [];
       const docChunkCount = {};
@@ -1038,6 +1109,14 @@ class BotKnowledgeService {
       }
 
       return result;
+    }
+
+    // Fallback: in Tamil mode, prioritize chunks from the uploaded Tamil Q&A PDF
+    if (isTamilMode && tamilDocIds.size > 0) {
+      const tamilFallback = activeChunks.filter(c => isTamilChunk(c));
+      if (tamilFallback.length > 0) {
+        return tamilFallback.slice(0, effectiveLimit).map(c => ({ ...c, score: 0.2 }));
+      }
     }
 
     // Fallback: return overview chunks from ALL active docs (not just seed)

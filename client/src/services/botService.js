@@ -4,9 +4,10 @@ import api from './api';
  * Send a chat message to the RAG AI bot
  * @param {string} message - User query
  * @param {Array} history - Previous conversation messages [{ role, content }]
+ * @param {string} language - Selected UI language ('en' | 'ta')
  */
-export const sendChatMessage = (message, history = []) => {
-  return api.post('/bot/chat', { message, history });
+export const sendChatMessage = (message, history = [], language = 'en') => {
+  return api.post('/bot/chat', { message, history, language });
 };
 
 /**

@@ -40,9 +40,10 @@ function getActiveModel() {
  * @param {Array} options.relevantChunks - Retrieved context chunks from PDF / knowledge base
  * @param {Array} options.conversationHistory - Multi-turn conversation messages
  */
-async function generateBotReply({ userMessage, relevantChunks = [], conversationHistory = [] }) {
+async function generateBotReply({ userMessage, relevantChunks = [], conversationHistory = [], language = 'en' }) {
   const apiKey = getActiveApiKey();
   const model = getActiveModel();
+  const isTamilMode = language === 'ta';
 
   // Format retrieved PDF context with relevance scores for transparency
   let contextBlock = '';
@@ -83,7 +84,13 @@ STRICT GROUNDING & ACCURACY:
    - In English: "I cannot find this specific information in our current clinic guide. For accurate guidance, please speak with our clinic doctors directly at +91 98430 66362 or message us on WhatsApp, or visit us in person at No. 22, Dr. Ambedkar Street, Karaikal."
    - In Tamil: "எங்கள் தற்போதைய மருத்துவமனை வழிகாட்டியில் இந்த குறிப்பிட்ட தகவல் கிடைக்கவில்லை. துல்லியமான மருத்துவ ஆலோசனைக்கு, தயவுசெய்து எங்கள் மருத்துவர்களை நேரடியாக +91 98430 66362 என்ற எண்ணில் அழைக்கவும் அல்லது வாட்ஸ்அப்பில் தொடர்பு கொள்ளவும், அல்லது எண் 22, டாக்டர் அம்பேத்கர் வீதி, காரைக்கால் முகவரியில் நேரில் வரவும்."
 7. TONE & FORMAT: Warm, compassionate, concise, and respectful. Use **bold** for key points and bullet points for lists. Keep paragraphs readable on mobile screens.
-8. GREETINGS: For greetings like "hi", "hello", "namaste", "வணக்கம்", greet warmly and invite the user to ask their question in Tamil or English.
+8. GREETINGS: For greetings like "hi", "hello", "namaste", "வணக்கம்", greet warmly and invite the user to ask their question in Tamil or English.${isTamilMode ? `
+
+ACTIVE LANGUAGE MODE: TAMIL (தமிழ்) — MANDATORY:
+- The user is currently in TAMIL language mode. You MUST write your ENTIRE response strictly in polite, clear, natural TAMIL (தமிழ்) script.
+- NEVER reply in English while Tamil language mode is active, even if the user types in English, Tanglish, or mixed words.
+- Prioritize and directly answer using the uploaded Tamil Q&A PDF excerpts provided in the CLINIC KNOWLEDGE BASE below.
+- If a clinic fact is only available in an English excerpt below, accurately translate and explain it completely in natural Tamil.` : ''}
 
 === CLINIC KNOWLEDGE BASE (FROM UPLOADED DOCUMENTS) ===
 ${contextBlock}
@@ -92,7 +99,7 @@ ${contextBlock}
   // If no Groq API Key is configured yet, provide resilient fallback using top matched knowledge
   if (!apiKey || apiKey === '' || apiKey.startsWith('gsk_your_groq_api_key')) {
     logger.warn('GROQ_API_KEY is not configured in server/.env. Using knowledge-base direct answer fallback.');
-    const fallback = generateFallbackAnswer(userMessage, relevantChunks);
+    const fallback = generateFallbackAnswer(userMessage, relevantChunks, null, language);
     fallback.keyStatus = 'not_configured';
     return fallback;
   }
@@ -178,7 +185,7 @@ ${contextBlock}
 
       // If key is invalid (401/403), indicate clearly
       if (response.status === 401 || response.status === 403) {
-        const fallback = generateFallbackAnswer(userMessage, relevantChunks, `API key authentication failed (HTTP ${response.status})`);
+        const fallback = generateFallbackAnswer(userMessage, relevantChunks, `API key authentication failed (HTTP ${response.status})`, language);
         fallback.keyStatus = 'invalid';
         fallback.apiError = `Groq API key rejected with HTTP ${response.status}. Please update the API key in Admin > AI Bot Settings.`;
         return fallback;
@@ -186,7 +193,7 @@ ${contextBlock}
 
       // If rate limited (429), indicate clearly
       if (response.status === 429) {
-        const fallback = generateFallbackAnswer(userMessage, relevantChunks, 'Rate limited');
+        const fallback = generateFallbackAnswer(userMessage, relevantChunks, 'Rate limited', language);
         fallback.keyStatus = 'rate_limited';
         fallback.apiError = 'Groq API rate limit reached. Please wait a moment and try again.';
         return fallback;
@@ -256,7 +263,7 @@ ${contextBlock}
     lastGroqErrorTime = new Date().toISOString();
 
     // Fallback to grounded excerpt answer rather than crashing
-    const fallback = generateFallbackAnswer(userMessage, relevantChunks, err.message);
+    const fallback = generateFallbackAnswer(userMessage, relevantChunks, err.message, language);
     fallback.keyStatus = 'error';
     fallback.apiError = err.message;
     return fallback;
@@ -272,8 +279,10 @@ function extractDirectAnswer(query, relevantChunks, isTamil) {
   const cleanQ = query.toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, ' ').trim();
   const qWords = cleanQ.split(/\s+/).filter(w => w.length >= 3);
 
-  // Regex matches formats like "Q1. Question? Answer: ...", "Q2... Ans: ...", "கேள்வி 1... பதில்: ..."
-  const qaPattern = /(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])\s*[\.\:\)]?\s*(.*?)\s*(?:Answer|Ans|பதில்)[\:\-]\s*([\s\S]*?)(?=(?:(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])[\.\:\)]|$))/gi;
+  // Regex matches formats like "Q1. Question? Answer: ...", "Q2... Ans: ...", "கேள்வி 1... பதில்: ...", "கே: ... ப: ..."
+  const qaPattern = isTamil
+    ? /(?:Q\s*\d*|கேள்வி\s*\d*|கே\s*\d*|\b\d+[\.\)])\s*[\.\:\)]?\s*(.*?)\s*(?:Answer|Ans|பதில்|ப)[\:\-]\s*([\s\S]*?)(?=(?:(?:Q\s*\d*|கேள்வி\s*\d*|கே\s*\d*|\b\d+[\.\)])[\.\:\)]|$))/gi
+    : /(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])\s*[\.\:\)]?\s*(.*?)\s*(?:Answer|Ans|பதில்)[\:\-]\s*([\s\S]*?)(?=(?:(?:Q\s*\d*|கேள்வி\s*\d*|\b\d+[\.\)])[\.\:\)]|$))/gi;
 
   const qaPairs = [];
 
@@ -350,12 +359,20 @@ function extractDirectAnswer(query, relevantChunks, isTamil) {
  * Accurately extracts direct answers from uploaded Q&A PDFs and clinic documents.
  * Seamlessly supports Tamil and English queries.
  */
-function generateFallbackAnswer(query, relevantChunks, apiError = null) {
-  // Check if query is in Tamil script or Tamil keywords
-  const isTamil = /[\u0B80-\u0BFF]/.test(query) || 
+function generateFallbackAnswer(query, relevantChunks, apiError = null, language = 'en') {
+  // Check if Tamil language mode is active OR query is in Tamil script / Tamil keywords
+  const isTamil = language === 'ta' || /[\u0B80-\u0BFF]/.test(query) || 
     /\b(vanakkam|siddha|ayurveda|maruthuvam|varmam|timing enna|doctor yaaru)\b/i.test(query);
 
-  if (!relevantChunks || relevantChunks.length === 0) {
+  // In Tamil mode, prefer chunks from uploaded Tamil Q&A PDFs if available
+  const effectiveChunks = (language === 'ta' && Array.isArray(relevantChunks))
+    ? (() => {
+        const tamilOnly = relevantChunks.filter(c => /[\u0B80-\u0BFF]/.test(c.content || ''));
+        return tamilOnly.length > 0 ? tamilOnly : relevantChunks;
+      })()
+    : relevantChunks;
+
+  if (!effectiveChunks || effectiveChunks.length === 0) {
     if (isTamil) {
       return {
         reply: `வணக்கம்! 🙏 சஞ்சீவினி சித்த & ஆயுர்வேத மருத்துவ மையத்திற்கு தங்களை அன்புடன் வரவேற்கிறோம்.\n\nஎங்கள் மருத்துவமனை திங்கள் முதல் சனி வரை மாலை 5:00 மணி முதல் இரவு 9:30 மணி வரை செயல்படுகிறது. முகவரி: எண் 22, டாக்டர் அம்பேத்கர் வீதி, காரைக்கால் - 609602.\n\nசிகிச்சைகள் மற்றும் முன்பதிவுக்கு எங்களை **+91 98430 66362** என்ற எண்ணில் நேரடியாக அழைக்கலாம் அல்லது வாட்ஸ்அப்பில் தொடர்பு கொள்ளலாம்.`,
@@ -374,7 +391,7 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   // Deduplicate sources
   const seenSources = new Set();
   const uniqueSources = [];
-  for (const c of relevantChunks) {
+  for (const c of effectiveChunks) {
     const key = `${c.document_name || 'Clinic Guide'}|${c.section_title || ''}`;
     if (!seenSources.has(key)) {
       seenSources.add(key);
@@ -394,7 +411,7 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
     : 'For appointments or further questions, please call us at **+91 98430 66362** or WhatsApp us at **9486838368**.';
 
   // 1. Try to extract direct structured Q&A answer if user asked a question matching the Q&A bank
-  const directQA = extractDirectAnswer(query, relevantChunks, isTamil);
+  const directQA = extractDirectAnswer(query, effectiveChunks, isTamil);
   if (directQA) {
     const specificSource = [{
       document: directQA.chunk.document_name || 'Clinic Q&A Document',
@@ -410,7 +427,7 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   }
 
   // 2. Fallback to clean excerpt synthesis from top matching chunks
-  const topChunks = relevantChunks.slice(0, 3);
+  const topChunks = effectiveChunks.slice(0, 3);
   const cleanedSnippets = topChunks.map(c => {
     let text = c.content
       .replace(/^\[Section:\s*[^\]]*\]\s*/i, '')
@@ -426,7 +443,7 @@ function generateFallbackAnswer(query, relevantChunks, apiError = null) {
   return {
     reply: `${greeting} ${intro}\n\n${displayContent}\n\n${contactLine}`,
     modelUsed: 'local-knowledge-fallback',
-    sourceCount: relevantChunks.length,
+    sourceCount: effectiveChunks.length,
     sources: uniqueSources
   };
 }

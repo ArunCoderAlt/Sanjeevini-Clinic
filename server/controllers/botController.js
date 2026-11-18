@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
  */
 exports.chat = async (req, res, next) => {
   try {
-    const { message, history } = req.body;
+    const { message, history, language } = req.body;
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
@@ -20,18 +20,22 @@ exports.chat = async (req, res, next) => {
     }
 
     const trimmedMessage = message.trim();
+    const requestedLang = language === 'ta' ? 'ta' : 'en';
 
     // 1. Ensure knowledge base documents & chunks are loaded from Supabase
     await botKnowledgeService.ensureInitialized();
 
     // 2. Retrieve top matching chunks from knowledge base
-    const relevantChunks = botKnowledgeService.searchRelevantChunks(trimmedMessage, 8);
+    const relevantChunks = botKnowledgeService.searchRelevantChunks(trimmedMessage, 8, {
+      language: requestedLang
+    });
 
     // 3. Call Groq with strict PDF grounding and conversation history
     const botResult = await generateBotReply({
       userMessage: trimmedMessage,
       relevantChunks,
-      conversationHistory: Array.isArray(history) ? history : []
+      conversationHistory: Array.isArray(history) ? history : [],
+      language: requestedLang
     });
 
     res.status(200).json({

@@ -1,18 +1,23 @@
+import { Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/common/PageTransition';
 import HeroSection from '../components/home/HeroSection';
 import TrustStats from '../components/home/TrustStats';
 import AboutPreview from '../components/home/AboutPreview';
-import WhyChooseUs from '../components/home/WhyChooseUs';
-import ServicesPreview from '../components/home/ServicesPreview';
-import TreatmentsPreview from '../components/home/TreatmentsPreview';
-import DoctorsPreview from '../components/home/DoctorsPreview';
-import PhilosophySection from '../components/home/PhilosophySection';
-import InstagramSection from '../components/home/InstagramSection';
-import GalleryPreview from '../components/home/GalleryPreview';
-import VideoSection from '../components/home/VideoSection';
-import Testimonials from '../components/home/Testimonials';
-import Newsletter from '../components/home/Newsletter';
+
+// Lazy-load below-the-fold sections so hero & above-the-fold content render immediately
+const WhyChooseUs = lazy(() => import('../components/home/WhyChooseUs'));
+const ServicesPreview = lazy(() => import('../components/home/ServicesPreview'));
+const TreatmentsPreview = lazy(() => import('../components/home/TreatmentsPreview'));
+const DoctorsPreview = lazy(() => import('../components/home/DoctorsPreview'));
+const PhilosophySection = lazy(() => import('../components/home/PhilosophySection'));
+const InstagramSection = lazy(() => import('../components/home/InstagramSection'));
+const GalleryPreview = lazy(() => import('../components/home/GalleryPreview'));
+const VideoSection = lazy(() => import('../components/home/VideoSection'));
+const Testimonials = lazy(() => import('../components/home/Testimonials'));
+const Newsletter = lazy(() => import('../components/home/Newsletter'));
+
+const SectionFallback = () => <div className="min-h-[260px]" aria-hidden="true" />;
 
 const Home = () => {
   return (
@@ -24,16 +29,18 @@ const Home = () => {
       <HeroSection />
       <TrustStats />
       <AboutPreview />
-      <WhyChooseUs />
-      <ServicesPreview />
-      <TreatmentsPreview />
-      <DoctorsPreview />
-      <PhilosophySection />
-      <InstagramSection />
-      <GalleryPreview />
-      <VideoSection />
-      <Testimonials />
-      <Newsletter />
+      <Suspense fallback={<SectionFallback />}>
+        <WhyChooseUs />
+        <ServicesPreview />
+        <TreatmentsPreview />
+        <DoctorsPreview />
+        <PhilosophySection />
+        <InstagramSection />
+        <GalleryPreview />
+        <VideoSection />
+        <Testimonials />
+        <Newsletter />
+      </Suspense>
     </PageTransition>
   );
 };

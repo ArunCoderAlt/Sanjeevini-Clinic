@@ -311,7 +311,8 @@ export default function FloatingChatbot() {
           content: m.content
         }));
 
-      const res = await sendChatMessage(query, historyPayload);
+      const effectiveLang = isTamilInput ? 'ta' : currentLang;
+      const res = await sendChatMessage(query, historyPayload, effectiveLang);
       const data = res?.data?.data || {};
 
       const defaultFallbackReply = isTamilInput || currentLang === 'ta'
