@@ -110,7 +110,11 @@ api.interceptors.response.use(
     const method = response.config?.method?.toUpperCase();
     const url = response.config?.url || '';
 
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    // Chatbot messages are not data mutations: they must not wipe the site's query cache,
+    // broadcast "data changed" events, or be recorded in the admin action history.
+    const isChatMessage = url.includes('/bot/chat');
+
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !isChatMessage) {
       // Clear client-side memory cache immediately upon data mutation
       clearClientApiCache();
 
