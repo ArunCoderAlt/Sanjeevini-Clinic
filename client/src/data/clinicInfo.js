@@ -2,6 +2,7 @@ export const clinicInfo = {
   name: 'Sanjeevini Siddha & Ayurveda Medical Centre',
   address: 'No. 22, Dr. Ambedkar Street, Karaikal - 609602, Puducherry (U.T.), India',
   phone: '+91 98430 66362',
+  landline: '04368 293362',
   email: 'sanjeevinisiddha@gmail.com',
   hours: 'Monday – Saturday, 5:00 PM – 9:30 PM',
   whatsapp: '919486838368',

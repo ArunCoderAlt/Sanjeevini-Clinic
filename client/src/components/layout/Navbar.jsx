@@ -50,7 +50,7 @@ export default function Navbar() {
     <>
       <nav className={classNames(
         "sticky top-0 z-50 transition-all duration-300 navbar-dark-blue",
-        scrolled ? "bg-[#081d35]/95 backdrop-blur-md shadow-lg py-3" : "bg-[#081d35] py-4"
+        scrolled ? "bg-[#081d35] shadow-lg py-3" : "bg-[#081d35] py-4"
       )}>
         <Container className="flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
@@ -74,10 +74,10 @@ export default function Navbar() {
                   key={link.name}
                   to={link.path}
                   className={classNames(
-                    "text-xs xl:text-sm font-medium transition-all whitespace-nowrap py-1",
+                    "text-xs xl:text-sm transition-all whitespace-nowrap py-1 text-white",
                     location.pathname === link.path 
-                      ? "text-[#38BDF8] border-b-2 border-[#38BDF8] font-semibold" 
-                      : "text-white/85 hover:text-[#38BDF8]"
+                      ? "border-b-2 border-white font-bold opacity-100" 
+                      : "opacity-85 hover:opacity-100 font-medium"
                   )}
                 >
                   {link.name}
@@ -99,11 +99,11 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="lg:hidden text-white hover:text-[#38BDF8] p-2 transition-colors focus:outline-none"
+            className="lg:hidden text-white hover:text-[#38BDF8] p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-[#38BDF8]/40 rounded-lg"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open mobile navigation menu"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-6 h-6 text-white" />
           </button>
         </Container>
       </nav>

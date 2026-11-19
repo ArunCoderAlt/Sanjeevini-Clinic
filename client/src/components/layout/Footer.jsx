@@ -96,6 +96,31 @@ export default function Footer() {
                 <Phone className="w-5 h-5 text-[#38BDF8] mr-3 shrink-0" />
                 <a href={`tel:${clinicInfo.phone.replace(/\s/g, '')}`} className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">{clinicInfo.phone}</a>
               </li>
+              {clinicInfo.landline && (
+                <li className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5 text-[#38BDF8] mr-3 shrink-0"
+                  >
+                    <path d="M20 3h-2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" />
+                    <path d="M16 4H5a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11" />
+                    <path d="M12 8H6v3h6V8z" />
+                    <line x1="6.5" y1="15" x2="6.51" y2="15" strokeWidth="2.5" />
+                    <line x1="9.5" y1="15" x2="9.51" y2="15" strokeWidth="2.5" />
+                    <line x1="12.5" y1="15" x2="12.51" y2="15" strokeWidth="2.5" />
+                    <line x1="6.5" y1="18" x2="6.51" y2="18" strokeWidth="2.5" />
+                    <line x1="9.5" y1="18" x2="9.51" y2="18" strokeWidth="2.5" />
+                    <line x1="12.5" y1="18" x2="12.51" y2="18" strokeWidth="2.5" />
+                  </svg>
+                  <a href={`tel:${clinicInfo.landline.replace(/\s/g, '')}`} className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">{clinicInfo.landline} (Landline)</a>
+                </li>
+              )}
               <li className="flex items-center">
                 <Mail className="w-5 h-5 text-[#38BDF8] mr-3 shrink-0" />
                 <a href={`mailto:${clinicInfo.email}`} className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">{clinicInfo.email}</a>

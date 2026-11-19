@@ -50,21 +50,42 @@ const SwarnaBindu = () => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-amber-500/10 via-sky-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        {/* Top-Right Decorative Product Bottle (Seamless Transparent Blend) */}
+        {/* Bottom-Left Decorative Product Bottle (Seamless Transparent Blend) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-4 left-1 sm:left-3 md:left-6 lg:left-10 xl:left-16 z-0 pointer-events-none"
+        >
+          <div className="relative">
+            {/* Subtle warm glow behind bottle matching the dark blue website theme */}
+            <div className="absolute -inset-3 sm:-inset-6 bg-gradient-to-tr from-amber-400/25 via-amber-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <img
+              src="/images/swarna-bindu-bottle.png"
+              alt="Sanjeevini Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி)"
+              className="relative z-10 w-24 sm:w-32 md:w-44 lg:w-52 xl:w-60 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)] opacity-40 sm:opacity-60 md:opacity-90 lg:opacity-100"
+              loading="eager"
+            />
+          </div>
+        </motion.div>
+
+        {/* Top-Right Decorative Pushya Nakshatra & Child Administration Art (Seamless Transparent Blend) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="absolute top-10 sm:top-14 md:top-14 lg:top-16 right-3 sm:right-6 md:right-10 lg:right-14 xl:right-20 z-20 pointer-events-none"
+          className="absolute top-8 sm:top-10 md:top-12 lg:top-14 right-2 sm:right-4 md:right-8 lg:right-12 xl:right-16 z-10 pointer-events-none select-none"
         >
           <div className="relative">
-            {/* Subtle warm glow behind bottle matching the dark blue website theme */}
-            <div className="absolute -inset-3 sm:-inset-6 bg-gradient-to-br from-amber-400/25 via-amber-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+            {/* Subtle golden celestial glow matching the constellation & dark blue theme */}
+            <div className="absolute -inset-4 sm:-inset-6 bg-gradient-to-bl from-amber-400/20 via-amber-300/10 to-transparent rounded-full blur-2xl pointer-events-none" />
             <img
-              src="/images/swarna-bindu-bottle.png"
-              alt="Sanjeevini Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி)"
-              className="relative z-10 w-24 sm:w-36 md:w-44 lg:w-52 xl:w-60 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)]"
+              src="/images/swarna-bindu-child.png"
+              alt="Pushya Nakshatra Swarna Bindu Drops Administration"
+              className="relative z-10 w-20 sm:w-28 md:w-36 lg:w-44 xl:w-52 h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)] opacity-50 sm:opacity-75 md:opacity-95 lg:opacity-100"
               loading="eager"
+              decoding="async"
+              draggable="false"
             />
           </div>
         </motion.div>

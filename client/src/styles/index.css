@@ -362,14 +362,22 @@ input:focus, textarea:focus, select:focus {
 
 /* ==========================================================================
    Step 7 — Public Website Navigation (Dark Blue Navbar #081d35)
+   Guaranteed 100% Solid Dark Blue and High Contrast Text in Mobile & Desktop
    ========================================================================== */
 .navbar-dark-blue,
-nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) {
+nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav) {
   background-image: linear-gradient(180deg, #081d35 0%, #06172b 100%) !important;
   background-color: #081d35 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
-  backdrop-filter: blur(12px) !important;
+}
+
+/* Mobile Navigation Drawer - Always solid dark blue gradient */
+.mobile-nav-drawer,
+nav.mobile-nav-drawer {
+  background-image: linear-gradient(180deg, #081d35 0%, #0A223B 50%, #06172b 100%) !important;
+  background-color: #081d35 !important;
+  color: #FFFFFF !important;
 }
 
 /* Ensure sub-containers inside public website nav are transparent */
@@ -380,6 +388,53 @@ nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-na
 nav:not(.admin-sidebar-nav):not(.admin-portal nav):not(aside nav):not(.mobile-nav-drawer) [class*="Container"] {
   background-color: transparent !important;
   background-image: none !important;
+}
+
+/* Public Navbar & Mobile Menu Text Visibility Enforcement - Pure White Links in PC & Mobile (Cross-Browser Compatible) */
+.navbar-dark-blue a,
+.navbar-dark-blue a:visited,
+.navbar-dark-blue a:hover,
+.navbar-dark-blue span:not([class*="text-[#93C5FD]"]),
+.navbar-dark-blue button,
+.navbar-dark-blue p,
+.mobile-nav-drawer a,
+.mobile-nav-drawer a:visited,
+.mobile-nav-drawer a:hover,
+.mobile-nav-drawer span:not([class*="text-[#93C5FD]"]):not([class*="text-[#25D366]"]):not([class*="text-[#38BDF8]"]),
+.mobile-nav-drawer button,
+.mobile-nav-drawer p {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background-image: none !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  text-decoration: none !important;
+}
+
+.navbar-dark-blue .text-white,
+.mobile-nav-drawer .text-white {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.navbar-dark-blue [class*="text-[#93C5FD]"],
+.mobile-nav-drawer [class*="text-[#93C5FD]"] {
+  color: #93C5FD !important;
+  background-image: none !important;
+  -webkit-text-fill-color: #93C5FD !important;
+}
+
+.mobile-nav-drawer .overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.mobile-nav-drawer .text-gray-300,
+.mobile-nav-drawer .text-gray-400,
+.mobile-nav-drawer .text-slate-200,
+.mobile-nav-drawer .text-slate-300,
+.mobile-nav-drawer .text-slate-400 {
+  color: #E2EEF8 !important;
 }
 
 @layer utilities {
