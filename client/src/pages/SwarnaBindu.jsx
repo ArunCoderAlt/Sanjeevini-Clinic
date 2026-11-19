@@ -50,39 +50,39 @@ const SwarnaBindu = () => {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-amber-500/10 via-sky-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
 
-        {/* Bottom-Left Decorative Product Bottle (Seamless Transparent Blend) */}
+        {/* Desktop Bottom-Left Decorative Product Bottle (Hidden on Mobile/Tablet to Prevent Any Text Collision) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-4 left-1 sm:left-3 md:left-6 lg:left-10 xl:left-16 z-0 pointer-events-none"
+          className="hidden lg:block absolute bottom-2 xl:bottom-6 left-3 lg:left-6 xl:left-12 2xl:left-20 z-0 pointer-events-none select-none"
         >
           <div className="relative">
             {/* Subtle warm glow behind bottle matching the dark blue website theme */}
-            <div className="absolute -inset-3 sm:-inset-6 bg-gradient-to-tr from-amber-400/25 via-amber-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -inset-6 bg-gradient-to-tr from-amber-400/25 via-amber-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
             <img
               src="/images/swarna-bindu-bottle.png"
               alt="Sanjeevini Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி)"
-              className="relative z-10 w-24 sm:w-32 md:w-44 lg:w-52 xl:w-60 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)] opacity-40 sm:opacity-60 md:opacity-90 lg:opacity-100"
+              className="relative z-10 w-36 lg:w-44 xl:w-52 2xl:w-60 h-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.65)]"
               loading="eager"
             />
           </div>
         </motion.div>
 
-        {/* Top-Right Decorative Pushya Nakshatra & Child Administration Art (Seamless Transparent Blend) */}
+        {/* Desktop Top-Right Decorative Pushya Nakshatra & Child Administration Art (Hidden on Mobile/Tablet to Prevent Any Text Collision) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="absolute top-8 sm:top-10 md:top-12 lg:top-14 right-2 sm:right-4 md:right-8 lg:right-12 xl:right-16 z-10 pointer-events-none select-none"
+          className="hidden lg:block absolute top-10 xl:top-14 right-3 lg:right-6 xl:right-12 2xl:right-20 z-10 pointer-events-none select-none"
         >
           <div className="relative">
             {/* Subtle golden celestial glow matching the constellation & dark blue theme */}
-            <div className="absolute -inset-4 sm:-inset-6 bg-gradient-to-bl from-amber-400/20 via-amber-300/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -inset-6 bg-gradient-to-bl from-amber-400/20 via-amber-300/10 to-transparent rounded-full blur-2xl pointer-events-none" />
             <img
               src="/images/swarna-bindu-child.png"
               alt="Pushya Nakshatra Swarna Bindu Drops Administration"
-              className="relative z-10 w-20 sm:w-28 md:w-36 lg:w-44 xl:w-52 h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)] opacity-50 sm:opacity-75 md:opacity-95 lg:opacity-100"
+              className="relative z-10 w-28 lg:w-36 xl:w-44 2xl:w-52 h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)]"
               loading="eager"
               decoding="async"
               draggable="false"
@@ -95,9 +95,9 @@ const SwarnaBindu = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs md:text-sm font-semibold tracking-wider uppercase mb-5"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider uppercase mb-3 sm:mb-5 max-w-fit mx-auto"
           >
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
             <span>Monthly Pediatric Immunisation Schedule</span>
           </motion.div>
 
@@ -115,16 +115,57 @@ const SwarnaBindu = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-sm sm:text-lg md:text-2xl font-bold tracking-wide mb-5 sm:mb-6 shadow-sm"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-sm sm:text-lg md:text-2xl font-bold tracking-wide mb-3 sm:mb-4 shadow-sm"
           >
             <span>அமிர்த கனக சஞ்சீவி</span>
+          </motion.div>
+
+          {/* Mobile & Tablet Visual Showcase (Zero Overlap with Text, 100% Fully Visible) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex lg:hidden items-center justify-center gap-6 sm:gap-10 my-4 sm:my-6 px-2"
+          >
+            {/* Left: Swarna Bindu Bottle */}
+            <div className="flex flex-col items-center text-center">
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-tr from-amber-400/25 via-amber-500/15 to-transparent rounded-full blur-xl pointer-events-none" />
+                <img
+                  src="/images/swarna-bindu-bottle.png"
+                  alt="Sanjeevini Swarna Bindu Drops (அமிர்த கனக சஞ்சீவி)"
+                  className="relative z-10 h-28 sm:h-36 md:h-40 w-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.65)]"
+                  loading="eager"
+                />
+              </div>
+              <span className="text-[10px] sm:text-xs font-semibold text-amber-300/90 mt-2 tracking-wider uppercase">
+                Swarna Rasayana
+              </span>
+            </div>
+
+            {/* Right: Pushya Nakshatra Child Drops */}
+            <div className="flex flex-col items-center text-center">
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-bl from-amber-400/25 via-amber-300/15 to-transparent rounded-full blur-xl pointer-events-none" />
+                <img
+                  src="/images/swarna-bindu-child.png"
+                  alt="Pushya Nakshatra Swarna Bindu Drops Administration"
+                  className="relative z-10 h-28 sm:h-36 md:h-40 w-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+              <span className="text-[10px] sm:text-xs font-semibold text-amber-300/90 mt-2 tracking-wider uppercase">
+                Pushya Nakshatra
+              </span>
+            </div>
           </motion.div>
 
           <motion.p 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light leading-relaxed mb-8"
+            className="max-w-3xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light leading-relaxed mb-6 sm:mb-8 px-2"
           >
             An ancient pediatric Rasayana mentioned in <em>Kashyapa Samhita</em>, prepared with purified Swarna Bhasma, Medhya herbs, cow ghee, and honey. Administered exclusively on auspicious <strong>Pushya Nakshatra</strong> days for children from birth to 16 years.
           </motion.p>
