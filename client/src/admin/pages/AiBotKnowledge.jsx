@@ -314,6 +314,9 @@ export default function AiBotKnowledge() {
     try {
       const res = await uploadBotPdf(formData);
       toast.success(res.data?.message || 'PDF uploaded and indexed successfully!');
+      if (res.data?.warning) {
+        toast(res.data.warning, { icon: '⚠️', duration: 8000 });
+      }
       setSelectedFile(null);
       const fileInput = document.getElementById('pdf-upload-input');
       if (fileInput) fileInput.value = '';
@@ -355,7 +358,7 @@ export default function AiBotKnowledge() {
       toast.success('Default Clinic Portfolio Guide restored to active knowledge!');
       fetchData();
     } catch (err) {
-      toast.error('Failed to restore default clinic guide');
+      toast.error(err.response?.data?.message || 'Failed to restore default clinic guide');
     }
   };
 
@@ -365,7 +368,7 @@ export default function AiBotKnowledge() {
       toast.success(`Document ${!currentStatus ? 'activated' : 'deactivated'}`);
       setDocuments(prev => prev.map(d => d.id === id ? { ...d, is_active: !currentStatus } : d));
     } catch (err) {
-      toast.error('Failed to update document status');
+      toast.error(err.response?.data?.message || 'Failed to update document status');
     }
   };
 

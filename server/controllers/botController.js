@@ -3,6 +3,8 @@ const botKnowledgeService = require('../services/botKnowledgeService');
 const { generateBotReply, testGroqConnection, updateGroqConfig, getGroqHealthStatus } = require('../services/groqService');
 const logger = require('../utils/logger');
 
+const MAX_MESSAGE_LENGTH = 1000;
+
 /**
  * @desc    Process a chat message from patient / visitor
  * @route   POST /api/bot/chat
@@ -10,7 +12,7 @@ const logger = require('../utils/logger');
  */
 exports.chat = async (req, res, next) => {
   try {
-    const { message, history, language } = req.body;
+    const { message, history, language } = req.body || {};
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
@@ -20,6 +22,13 @@ exports.chat = async (req, res, next) => {
     }
 
     const trimmedMessage = message.trim();
+    if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({
+        success: false,
+        message: `Message is too long. Please keep it under ${MAX_MESSAGE_LENGTH} characters.`
+      });
+    }
+
     const requestedLang = language === 'ta' ? 'ta' : 'en';
 
     // 1. Ensure knowledge base documents & chunks are loaded from Supabase
@@ -38,14 +47,15 @@ exports.chat = async (req, res, next) => {
       language: requestedLang
     });
 
+    // Internal API error details are logged server-side and shown in the admin status panel,
+    // never returned to public visitors.
     res.status(200).json({
       success: true,
       data: {
         reply: botResult.reply,
         sources: botResult.sources || [],
         modelUsed: botResult.modelUsed,
-        keyStatus: botResult.keyStatus || 'unknown',
-        apiError: botResult.apiError || null
+        keyStatus: botResult.keyStatus || 'unknown'
       }
     });
   } catch (err) {
@@ -139,13 +149,20 @@ exports.uploadDocument = async (req, res) => {
       chunks
     });
 
-    logger.info(`Successfully stored PDF in Supabase Storage and indexed "${originalName}" with ${result.chunkCount} chunks.`);
+    logger.info(`Indexed "${originalName}" with ${result.chunkCount} chunks (database saved: ${result.dbSaved}).`);
+
+    const warning = result.dbSaved
+      ? null
+      : 'Supabase is not configured, so this document is only held in server memory and will be lost when the server restarts.';
 
     return res.status(201).json({
       success: true,
       message: `Successfully indexed ${originalName} with ${result.chunkCount} knowledge chunks!`,
+      warning,
       data: result.document,
-      chunkCount: result.chunkCount
+      chunkCount: result.chunkCount,
+      storageSaved: result.storageSaved,
+      dbSaved: result.dbSaved
     });
   } catch (err) {
     logger.error(`Error in uploadDocument: ${err.message}`);
@@ -165,6 +182,12 @@ exports.deleteDocument = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await botKnowledgeService.deleteDocument(id);
+    if (!result.success) {
+      return res.status(result.notFound ? 404 : 500).json({
+        success: false,
+        message: result.message || 'Could not remove the knowledge document'
+      });
+    }
     return res.status(200).json({
       success: true,
       message: 'Knowledge document removed successfully',
@@ -172,10 +195,9 @@ exports.deleteDocument = async (req, res) => {
     });
   } catch (err) {
     logger.error(`Error in deleteDocument: ${err.message}`);
-    return res.status(200).json({
-      success: true,
-      message: 'Knowledge document removal handled',
-      warning: err.message
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Could not remove the knowledge document'
     });
   }
 };
@@ -187,14 +209,17 @@ exports.deleteDocument = async (req, res) => {
  */
 exports.toggleDocument = async (req, res, next) => {
   try {
-    const updated = await botKnowledgeService.toggleDocument(req.params.id, req.body.isActive);
+    const updated = await botKnowledgeService.toggleDocument(req.params.id, req.body ? req.body.isActive : undefined);
     res.status(200).json({
       success: true,
       message: `Document is now ${updated.is_active ? 'active' : 'inactive'}`,
       data: updated
     });
   } catch (err) {
-    next(err);
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || 'Failed to update document status'
+    });
   }
 };
 
@@ -255,15 +280,28 @@ exports.getUsage = async (req, res, next) => {
  */
 exports.updateSettings = async (req, res, next) => {
   try {
-    const { apiKey, model } = req.body;
-    const configResult = updateGroqConfig({ apiKey, model });
+    const { apiKey, model } = req.body || {};
+
+    if (apiKey !== undefined && (typeof apiKey !== 'string' || /[\r\n\s]/.test(apiKey.trim()) || apiKey.trim().length < 10)) {
+      return res.status(400).json({ success: false, message: 'Invalid Groq API key format.' });
+    }
+    if (model !== undefined && model !== null && model !== '' &&
+        (typeof model !== 'string' || !/^[A-Za-z0-9._:\/-]{1,100}$/.test(model.trim()))) {
+      return res.status(400).json({ success: false, message: 'Invalid model name.' });
+    }
+
+    const configResult = updateGroqConfig({ apiKey, model: typeof model === 'string' ? model.trim() : undefined });
     const groqTest = await testGroqConnection();
+
+    const persistNote = configResult.persistedToEnvFile
+      ? ''
+      : ' This change is active now but will reset when the server restarts — also update GROQ_API_KEY / GROQ_MODEL in your hosting environment variables.';
 
     res.status(200).json({
       success: true,
-      message: groqTest.connected 
-        ? 'Groq API Key verified and saved successfully!' 
-        : 'Groq settings updated. Note: ' + groqTest.message,
+      message: (groqTest.connected
+        ? 'Groq API Key verified and saved successfully!'
+        : 'Groq settings updated. Note: ' + groqTest.message) + persistNote,
       data: {
         ...configResult,
         groq: groqTest
@@ -281,7 +319,7 @@ exports.updateSettings = async (req, res, next) => {
  */
 exports.restoreSeed = async (req, res, next) => {
   try {
-    const doc = botKnowledgeService.restoreSeedDocument();
+    const doc = await botKnowledgeService.restoreSeedDocument();
     res.status(200).json({
       success: true,
       message: 'Default clinic guide restored to knowledge base',

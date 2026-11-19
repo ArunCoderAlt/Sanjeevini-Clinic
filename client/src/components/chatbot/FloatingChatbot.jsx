@@ -304,8 +304,10 @@ export default function FloatingChatbot() {
 
     try {
       // Build conversation history excluding initial greeting
+      // Exclude the greeting and local error notices (they are not real assistant answers), keep recent turns only
       const historyPayload = newMessages
-        .filter(m => !m.id.startsWith('welcome-'))
+        .filter(m => !m.id.startsWith('welcome-') && !m.id.startsWith('assistant-err-'))
+        .slice(-10)
         .map(m => ({
           role: m.role,
           content: m.content
@@ -413,9 +415,11 @@ export default function FloatingChatbot() {
 
       if (isBullet) {
         return (
-          <li key={idx} className="ml-4 list-disc text-xs sm:text-sm my-1 leading-relaxed">
-            {formattedParts}
-          </li>
+          <ul key={idx} className="ml-4 list-disc">
+            <li className="text-xs sm:text-sm my-1 leading-relaxed">
+              {formattedParts}
+            </li>
+          </ul>
         );
       }
 
@@ -733,6 +737,7 @@ export default function FloatingChatbot() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  maxLength={1000}
                   placeholder={
                     isListening
                       ? (currentLang === 'ta' ? 'பேசுங்கள்... கேட்கிறது...' : 'Listening...')
