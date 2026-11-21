@@ -4,8 +4,8 @@ const { success, error } = require('../utils/apiResponse');
 const { notifyNewTestimonial } = require('../services/notificationService');
 
 exports.getTestimonials = asyncHandler(async (req, res) => {
-  const isAdmin = (req.user && req.user.role === 'admin') || req.query.all === 'true';
-  const filter = isAdmin ? {} : { isApproved: true };
+  const isAdmin = req.user && req.user.role === 'admin';
+  const filter = (isAdmin && req.query.all === 'true') ? {} : { isApproved: true };
   const testimonials = await Testimonial.find(filter).sort({ createdAt: -1 });
   return success(res, testimonials);
 });
@@ -19,13 +19,16 @@ exports.createTestimonial = asyncHandler(async (req, res) => {
   const testimonial = await Testimonial.create({
     name,
     review,
-    rating,
-    location,
-    treatment,
+    rating: Number(rating) || 5,
+    location: location || '',
+    treatment: treatment || '',
     isApproved,
     isFeatured,
   });
-  await notifyNewTestimonial(testimonial);
+  
+  // Non-blocking notification dispatch
+  notifyNewTestimonial(testimonial).catch(() => {});
+
   return success(res, testimonial, isAdmin ? 'Testimonial created successfully' : 'Testimonial submitted and pending approval', 201);
 });
 

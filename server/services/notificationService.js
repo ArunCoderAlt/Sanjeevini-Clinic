@@ -1,15 +1,6 @@
 const { sendEmail } = require('./emailService');
 const env = require('../config/environment');
 
-exports.notifyNewAppointment = async (appointment) => {
-  const msg = `New appointment request from ${appointment.name}.\nPhone: ${appointment.phone}\nService: ${appointment.service}\nDate: ${appointment.preferredDate}`;
-  await sendEmail({
-    email: env.emailUser,
-    subject: 'New Appointment Request',
-    message: msg,
-  }).catch(console.error);
-};
-
 exports.notifyNewContact = async (contact) => {
   const msg = `New contact message from ${contact.name}.\nEmail: ${contact.email}\nMessage: ${contact.message}`;
   await sendEmail({

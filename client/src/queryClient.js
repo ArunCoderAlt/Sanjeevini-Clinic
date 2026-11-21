@@ -13,9 +13,9 @@ import { invalidateBrowserCache, clearAllBrowserCache } from './utils/browserCac
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0, // Immediately consider data stale so reloads and mounts always fetch latest updates
-      gcTime: 60 * 1000, // 60s garbage collection for inactive queries
-      refetchOnWindowFocus: true,
+      staleTime: 60 * 1000, // 60s fresh window for fast instant page transitions
+      gcTime: 5 * 60 * 1000, // 5m cache retention
+      refetchOnWindowFocus: false, // Prevent aggressive background refetches on window focus
       refetchOnReconnect: 'always',
       retry: 1,
     },
@@ -56,10 +56,6 @@ export const purgeAllQueriesAndCache = () => {
 
 // Auto-purge matching query keys and browser cache when real-time updates happen across tabs
 if (typeof window !== 'undefined') {
-  window.addEventListener('focus', () => {
-    queryClient.invalidateQueries({ refetchType: 'all' });
-  });
-
   subscribeToDataChanges((event) => {
     const url = event?.url?.toLowerCase() || '';
     if (url.includes('/doctors')) {
@@ -78,7 +74,9 @@ if (typeof window !== 'undefined') {
       purgeAndInvalidateQuery(['swarna-bindu']);
     } else if (url.includes('/settings')) {
       purgeAndInvalidateQuery(['settings']);
-    } else {
+    } else if (url.includes('/bot/chat') || url.includes('/contact') || url.includes('/newsletter')) {
+      // Chat and public form submissions do not alter clinic catalogue content
+    } else if (url) {
       purgeAllQueriesAndCache();
     }
   });

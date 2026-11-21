@@ -37,8 +37,8 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // For GET requests, append dynamic timestamp to prevent browser & proxy response caching
-  if (config.method?.toLowerCase() === 'get') {
+  // For explicitly bypassed queries, append dynamic timestamp
+  if (config.method?.toLowerCase() === 'get' && config.params?.fresh) {
     config.params = {
       ...config.params,
       _t: Date.now()
@@ -71,10 +71,6 @@ const deduceActionInfo = (url = '', method = 'POST', data = {}) => {
   if (cleanUrl.includes('/swarna-bindu')) {
     const action = methodUpper === 'POST' ? 'Added Swarna Bindu Camp' : methodUpper === 'DELETE' ? 'Deleted Swarna Bindu Camp' : 'Updated Swarna Bindu Schedule';
     return { action, category: 'Swarna Bindu', target: data?.nakshatra || data?.date || 'Camp Schedule' };
-  }
-  if (cleanUrl.includes('/appointments')) {
-    const action = methodUpper === 'DELETE' ? 'Deleted Appointment' : methodUpper === 'PUT' ? 'Updated Appointment Status' : 'New Appointment Scheduled';
-    return { action, category: 'Appointments', target: data?.name || 'Appointment' };
   }
   if (cleanUrl.includes('/testimonials')) {
     const action = methodUpper === 'POST' ? 'Added Testimonial' : methodUpper === 'DELETE' ? 'Deleted Testimonial' : 'Updated Testimonial';
@@ -133,13 +129,16 @@ api.interceptors.response.use(
           purgeAndInvalidateQuery(['swarna-bindu']);
         } else if (cleanUrl.includes('/settings')) {
           purgeAndInvalidateQuery(['settings']);
+        } else if (cleanUrl.includes('/bot/chat') || cleanUrl.includes('/contact') || cleanUrl.includes('/newsletter')) {
+          // Public contact/newsletter/chatbot interactions do not mutate clinic catalogue content
         } else {
           purgeAllQueriesAndCache();
         }
       } catch (_) {}
 
-      // Don't auto-log normal login query here as AuthContext handles it with user credentials
-      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
+      // Only record admin action if authenticated as admin (never for anonymous public visitors)
+      const token = getToken();
+      if (token && !url.includes('/auth/login') && !url.includes('/auth/register')) {
         const actionInfo = deduceActionInfo(url, method, response.config?.data ? (() => {
           try { return typeof response.config.data === 'string' ? JSON.parse(response.config.data) : response.config.data; } catch { return {}; }
         })() : {});

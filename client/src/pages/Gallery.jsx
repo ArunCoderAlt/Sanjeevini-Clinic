@@ -47,7 +47,7 @@ const Gallery = () => {
               <Camera className="w-4 h-4 text-primary-700" />
               <span className="text-sm font-semibold text-primary-700">Photo Gallery</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-serif text-primary-700 mb-3">Our Clinic Gallery</h2>
+            <h1 className="text-3xl md:text-4xl font-serif text-primary-700 mb-3">Our Clinic Gallery</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
               A glimpse into our clinic, treatment rooms, events, and the team behind your healing journey.
             </p>

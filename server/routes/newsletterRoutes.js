@@ -5,9 +5,10 @@ const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 const { newsletterValidation } = require('../validators/newsletterValidator');
 const { validate } = require('../middleware/validationMiddleware');
+const { submissionLimiter } = require('../middleware/rateLimitMiddleware');
 
-router.post('/subscribe', newsletterValidation, validate, subscribe);
-router.post('/unsubscribe', newsletterValidation, validate, unsubscribe);
+router.post('/subscribe', submissionLimiter, newsletterValidation, validate, subscribe);
+router.post('/unsubscribe', protect, admin, newsletterValidation, validate, unsubscribe);
 router.get('/', protect, admin, getSubscribers);
 
 module.exports = router;

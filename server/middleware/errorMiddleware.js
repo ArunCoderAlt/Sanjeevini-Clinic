@@ -7,10 +7,13 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  let statusCode = err.statusCode || err.status || (res.statusCode === 200 ? 500 : res.statusCode);
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    statusCode = 400;
+  }
   res.status(statusCode).json({
     success: false,
-    message: err.message,
+    message: statusCode === 400 && err instanceof SyntaxError ? 'Invalid JSON format in request body' : (err.message || 'Server Error'),
     stack: env.nodeEnv === 'production' ? null : err.stack,
   });
 };

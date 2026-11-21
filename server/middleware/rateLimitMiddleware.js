@@ -47,3 +47,15 @@ exports.contactLimiter = rateLimit({
     message: 'Too many form submissions, please try again after 15 minutes',
   },
 });
+
+exports.submissionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: isDev ? 200 : 20,
+  skip: (req) => req.method === 'OPTIONS' || (isDev && isLoopback(req.ip)),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many submissions from this IP, please try again after 15 minutes',
+  },
+});

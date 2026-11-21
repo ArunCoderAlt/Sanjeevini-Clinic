@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import * as Icons from 'lucide-react';
 import { getImageUrl, getDefaultServiceImage, isValidImage } from '../../utils/helpers';
 
 const ServiceCard = ({ service }) => {
@@ -11,7 +10,6 @@ const ServiceCard = ({ service }) => {
     setImgError(false);
   }, [service?.image]);
 
-  const Icon = Icons[service?.iconName] || Icons.Activity;
   const fallbackImg = getDefaultServiceImage(service);
   const activeImg = !imgError && isValidImage(service?.image) ? service.image : fallbackImg;
   const imgSrc = getImageUrl(activeImg) || fallbackImg;

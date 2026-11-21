@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import AdminNavbar from './components/AdminNavbar';
 import Dashboard from './pages/Dashboard';
-import Appointments from './pages/Appointments';
 import Doctors from './pages/Doctors';
 import Services from './pages/Services';
 import Treatments from './pages/Treatments';

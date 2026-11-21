@@ -398,50 +398,9 @@ async function runAllTests() {
     }
 
     // ----------------------------------------------------
-    // 10. Appointments End-to-End
+    // 10. Appointments (Decommissioned - consultations routed through Contact & Direct Call)
     // ----------------------------------------------------
-    console.log('\n[10/13] Testing Appointment Booking & Admin Management...');
-    const testAppointment = {
-      name: 'E2E Test Patient',
-      phone: '9876543210',
-      email: 'testpatient@example.com',
-      service: 'Varmam Therapy',
-      preferredDate: '2026-12-01',
-      preferredTime: 'Evening',
-      message: 'Initial appointment booking for chronic stiffness.'
-    };
-
-    const createAppointmentRes = await request('/api/appointments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(testAppointment)
-    });
-    assert(createAppointmentRes.status === 201 && createAppointmentRes.body?.data?.id,
-      'POST /api/appointments creates appointment and returns 201');
-    const appointmentId = createAppointmentRes.body?.data?.id;
-
-    if (appointmentId) {
-      // Admin View
-      const getApptsRes = await request('/api/appointments', { headers: authHeaders });
-      const apptFound = getApptsRes.body?.data?.some(a => (a.id === appointmentId || a._id === appointmentId));
-      assert(apptFound, 'Admin GET /api/appointments includes newly booked appointment');
-
-      // Admin Status Update
-      const statusRes = await request(`/api/appointments/${appointmentId}/status`, {
-        method: 'PUT',
-        headers: authHeaders,
-        body: JSON.stringify({ status: 'confirmed' })
-      });
-      assert(statusRes.status === 200 && statusRes.body?.data?.status === 'confirmed',
-        'Admin PUT /api/appointments/:id/status updates status to confirmed');
-
-      // Delete
-      const deleteApptRes = await request(`/api/appointments/${appointmentId}`, {
-        method: 'DELETE',
-        headers: authHeaders
-      });
-      assert(deleteApptRes.status === 200, 'DELETE Appointment returns 200');
-    }
+    console.log('\n[10/13] Appointments decommissioned (consultations routed through Contact & Direct Call - SKIPPED)');
 
     // ----------------------------------------------------
     // 11. Contact Form Messages End-to-End

@@ -14,7 +14,6 @@ const authRoutes = require('./routes/authRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const treatmentRoutes = require('./routes/treatmentRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const contactRoutes = require('./routes/contactRoutes');
@@ -65,15 +64,15 @@ const corsOptions = {
         hostname === '127.0.0.1' ||
         hostname.endsWith('.vercel.app') ||
         hostname.endsWith('.onrender.com') ||
-        hostname.endsWith('sanjeevinisiddha.in') ||
-        hostname.includes('sanjeevini')
+        hostname === 'sanjeevinisiddha.in' ||
+        hostname.endsWith('.sanjeevinisiddha.in')
       ) {
         return callback(null, true);
       }
     } catch (_) {}
 
-    // Pass through origin gracefully rather than throwing 500 error
-    return callback(null, true);
+    // Reject all other unverified cross-origin requests
+    return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -148,7 +147,6 @@ app.use('/api/auth', privateNoCache, authRoutes);
 app.use('/api/doctors', publicCache, doctorRoutes);
 app.use('/api/services', publicCache, serviceRoutes);
 app.use('/api/treatments', publicCache, treatmentRoutes);
-app.use('/api/appointments', privateNoCache, appointmentRoutes);
 app.use('/api/gallery', publicCache, galleryRoutes);
 app.use('/api/reels', publicCache, reelRoutes);
 app.use('/api/testimonials', publicCache, testimonialRoutes);

@@ -160,7 +160,7 @@
         "External Varmam therapy",
         "Constitutional diet"
       ],
-      "image": "/uploads/GlowingGlassGastrointestinalSystem-1794425513998-591383.png",
+      "image": "/images/treatments/gastrointestinal.png",
       "order": 1,
       "isActive": true,
       "createdAt": "2026-11-16T04:41:47.496Z"
@@ -186,7 +186,7 @@
         "External Varmam therapy",
         "Constitutional diet"
       ],
-      "image": "/uploads/dermatology-treatment-1794426000000.png",
+      "image": "/images/treatments/dermatology.png",
       "order": 2,
       "isActive": true,
       "createdAt": "2026-11-16T04:41:47.496Z"
@@ -264,7 +264,7 @@
         "External Varmam therapy",
         "Constitutional diet"
       ],
-      "image": "/uploads/musculoskeletal-treatment-1794426000000.png",
+      "image": "/images/treatments/musculoskeletal.png",
       "order": 5,
       "isActive": true,
       "createdAt": "2026-11-16T04:41:47.496Z"
@@ -670,7 +670,6 @@
       "createdAt": "2026-10-07T10:00:00.000Z"
     }
   ],
-  "appointments": [],
   "contact_messages": [],
   "newsletters": [],
   "swarna_bindu": [

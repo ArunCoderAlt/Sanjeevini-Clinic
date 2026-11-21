@@ -38,15 +38,25 @@ const loadFallbackStore = () => {
   return null;
 };
 
+let pendingSaveTimeout = null;
 const saveFallbackStore = (stores) => {
-  try {
-    const dir = path.dirname(LOCAL_STORE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+  if (pendingSaveTimeout) return;
+  pendingSaveTimeout = setTimeout(() => {
+    pendingSaveTimeout = null;
+    try {
+      const dir = path.dirname(LOCAL_STORE_PATH);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFile(LOCAL_STORE_PATH, JSON.stringify(stores, null, 2), 'utf8', (err) => {
+        if (err) logger.warn(`Could not persist local fallback store: ${err.message}`);
+      });
+    } catch (err) {
+      logger.warn(`Could not persist local fallback store: ${err.message}`);
     }
-    fs.writeFileSync(LOCAL_STORE_PATH, JSON.stringify(stores, null, 2), 'utf8');
-  } catch (err) {
-    logger.warn(`Could not persist local fallback store: ${err.message}`);
+  }, 1000);
+  if (pendingSaveTimeout.unref) {
+    pendingSaveTimeout.unref();
   }
 };
 
@@ -62,7 +72,6 @@ const memoryStores = {
   gallery: savedStores?.gallery ? [...savedStores.gallery] : [...fallbackGallery],
   users: savedStores?.users ? [...savedStores.users] : [...fallbackUsers],
   reels: savedStores?.reels ? [...savedStores.reels] : [...fallbackReels],
-  appointments: savedStores?.appointments ? [...savedStores.appointments] : [],
   contact_messages: savedStores?.contact_messages ? [...savedStores.contact_messages] : [],
   newsletters: savedStores?.newsletters ? [...savedStores.newsletters] : [],
   swarna_bindu: savedStores?.swarna_bindu ? [...savedStores.swarna_bindu] : [...fallbackSwarnaBindu],
@@ -125,7 +134,6 @@ const TABLE_TTLS = {
   testimonials: 30 * 1000,     // 30 seconds
   reels: 30 * 1000,            // 30 seconds
   swarna_bindu: 30 * 1000,     // 30 seconds
-  appointments: 10 * 1000,     // 10 seconds
   contact_messages: 10 * 1000, // 10 seconds
   users: 0,                    // Never cache user auth queries
   groq_key_periods: 0,         // Real-time API token usage tracking (never cache)
@@ -269,17 +277,6 @@ const toDbRow = (data, tableName = '') => {
     }
   }
 
-  if (tableName === 'appointments') {
-    if (result['date'] !== undefined && result['preferred_date'] === undefined) {
-      result['preferred_date'] = result['date'];
-    }
-    delete result['date'];
-    if (result['time'] !== undefined && result['preferred_time'] === undefined) {
-      result['preferred_time'] = result['time'];
-    }
-    delete result['time'];
-  }
-
   if (tableName === 'gallery') {
     if (result['caption'] !== undefined && result['description'] === undefined) {
       result['description'] = result['caption'];
@@ -338,11 +335,6 @@ const formatRow = (row, tableName, customMethods = {}) => {
     formatted.imageUrl = galleryImg;
     formatted.caption = row.caption || row.description || '';
     formatted.description = row.description || row.caption || '';
-  }
-
-  if (tableName === 'appointments') {
-    formatted.date = row.date || row.preferred_date || '';
-    formatted.preferredDate = row.preferred_date || row.date || '';
   }
 
   formatted.save = async function () {
@@ -802,13 +794,20 @@ const createSupabaseModel = (tableName, options = {}) => {
             .select()
             .single();
 
-          if (!error && created) {
+          if (error) {
+            logger.error(`Supabase insert error on ${tableName}: ${error.message} (${error.code})`);
+            const dbError = new Error(`Database insert failed: ${error.message}`);
+            dbError.code = error.code;
+            dbError.statusCode = 500;
+            throw dbError;
+          }
+
+          if (created) {
             supabaseCreated = formatRow(created, tableName, customMethods);
-          } else if (error) {
-            logger.warn(`Supabase insert error on ${tableName}: ${error.message} (${error.code})`);
           }
         } catch (err) {
-          logger.warn(`Supabase insert failed on ${tableName}: ${err.message}. Persisting in memory.`);
+          logger.error(`Supabase insert failed on ${tableName}: ${err.message}`);
+          throw err;
         }
       }
 

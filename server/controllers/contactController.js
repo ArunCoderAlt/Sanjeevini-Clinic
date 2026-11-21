@@ -4,9 +4,20 @@ const { success, error } = require('../utils/apiResponse');
 const { notifyNewContact } = require('../services/notificationService');
 
 exports.submitContact = asyncHandler(async (req, res) => {
-  const message = await ContactMessage.create(req.body);
-  await notifyNewContact(message);
-  return success(res, message, 'Message sent successfully', 201);
+  const { name, email, phone, subject, message } = req.body;
+  const newMsg = await ContactMessage.create({
+    name,
+    email,
+    phone,
+    subject: subject || 'General Inquiry',
+    message,
+    isRead: false,
+  });
+
+  // Non-blocking notification dispatch
+  notifyNewContact(newMsg).catch(() => {});
+
+  return success(res, newMsg, 'Message sent successfully', 201);
 });
 
 exports.getMessages = asyncHandler(async (req, res) => {
