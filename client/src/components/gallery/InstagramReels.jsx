@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { clinicInfo } from '../../data/clinicInfo';
 import { useReels } from '../../hooks/useQueries';
-import { defaultClinicReels } from '../home/InstagramSection';
+import { defaultClinicReels } from '../../data/clinicReelsData';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
