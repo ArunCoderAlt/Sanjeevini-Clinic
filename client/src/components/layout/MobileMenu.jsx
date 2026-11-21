@@ -78,7 +78,7 @@ export default function MobileMenu({ isOpen, onClose, currentPath }) {
                 }, 150);
               }
             }} 
-            className="w-full justify-center bg-gradient-to-r from-[#0284C7] to-[#0369A1] hover:from-[#0369A1] hover:to-[#075985] text-white border border-[#38BDF8]/30 font-semibold py-3 shadow-md"
+            className="nav-contact-btn w-full justify-center font-bold py-3"
           >
             Contact Us
           </Button>

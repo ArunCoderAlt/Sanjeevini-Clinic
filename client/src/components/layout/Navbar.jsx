@@ -90,7 +90,7 @@ export default function Navbar() {
                 onClick={handleContactClick} 
                 variant="gold" 
                 size="sm"
-                className="bg-gradient-to-r from-[#0284C7] to-[#0369A1] hover:from-[#0369A1] hover:to-[#075985] text-white border border-[#38BDF8]/30 shadow-md font-semibold px-5 py-2 text-xs xl:text-sm"
+                className="nav-contact-btn font-bold px-5 py-2 text-xs xl:text-sm"
               >
                 Contact Us
               </Button>

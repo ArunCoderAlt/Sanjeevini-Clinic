@@ -3,8 +3,19 @@ import { Leaf, MapPin, Phone, Mail, Clock, Youtube, Instagram, Facebook } from '
 import Container from '../common/Container';
 import { clinicInfo } from '../../data/clinicInfo';
 import { footerLinks } from '../../data/navigation';
+import { useServices } from '../../hooks/useQueries';
+
+const defaultFooterServices = [
+  { title: 'Varmam Therapy', slug: 'varmam-therapy' },
+  { title: 'Thokkanam Therapy', slug: 'thokkanam-therapy' },
+  { title: 'Wellness Support', slug: 'wellness-support' },
+];
 
 export default function Footer() {
+  const { data: rawServices } = useServices();
+  const services = Array.isArray(rawServices) && rawServices.length > 0
+    ? rawServices.filter(s => s.isActive !== false)
+    : defaultFooterServices;
   return (
     <footer className="footer-dark-gradient bg-gradient-to-b from-[#091C2E] via-[#061524] to-[#020910] text-[#CADBE9] pt-16 pb-8 border-t border-[#143B5C]/40 relative z-20">
       <Container>
@@ -76,9 +87,16 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-heading font-semibold text-xl mb-6">Services</h3>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/services/varmam-therapy" className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">Varmam Therapy</Link></li>
-              <li><Link to="/services/thokkanam-therapy" className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">Thokkanam Therapy</Link></li>
-              <li><Link to="/services/wellness-support" className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors">Wellness Support</Link></li>
+              {services.map((service) => (
+                <li key={service.id || service._id || service.slug || service.title}>
+                  <Link 
+                    to={`/services/${service.slug || service.id || service._id}`} 
+                    className="text-[#CADBE9] hover:text-[#38BDF8] transition-colors"
+                  >
+                    {service.title || service.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
