@@ -1,13 +1,56 @@
 const SwarnaBindu = require('../models/SwarnaBindu');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/apiResponse');
+const { getSupabase } = require('../config/supabase');
+const env = require('../config/environment');
+
+const isSupabaseConfigured = () => {
+  const url = env.supabaseUrl;
+  const key = env.supabaseKey;
+  return Boolean(url && key && !url.includes('your-project-id.supabase.co'));
+};
 
 exports.getEvents = asyncHandler(async (req, res) => {
-  const filter = {};
-  if (req.query.all !== 'true') {
-    filter.isActive = true;
+  const filterActive = req.query.all !== 'true';
+  let events = [];
+
+  // Directly fetch from live Supabase database with zero fallback injection
+  if (isSupabaseConfigured()) {
+    try {
+      const client = getSupabase();
+      let query = client.from('swarna_bindu').select('*').order('order_index', { ascending: true });
+      if (filterActive) {
+        query = query.eq('is_active', true);
+      }
+      const { data, error: dbErr } = await query;
+      if (!dbErr && Array.isArray(data)) {
+        events = data.map((r) => {
+          const isNext = r.notes && String(r.notes).includes('[SPOTLIGHT]');
+          return {
+            id: r.id,
+            _id: r.id,
+            month: r.month,
+            date: r.date,
+            day: r.day,
+            nakshatra: r.nakshatra || 'Pushya (Poosam)',
+            timings: r.timings || '5:00 PM – 9:30 PM',
+            venue: r.venue || 'Sanjeevini Medical Centre, Karaikal',
+            status: isNext ? 'Next Camp' : r.status,
+            notes: String(r.notes || '').replace(/\s*\[SPOTLIGHT\]\s*/g, '').trim(),
+            order: r.order_index,
+            order_index: r.order_index,
+            isActive: r.is_active,
+            is_active: r.is_active,
+            createdAt: r.created_at,
+            updatedAt: r.updated_at,
+          };
+        });
+      }
+    } catch (_) {
+      events = [];
+    }
   }
-  let events = await SwarnaBindu.find(filter).sort({ order: 1, date: 1, createdAt: 1 });
+
   if (req.query.status && req.query.status !== 'all') {
     events = events.filter((e) => e.status === req.query.status);
   }

@@ -8,7 +8,8 @@ import {
   ShieldCheck, 
   Sparkles, 
   Baby, 
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import Container from '../components/common/Container';
 import PageTransition from '../components/common/PageTransition';
@@ -296,37 +297,19 @@ const SwarnaBindu = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
                     {isLoading ? (
-                      Array.from({ length: 7 }).map((_, i) => (
-                        <tr key={`skeleton-${i}`} className="animate-pulse border-b border-slate-100/80 bg-white">
-                          {/* Month skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-slate-200" />
-                              <div className="h-4 bg-slate-200/80 rounded w-20 sm:w-24" />
-                            </div>
-                          </td>
-                          {/* Date skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="h-4 bg-slate-200/80 rounded w-24 sm:w-28" />
-                          </td>
-                          {/* Day skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="h-4 bg-slate-200/60 rounded w-16 sm:w-20" />
-                          </td>
-                          {/* Nakshatra skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="h-6 bg-amber-50 rounded-full w-28 sm:w-32 border border-amber-100/80" />
-                          </td>
-                          {/* Timings skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="h-4 bg-slate-200/60 rounded w-24 sm:w-28" />
-                          </td>
-                          {/* Status skeleton */}
-                          <td className="py-4 px-3 sm:px-6">
-                            <div className="h-5 bg-slate-200/70 rounded-full w-16 sm:w-20" />
-                          </td>
-                        </tr>
-                      ))
+                      <tr>
+                        <td colSpan={6} className="py-20 text-center bg-white">
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <Loader2 className="w-10 h-10 text-[#144979] animate-spin" />
+                            <span className="text-sm font-semibold text-slate-750 text-[#0C2B4B]">
+                              Loading Pushya Nakshatra schedule...
+                            </span>
+                            <span className="text-xs text-slate-400">
+                              Fetching live camp dates from database
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
                     ) : filteredSchedule.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="py-12 px-6 text-center text-slate-500 font-medium bg-slate-50/50">

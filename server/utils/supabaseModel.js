@@ -84,21 +84,25 @@ if (!savedStores) {
   saveFallbackStore(memoryStores);
 }
 
-let supabaseIsHealthy = false;
+const isSupabaseConfigured = () => {
+  const url = env.supabaseUrl;
+  const key = env.supabaseKey;
+  return Boolean(url && key && !url.includes('your-project-id.supabase.co'));
+};
+
+let supabaseIsHealthy = isSupabaseConfigured();
 let lastSupabaseHealthCheck = 0;
 const HEALTH_CHECK_INTERVAL = 30 * 1000;
 
 const checkSupabaseLive = async () => {
-  const url = env.supabaseUrl;
-  const key = env.supabaseKey;
-  if (!url || !key || url.includes('your-project-id.supabase.co')) {
+  if (!isSupabaseConfigured()) {
     supabaseIsHealthy = false;
     return false;
   }
   try {
     const client = getSupabase();
     const query = client.from('users').select('id').limit(1);
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500));
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
     const { data, error } = await Promise.race([query, timeout]);
     supabaseIsHealthy = !error;
   } catch {
@@ -112,6 +116,7 @@ const checkSupabaseLive = async () => {
 checkSupabaseLive().catch(() => {});
 
 const isSupabaseLive = () => {
+  if (!isSupabaseConfigured()) return false;
   if (Date.now() - lastSupabaseHealthCheck > HEALTH_CHECK_INTERVAL) {
     checkSupabaseLive().catch(() => {});
   }
@@ -558,7 +563,7 @@ class QueryBuilder {
     let results = [];
     let queryWorked = false;
 
-    if (isSupabaseLive()) {
+    if (isSupabaseConfigured() && isSupabaseLive()) {
       try {
         const client = getSupabase();
         let query = client.from(this.tableName).select(this.selectVal);
@@ -597,6 +602,9 @@ class QueryBuilder {
         if (!error && Array.isArray(data)) {
           results = data;
           queryWorked = true;
+          supabaseIsHealthy = true;
+        } else if (error) {
+          logger.warn(`Supabase query on ${this.tableName} failed: ${error.message} (${error.code})`);
         }
       } catch (err) {
         logger.warn(`Supabase query on ${this.tableName} failed (${err.message}). Serving fallback data.`);
@@ -617,8 +625,10 @@ class QueryBuilder {
       results = filtered;
     }
 
-    // Cache results for ultra-fast subsequent lookups
-    setCachedQuery(this.tableName, 'find', cacheParams, results);
+    // Cache live results for ultra-fast subsequent lookups
+    if (queryWorked) {
+      setCachedQuery(this.tableName, 'find', cacheParams, results);
+    }
 
     return results.map((row) => {
       const formatted = formatRow(row, this.tableName, this.customMethods);
