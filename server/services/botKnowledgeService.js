@@ -5,6 +5,37 @@ const clinicSeedKnowledge = require('../data/clinicSeedKnowledge');
 
 const BUCKET_NAME = 'rag-documents';
 
+// The built-in seed guide's admin state (active / inactive / deleted) is stored as a marker row in the
+// documents table so it survives server restarts. The marker has no chunks and is never shown in lists.
+const SEED_DOC_ID = 'seed-sanjeevini-guide-01';
+const SEED_MARKER_ID = '5eed0000-0000-4000-8000-000000000001';
+const SEED_STORAGE_PATH = 'seed://clinic-portfolio-guide';
+const SEED_STATE_PREFIX = '__seed_state__:';
+const CHUNK_PAGE_SIZE = 1000; // PostgREST returns at most 1000 rows per request by default
+const INIT_WAIT_MS = 8000;
+const RELOAD_RETRY_MS = 60 * 1000;
+
+function safeGetSupabase() {
+  try {
+    return getSupabase();
+  } catch {
+    return null; // Supabase not configured
+  }
+}
+
+function isSeedMarker(doc) {
+  return Boolean(doc) && (
+    doc.id === SEED_MARKER_ID ||
+    String(doc.filename || '').startsWith(SEED_STATE_PREFIX)
+  );
+}
+
+function seedStateFromMarker(marker) {
+  const state = String(marker.filename || '').slice(SEED_STATE_PREFIX.length);
+  if (state === 'deleted' || state === 'inactive' || state === 'active') return state;
+  return marker.is_active === false ? 'inactive' : 'active';
+}
+
 // Stop words to filter out during keyword scoring (English)
 const STOP_WORDS = new Set([
   'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t',
@@ -209,9 +240,19 @@ class BotKnowledgeService {
    * Wait for initial asynchronous loading of documents & chunks from Supabase
    */
   async ensureInitialized() {
-    if (this.isInitialized) return true;
     if (this.initPromise) {
-      await this.initPromise;
+      // Don't let a slow / unreachable database hang patient chat requests
+      await Promise.race([
+        this.initPromise,
+        new Promise((resolve) => setTimeout(resolve, INIT_WAIT_MS))
+      ]);
+    }
+
+    // If the knowledge base could not be loaded from Supabase (e.g. DB asleep at boot), retry in the background
+    if (!this._loadedFromDb && !this._reloading && safeGetSupabase() &&
+        Date.now() - (this._lastLoadAttempt || 0) > RELOAD_RETRY_MS) {
+      this._reloading = true;
+      this.initPromise = this.init().finally(() => { this._reloading = false; });
     }
     return this.isInitialized;
   }
@@ -235,6 +276,14 @@ class BotKnowledgeService {
       if (!ragErr) {
         this._tableNames = { docTable: 'rag_documents', chunkTable: 'rag_chunks', isReady: true };
         return this._tableNames;
+      }
+
+      // Only fall back to the legacy tables when rag_documents genuinely does not exist.
+      // A transient error (database waking up, timeout) must not permanently switch tables.
+      const missingTable = ['42P01', 'PGRST205', 'PGRST202'].includes(ragErr.code) ||
+        /does not exist|could not find the table/i.test(ragErr.message || '');
+      if (!missingTable) {
+        return { docTable: 'rag_documents', chunkTable: 'rag_chunks', isReady: false };
       }
 
       // Fallback: check bot_documents
@@ -294,33 +343,111 @@ class BotKnowledgeService {
    * Initialize knowledge service from Supabase
    */
   async init() {
+    this._lastLoadAttempt = Date.now();
     try {
-      const { isSupabaseLive } = require('../utils/supabaseModel');
-      if (isSupabaseLive && !isSupabaseLive()) {
-        this.indexSeedDocument();
-        this.isInitialized = true;
-        logger.info(
-          `BotKnowledgeService initialized with seed knowledge: ${this.runtimeDocuments.length} docs, ${this.runtimeChunks.length} chunks`
-        );
-        return;
+      // Note: do not gate this on the model-layer health probe — at boot that probe has not finished yet,
+      // which previously caused uploaded PDFs to never be loaded after a restart.
+      const supabase = safeGetSupabase();
+      if (supabase) {
+        await this.ensureBucketExists();
+        this._loadedFromDb = await this.loadFromSupabase();
+        if (this._loadedFromDb) {
+          await this.recoverStoragePdfs();
+        }
       }
-
-      await this.ensureBucketExists();
-      await this.loadFromSupabase();
-      await this.recoverStoragePdfs();
 
       // ALWAYS ensure clinic has at least the seed document if no docs exist
       if (this.runtimeDocuments.length === 0 && !this._seedExplicitlyDeleted) {
         this.indexSeedDocument();
       }
 
-      this.isInitialized = true;
       logger.info(
-        `BotKnowledgeService initialized: ${this.runtimeDocuments.length} docs, ${this.runtimeChunks.length} chunks (Supabase Storage: ${BUCKET_NAME})`
+        `BotKnowledgeService initialized: ${this.runtimeDocuments.length} docs, ${this.runtimeChunks.length} chunks ` +
+        `(source: ${this._loadedFromDb ? `Supabase table + Storage ${BUCKET_NAME}` : 'built-in seed / memory only'})`
       );
     } catch (err) {
       logger.error(`Error initializing BotKnowledgeService: ${err.message}`);
+    } finally {
+      this.isInitialized = true;
     }
+  }
+
+  /**
+   * Apply the persisted admin state of the built-in seed guide
+   */
+  applySeedState(state) {
+    if (state === 'deleted') {
+      this._seedExplicitlyDeleted = true;
+      this.runtimeDocuments = this.runtimeDocuments.filter(d => d.id !== SEED_DOC_ID);
+      this.runtimeChunks = this.runtimeChunks.filter(c => c.document_id !== SEED_DOC_ID);
+      return;
+    }
+    this._seedExplicitlyDeleted = false;
+    let seed = this.runtimeDocuments.find(d => d.id === SEED_DOC_ID);
+    if (!seed) {
+      this.indexSeedDocument();
+      seed = this.runtimeDocuments.find(d => d.id === SEED_DOC_ID);
+    }
+    seed.is_active = state !== 'inactive';
+  }
+
+  /**
+   * Persist the seed guide state (active / inactive / deleted) to the documents table
+   */
+  async persistSeedState(state) {
+    const supabase = safeGetSupabase();
+    if (!supabase) return false;
+    try {
+      const { docTable, isReady } = await this.getTableNames();
+      if (!isReady) return false;
+      const now = new Date().toISOString();
+      const payload = prepareDocPayload(docTable, {
+        id: SEED_MARKER_ID,
+        filename: `${SEED_STATE_PREFIX}${state}`,
+        original_name: clinicSeedKnowledge.title || 'Clinic Guide',
+        file_url: '',
+        storage_path: SEED_STORAGE_PATH,
+        storage_bucket: BUCKET_NAME,
+        file_size: 0,
+        page_count: 0,
+        chunk_count: 0,
+        is_active: state === 'active',
+        metadata: { seedMarker: true, state },
+        created_at: now,
+        updated_at: now
+      });
+      const { error } = await supabase.from(docTable).upsert(payload, { onConflict: 'id' });
+      if (error) {
+        logger.warn(`Could not persist seed guide state: ${error.message}`);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      logger.warn(`Could not persist seed guide state: ${err.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Fetch all chunks for the given documents, paging past the PostgREST 1000-row limit
+   */
+  async fetchChunks(supabase, chunkTable, docIds) {
+    const all = [];
+    if (!docIds || docIds.length === 0) return all;
+    for (let from = 0; ; from += CHUNK_PAGE_SIZE) {
+      const { data, error } = await supabase
+        .from(chunkTable)
+        .select('*')
+        .in('document_id', docIds)
+        .order('document_id', { ascending: true })
+        .order('chunk_index', { ascending: true })
+        .range(from, from + CHUNK_PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      if (!Array.isArray(data) || data.length === 0) break;
+      all.push(...data);
+      if (data.length < CHUNK_PAGE_SIZE) break;
+    }
+    return all;
   }
 
   /**
@@ -328,70 +455,54 @@ class BotKnowledgeService {
    */
   async loadFromSupabase() {
     try {
-      const supabase = getSupabase();
+      const supabase = safeGetSupabase();
       if (!supabase) return false;
 
       const { docTable, chunkTable, isReady } = await this.getTableNames();
       if (!isReady) return false;
 
-      const { data: docs, error: docErr } = await supabase
+      const { data: rows, error: docErr } = await supabase
         .from(docTable)
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (docErr || !Array.isArray(docs)) {
+      if (docErr || !Array.isArray(rows)) {
         return false;
       }
 
-      // Preserve or index seed document
-      let seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
-      if (!seedDoc && !this._seedExplicitlyDeleted) {
+      // Apply the persisted seed-guide state and keep the marker row out of the document list
+      const marker = rows.find(isSeedMarker);
+      const docs = rows.filter(d => !isSeedMarker(d));
+      if (marker) {
+        this.applySeedState(seedStateFromMarker(marker));
+      } else if (!this._seedExplicitlyDeleted && !this.runtimeDocuments.some(d => d.id === SEED_DOC_ID)) {
         this.indexSeedDocument();
-        seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
       }
-      const seedChunks = this.runtimeChunks.filter(c => String(c.document_id).startsWith('seed-'));
 
-      // Preserve any in-memory runtime custom documents that are not yet in Supabase
+      const seedDoc = this.runtimeDocuments.find(d => d.id === SEED_DOC_ID);
+      const seedChunks = this.runtimeChunks.filter(c => c.document_id === SEED_DOC_ID);
+
+      // Preserve any in-memory runtime custom documents that are not in Supabase (memory-only mode)
       const runtimeCustomDocs = this.runtimeDocuments.filter(
-        rd => !String(rd.id).startsWith('seed-') && !docs.some(d => d.id === rd.id)
+        rd => rd.id !== SEED_DOC_ID && !docs.some(d => d.id === rd.id)
       );
-
-      const mergedDocs = [...docs, ...runtimeCustomDocs];
-      if (seedDoc && !mergedDocs.some(d => d.id === seedDoc.id)) {
-        mergedDocs.push(seedDoc);
-      }
-
-      this.runtimeDocuments = mergedDocs;
-
-      // Load chunks for active database documents
-      const activeIds = docs.filter(d => d.is_active).map(d => d.id);
-      let loadedChunks = [];
-      if (activeIds.length > 0) {
-        const { data: chunks, error: chunkErr } = await supabase
-          .from(chunkTable)
-          .select('*')
-          .in('document_id', activeIds);
-
-        if (!chunkErr && Array.isArray(chunks)) {
-          const docMap = new Map(docs.map(d => [d.id, d]));
-          loadedChunks = chunks.map(c => ({
-            ...c,
-            document_name: c.document_name || c.metadata?.document_name || docMap.get(c.document_id)?.original_name || 'Clinic Document'
-          }));
-        }
-      }
-
-      // Preserve chunks for runtime custom documents
       const runtimeCustomDocIds = new Set(runtimeCustomDocs.map(d => d.id));
       const preservedRuntimeChunks = this.runtimeChunks.filter(c => runtimeCustomDocIds.has(c.document_id));
 
-      // If seed doc is active, preserve seed chunks alongside loaded chunks
-      if (seedDoc && seedDoc.is_active) {
-        this.runtimeChunks = [...loadedChunks, ...preservedRuntimeChunks, ...seedChunks];
-      } else {
-        this.runtimeChunks = [...loadedChunks, ...preservedRuntimeChunks];
-      }
+      // Load chunks for ALL database documents (inactive ones too) so re-activating a document works
+      // immediately; search only uses chunks of active documents.
+      const docMap = new Map(docs.map(d => [d.id, d]));
+      const rawChunks = await this.fetchChunks(supabase, chunkTable, docs.map(d => d.id));
+      const loadedChunks = rawChunks.map(c => ({
+        ...c,
+        document_name: c.document_name || c.metadata?.document_name || docMap.get(c.document_id)?.original_name || 'Clinic Document'
+      }));
 
+      const mergedDocs = [...docs, ...runtimeCustomDocs];
+      if (seedDoc) mergedDocs.push(seedDoc);
+
+      this.runtimeDocuments = mergedDocs;
+      this.runtimeChunks = [...loadedChunks, ...preservedRuntimeChunks, ...seedChunks];
       return true;
     } catch (err) {
       logger.warn(`Could not load RAG documents from Supabase: ${err.message}`);
@@ -523,7 +634,7 @@ class BotKnowledgeService {
    * Built-in fallback clinic guide seed document
    */
   indexSeedDocument() {
-    const docId = 'seed-sanjeevini-guide-01';
+    const docId = SEED_DOC_ID;
 
     this.runtimeDocuments = this.runtimeDocuments.filter(d => d.id !== docId);
     this.runtimeChunks = this.runtimeChunks.filter(c => c.document_id !== docId);
@@ -559,10 +670,11 @@ class BotKnowledgeService {
     this.runtimeChunks.push(...seedChunks);
   }
 
-  restoreSeedDocument() {
+  async restoreSeedDocument() {
     this._seedExplicitlyDeleted = false;
     this.indexSeedDocument();
-    return this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
+    await this.persistSeedState('active');
+    return this.runtimeDocuments.find(d => d.id === SEED_DOC_ID);
   }
 
   /**
@@ -577,9 +689,11 @@ class BotKnowledgeService {
     let fileUrl = '';
     let storageSaved = false;
 
+    const supabaseClient = safeGetSupabase();
+
     // 1. Upload raw PDF directly to Supabase Storage bucket
     try {
-      const supabase = getSupabase();
+      const supabase = supabaseClient;
       if (supabase && fileBuffer) {
         await this.ensureBucketExists();
 
@@ -643,31 +757,56 @@ class BotKnowledgeService {
       created_at: now
     }));
 
-    // 2. Persist in Supabase separate table with schema-aware payload & retry
+    // 2. Persist in Supabase separate table with schema-aware payload & retry.
+    //    If Supabase is configured, the upload only succeeds when the document AND all its chunks are saved —
+    //    otherwise the document would silently disappear from the chatbot after the next restart.
     let dbSaved = false;
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const { docTable, chunkTable, isReady } = await this.getTableNames();
-        if (isReady) {
-          const docPayload = prepareDocPayload(docTable, docRecord);
-          const { error: insertDocErr } = await insertWithSchemaRetry(supabase, docTable, docPayload);
-          if (!insertDocErr) {
-            // Insert chunks in batches of 50 to respect payload limits
-            for (let i = 0; i < chunkRecords.length; i += 50) {
-              const rawBatch = chunkRecords.slice(i, i + 50);
-              const batch = rawBatch.map(c => prepareChunkPayload(chunkTable, c));
-              await insertWithSchemaRetry(supabase, chunkTable, batch);
+    if (supabaseClient) {
+      const supabase = supabaseClient;
+      const { docTable, chunkTable, isReady } = await this.getTableNames();
+      const rollbackStorage = async () => {
+        if (storageSaved) {
+          await supabase.storage.from(BUCKET_NAME).remove([storagePath]).catch(() => {});
+        }
+      };
+
+      if (!isReady) {
+        await rollbackStorage();
+        throw new Error('Knowledge base tables were not found in Supabase. Run server/supabase_rag_schema.sql in the Supabase SQL editor, then upload again.');
+      }
+
+      let failure = null;
+      try {
+        const docPayload = prepareDocPayload(docTable, docRecord);
+        const { error: insertDocErr } = await insertWithSchemaRetry(supabase, docTable, docPayload);
+        if (insertDocErr) {
+          failure = `Could not save the document record: ${insertDocErr.message}`;
+        } else {
+          // Insert chunks in batches of 50 to respect payload limits
+          for (let i = 0; i < chunkRecords.length; i += 50) {
+            const batch = chunkRecords.slice(i, i + 50).map(c => prepareChunkPayload(chunkTable, c));
+            const { error: chunkErr } = await insertWithSchemaRetry(supabase, chunkTable, batch);
+            if (chunkErr) {
+              failure = `Could not save knowledge chunks: ${chunkErr.message}`;
+              break;
             }
-            dbSaved = true;
-            logger.info(`Persisted document & chunks to Supabase table "${docTable}"`);
-          } else {
-            logger.warn(`Supabase table insert error (${docTable}): ${insertDocErr.message}`);
+          }
+          if (failure) {
+            await supabase.from(chunkTable).delete().eq('document_id', docId);
+            await supabase.from(docTable).delete().eq('id', docId);
           }
         }
+      } catch (dbErr) {
+        failure = `Could not save to Supabase: ${dbErr.message}`;
       }
-    } catch (dbErr) {
-      logger.warn(`Could not insert into Supabase table: ${dbErr.message}`);
+
+      if (failure) {
+        await rollbackStorage();
+        logger.warn(`PDF indexing aborted: ${failure}`);
+        throw new Error(failure);
+      }
+      dbSaved = true;
+      logger.info(`Persisted document & ${chunkRecords.length} chunks to Supabase table "${docTable}"`);
     }
 
     // Always update in-memory runtime cache
@@ -687,39 +826,10 @@ class BotKnowledgeService {
    * Get all knowledge documents (Supabase is the primary source, preserved with runtime cache)
    */
   async getDocuments() {
-    try {
-      const supabase = getSupabase();
-      const { docTable, isReady } = await this.getTableNames();
-      if (supabase && isReady) {
-        const { data, error } = await supabase
-          .from(docTable)
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (!error && Array.isArray(data)) {
-          // If seed doc was in runtime, preserve it; or if runtime is empty, ensure seed is present
-          let seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
-          if (!seedDoc && !this._seedExplicitlyDeleted) {
-            this.indexSeedDocument();
-            seedDoc = this.runtimeDocuments.find(d => String(d.id).startsWith('seed-'));
-          }
-
-          // Preserve any in-memory custom documents that haven't synced yet
-          const runtimeCustomDocs = this.runtimeDocuments.filter(
-            rd => !String(rd.id).startsWith('seed-') && !data.some(d => d.id === rd.id)
-          );
-
-          const merged = [...data, ...runtimeCustomDocs];
-          if (seedDoc && !merged.some(d => d.id === seedDoc.id)) {
-            merged.push(seedDoc);
-          }
-
-          this.runtimeDocuments = merged;
-          return merged;
-        }
-      }
-    } catch (err) {
-      logger.warn(`Error reading documents from Supabase: ${err.message}`);
+    // Re-sync from Supabase so the admin list reflects the database (and the chat index stays in step)
+    if (safeGetSupabase()) {
+      const loaded = await this.loadFromSupabase();
+      if (loaded) this._loadedFromDb = true;
     }
 
     if (this.runtimeDocuments.length === 0 && !this._seedExplicitlyDeleted) {
@@ -733,78 +843,56 @@ class BotKnowledgeService {
    * Delete a document, purge from Supabase Storage and remove from Supabase table
    */
   async deleteDocument(id) {
-    if (!id) return { success: false, removed: null };
+    if (!id) return { success: false, notFound: true, message: 'Document id is required' };
     const cleanId = decodeURIComponent(String(id).trim());
 
-    // 1. Locate the document to get storage_path and actual db ID
-    let targetDoc = this.runtimeDocuments.find(d => 
-      String(d.id).trim() === cleanId || 
-      String(d.filename).trim() === cleanId ||
-      String(d.original_name).trim() === cleanId
+    const targetDoc = this.runtimeDocuments.find(d =>
+      String(d.id).trim() === cleanId || String(d.filename).trim() === cleanId
     );
-
     const actualDbId = targetDoc?.id || cleanId;
-    const isSeedDoc = String(actualDbId).startsWith('seed-');
 
-    if (isSeedDoc) {
-      this._seedExplicitlyDeleted = true;
+    // Built-in seed guide: hide it and remember that choice across restarts
+    if (actualDbId === SEED_DOC_ID) {
+      this.applySeedState('deleted');
+      await this.persistSeedState('deleted');
+      return { success: true, removedDocument: targetDoc || { id: SEED_DOC_ID }, remainingCount: this.runtimeDocuments.length };
     }
 
-    // 2. Remove binary PDF file from Supabase Storage bucket (if not seed doc)
-    try {
-      const supabase = getSupabase();
-      if (supabase && targetDoc && targetDoc.storage_path && !targetDoc.storage_path.startsWith('seed://')) {
-        await supabase.storage.from(BUCKET_NAME).remove([targetDoc.storage_path]);
-        logger.info(`Removed PDF "${targetDoc.storage_path}" from Supabase Storage bucket "${BUCKET_NAME}"`);
-      }
-    } catch (storageDelErr) {
-      logger.warn(`Could not delete file from Supabase Storage: ${storageDelErr.message}`);
-    }
+    const supabase = safeGetSupabase();
+    if (supabase) {
+      const { docTable, chunkTable, isReady } = await this.getTableNames();
+      if (isReady) {
+        // Remove the database rows first; only report success if they are really gone
+        const { error: chunkErr } = await supabase.from(chunkTable).delete().eq('document_id', actualDbId);
+        if (chunkErr) return { success: false, message: `Could not delete document chunks: ${chunkErr.message}` };
+        const { data: deletedRows, error: docErr } = await supabase.from(docTable).delete().eq('id', actualDbId).select('id');
+        if (docErr) return { success: false, message: `Could not delete document: ${docErr.message}` };
+        if ((!deletedRows || deletedRows.length === 0) && !targetDoc) {
+          return { success: false, notFound: true, message: 'Document not found' };
+        }
 
-    // 3. Remove from Supabase Database tables (if not seed doc)
-    if (!isSeedDoc) {
-      try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { docTable, chunkTable, isReady } = await this.getTableNames();
-          if (isReady) {
-            await supabase.from(chunkTable).delete().eq('document_id', actualDbId);
-            await supabase.from(docTable).delete().eq('id', actualDbId);
+        // Then remove the binary PDF from Storage
+        if (targetDoc && targetDoc.storage_path && !String(targetDoc.storage_path).startsWith('seed://')) {
+          const { error: storageErr } = await supabase.storage.from(BUCKET_NAME).remove([targetDoc.storage_path]);
+          if (storageErr) {
+            logger.warn(`Could not delete file from Supabase Storage: ${storageErr.message}`);
+          } else {
+            logger.info(`Removed PDF "${targetDoc.storage_path}" from Supabase Storage bucket "${BUCKET_NAME}"`);
           }
         }
-      } catch (dbDelErr) {
-        logger.warn(`Could not delete document from Supabase table: ${dbDelErr.message}`);
       }
+    } else if (!targetDoc) {
+      return { success: false, notFound: true, message: 'Document not found' };
     }
 
-    // 4. Update runtime cache
-    const docIndex = this.runtimeDocuments.findIndex(d => 
-      String(d.id).trim() === cleanId || 
-      String(d.filename).trim() === cleanId ||
-      String(d.original_name).trim() === cleanId
-    );
-
-    let removedDoc = null;
-    if (docIndex !== -1) {
-      removedDoc = this.runtimeDocuments.splice(docIndex, 1)[0];
-    } else {
-      removedDoc = { id: cleanId, notFoundInStore: true };
-    }
-
-    const removedIdentifiers = new Set(
-      [cleanId, actualDbId, removedDoc?.id, removedDoc?.filename, removedDoc?.original_name]
-        .filter(Boolean)
-        .map(s => String(s).trim())
-    );
-
-    this.runtimeChunks = this.runtimeChunks.filter(c => 
-      !removedIdentifiers.has(String(c.document_id).trim()) &&
-      !removedIdentifiers.has(String(c.document_name).trim())
-    );
+    // Update runtime cache — remove only this document and its own chunks (by id, not by name,
+    // so another document with the same file name is not affected)
+    this.runtimeDocuments = this.runtimeDocuments.filter(d => d.id !== actualDbId);
+    this.runtimeChunks = this.runtimeChunks.filter(c => c.document_id !== actualDbId);
 
     return {
       success: true,
-      removedDocument: removedDoc,
+      removedDocument: targetDoc || { id: actualDbId },
       remainingCount: this.runtimeDocuments.length
     };
   }
@@ -814,31 +902,47 @@ class BotKnowledgeService {
    */
   async toggleDocument(id, isActive) {
     const cleanId = decodeURIComponent(String(id).trim());
-    const doc = this.runtimeDocuments.find(d => 
-      String(d.id).trim() === cleanId || 
+    const doc = this.runtimeDocuments.find(d =>
+      String(d.id).trim() === cleanId ||
       String(d.filename).trim() === cleanId
     );
-    if (!doc) throw new Error('Document not found');
+    if (!doc) {
+      const err = new Error('Document not found');
+      err.statusCode = 404;
+      throw err;
+    }
 
     const newStatus = typeof isActive === 'boolean' ? isActive : !doc.is_active;
-    doc.is_active = newStatus;
-    doc.updated_at = new Date().toISOString();
 
-    // Only update Supabase if not a built-in seed doc
-    if (!String(doc.id).startsWith('seed-')) {
-      try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { docTable, isReady } = await this.getTableNames();
-          if (isReady) {
-            await supabase.from(docTable).update({ is_active: newStatus }).eq('id', doc.id);
-          }
+    if (doc.id === SEED_DOC_ID) {
+      this.applySeedState(newStatus ? 'active' : 'inactive');
+      await this.persistSeedState(newStatus ? 'active' : 'inactive');
+      return this.runtimeDocuments.find(d => d.id === SEED_DOC_ID);
+    }
+
+    const supabase = safeGetSupabase();
+    if (supabase) {
+      const { docTable, chunkTable, isReady } = await this.getTableNames();
+      if (isReady) {
+        const { error } = await supabase.from(docTable).update({ is_active: newStatus }).eq('id', doc.id);
+        if (error) {
+          const err = new Error(`Could not update document state: ${error.message}`);
+          err.statusCode = 500;
+          throw err;
         }
-      } catch (err) {
-        logger.warn(`Could not update document state in Supabase: ${err.message}`);
+        // Make sure the document's chunks are in memory when it is (re)activated
+        if (newStatus && !this.runtimeChunks.some(c => c.document_id === doc.id)) {
+          const chunks = await this.fetchChunks(supabase, chunkTable, [doc.id]);
+          this.runtimeChunks.push(...chunks.map(c => ({
+            ...c,
+            document_name: c.document_name || c.metadata?.document_name || doc.original_name || 'Clinic Document'
+          })));
+        }
       }
     }
 
+    doc.is_active = newStatus;
+    doc.updated_at = new Date().toISOString();
     return doc;
   }
 
