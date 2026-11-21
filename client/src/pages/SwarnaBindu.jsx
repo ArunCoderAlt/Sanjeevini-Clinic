@@ -12,17 +12,14 @@ import {
 } from 'lucide-react';
 import Container from '../components/common/Container';
 import PageTransition from '../components/common/PageTransition';
-import { defaultPushyaSchedule } from '../data/swarnaBinduData';
 import { useSwarnaBindu } from '../hooks/useQueries';
 
 const SwarnaBindu = () => {
   const { data: rawEvents, isLoading } = useSwarnaBindu();
   const schedule = useMemo(() => {
-    if (!rawEvents) return defaultPushyaSchedule;
-    if (Array.isArray(rawEvents) && rawEvents.length === 0) return [];
-    return rawEvents;
+    if (Array.isArray(rawEvents)) return rawEvents;
+    return [];
   }, [rawEvents]);
-  const loading = isLoading && (!rawEvents || rawEvents.length === 0);
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'completed'
 
   const filteredSchedule = schedule.filter((item) => {
@@ -251,7 +248,7 @@ const SwarnaBindu = () => {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  All Dates ({schedule.length})
+                  All Dates ({isLoading ? '...' : schedule.length})
                 </button>
                 <button
                   onClick={() => setFilter('upcoming')}
@@ -298,7 +295,39 @@ const SwarnaBindu = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
-                    {filteredSchedule.length === 0 ? (
+                    {isLoading ? (
+                      Array.from({ length: 7 }).map((_, i) => (
+                        <tr key={`skeleton-${i}`} className="animate-pulse border-b border-slate-100/80 bg-white">
+                          {/* Month skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-slate-200" />
+                              <div className="h-4 bg-slate-200/80 rounded w-20 sm:w-24" />
+                            </div>
+                          </td>
+                          {/* Date skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="h-4 bg-slate-200/80 rounded w-24 sm:w-28" />
+                          </td>
+                          {/* Day skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="h-4 bg-slate-200/60 rounded w-16 sm:w-20" />
+                          </td>
+                          {/* Nakshatra skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="h-6 bg-amber-50 rounded-full w-28 sm:w-32 border border-amber-100/80" />
+                          </td>
+                          {/* Timings skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="h-4 bg-slate-200/60 rounded w-24 sm:w-28" />
+                          </td>
+                          {/* Status skeleton */}
+                          <td className="py-4 px-3 sm:px-6">
+                            <div className="h-5 bg-slate-200/70 rounded-full w-16 sm:w-20" />
+                          </td>
+                        </tr>
+                      ))
+                    ) : filteredSchedule.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="py-12 px-6 text-center text-slate-500 font-medium bg-slate-50/50">
                           No camp dates scheduled under this filter. Please check back soon or contact the clinic.
@@ -385,7 +414,7 @@ const SwarnaBindu = () => {
                 </table>
               </div>
 
-              {filteredSchedule.length === 0 && (
+              {!isLoading && filteredSchedule.length === 0 && (
                 <div className="py-12 text-center text-slate-500 text-sm">
                   No schedule entries found for the selected filter.
                 </div>

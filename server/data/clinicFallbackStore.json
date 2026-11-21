@@ -50,7 +50,7 @@
       "title": "Varmam Therapy",
       "slug": "varmam-therapy",
       "shortDescription": "Traditional therapeutic technique targeting vital energy points to stimulate healing.",
-      "fullDescription": "Ancient Siddha vital point manipulation therapy that restores energy flow, alleviates chronic pain, and accelerates neurological recovery.",
+      "fullDescription": "",
       "image": "/images/hero/slide-4.png",
       "icon": "HeartPulse",
       "benefits": [
@@ -73,7 +73,7 @@
       "title": "Thokkanam Therapy",
       "slug": "thokkanam-therapy",
       "shortDescription": "Traditional Siddha physical manipulation and medicinal oil massage therapy.",
-      "fullDescription": "Nine specialized physical touch techniques combined with medicated herbal oils to rejuvenate muscle tissues and relieve stress.",
+      "fullDescription": "",
       "image": "/images/hero/slide-6.png",
       "icon": "Sparkles",
       "benefits": [
@@ -681,11 +681,13 @@
       "nakshatra": "Pushya (Poosam)",
       "timings": "All Day",
       "venue": "Sanjeevini Medical Centre, Karaikal",
-      "status": "Completed",
+      "status": "Next Camp",
       "notes": "Camp completed successfully",
       "order": 2,
       "isActive": true,
-      "createdAt": "2026-11-16T04:41:47.497Z"
+      "createdAt": "2026-11-16T04:41:47.497Z",
+      "_id": "sb-2026-02",
+      "updatedAt": "2026-11-21T11:29:36.188Z"
     },
     {
       "id": "sb-2026-03a",

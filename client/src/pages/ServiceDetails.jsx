@@ -13,7 +13,7 @@ const serviceCatalog = {
   'varmam-therapy': {
     title: 'Varmam Therapy',
     shortDescription: 'Traditional therapeutic vital point stimulation for rapid pain relief, neuromuscular restoration, and energy balance.',
-    fullDescription: `Varmam is a specialized, ancient Tamil healing science that targets vital points where physical and subtle energy pathways converge. When these points are blocked or traumatized by stress, injury, or wear-and-tear, severe musculoskeletal and nervous disorders arise.\n\nOur expert practitioners apply measured, precise manual pressure to specific Varmam points to release trapped energy, restore nervous conductivity, and provide fast, lasting relief from spinal, joint, and nerve pain without surgery.`,
+    fullDescription: '',
     benefits: [
       'Relief from chronic spinal, back, and neck pain',
       'Neuromuscular stimulation for stroke rehabilitation',
@@ -25,7 +25,7 @@ const serviceCatalog = {
   'varmam': {
     title: 'Varmam Therapy',
     shortDescription: 'Traditional therapeutic vital point stimulation for rapid pain relief, neuromuscular restoration, and energy balance.',
-    fullDescription: `Varmam is a specialized, ancient Tamil healing science that targets vital points where physical and subtle energy pathways converge. When these points are blocked or traumatized by stress, injury, or wear-and-tear, severe musculoskeletal and nervous disorders arise.\n\nOur expert practitioners apply measured, precise manual pressure to specific Varmam points to release trapped energy, restore nervous conductivity, and provide fast, lasting relief from spinal, joint, and nerve pain without surgery.`,
+    fullDescription: '',
     benefits: [
       'Relief from chronic spinal, back, and neck pain',
       'Neuromuscular stimulation for stroke rehabilitation',
@@ -37,7 +37,7 @@ const serviceCatalog = {
   'thokkanam-therapy': {
     title: 'Thokkanam Therapy',
     shortDescription: 'Traditional Siddha physical manipulation and medicated oil massage for neuromuscular rehabilitation.',
-    fullDescription: `Thokkanam is the physical manipulation therapy of the Siddha medicine system. Employing nine distinct therapeutic manual techniques—including kneading, tapping, gliding, and passive stretching—alongside warm medicated herbal oils.\n\nThokkanam effectively penetrates deep muscular layers to disperse lactic acid, nourish dry joints, reduce inflammatory stiffness, and re-establish harmonious blood and lymph circulation throughout the body.`,
+    fullDescription: '',
     benefits: [
       'Alleviation of deep muscle fatigue and spasm',
       'Nourishment of arthritic and stiff joints',
@@ -49,12 +49,36 @@ const serviceCatalog = {
   'thokkanam': {
     title: 'Thokkanam Therapy',
     shortDescription: 'Traditional Siddha physical manipulation and medicated oil massage for neuromuscular rehabilitation.',
-    fullDescription: `Thokkanam is the physical manipulation therapy of the Siddha medicine system. Employing nine distinct therapeutic manual techniques—including kneading, tapping, gliding, and passive stretching—alongside warm medicated herbal oils.\n\nThokkanam effectively penetrates deep muscular layers to disperse lactic acid, nourish dry joints, reduce inflammatory stiffness, and re-establish harmonious blood and lymph circulation throughout the body.`,
+    fullDescription: '',
     benefits: [
       'Alleviation of deep muscle fatigue and spasm',
       'Nourishment of arthritic and stiff joints',
       'Re-establishment of healthy blood and lymphatic flow',
       'Balancing of Vatha humor across the nervous system'
+    ],
+    image: '/images/hero/slide-3.png'
+  },
+  'swedanam-therapy': {
+    title: 'Swedanam Therapy',
+    shortDescription: 'Traditional herbal steam and sudation therapy to open microchannels, relieve deep muscle stiffness, and eliminate metabolic toxins.',
+    fullDescription: '',
+    benefits: [
+      'Relief from muscular stiffness and joint rigidity',
+      'Enhanced blood circulation and tissue oxygenation',
+      'Deep cellular detoxification through perspiration',
+      'Restoration of bodily lightness and flexibility'
+    ],
+    image: '/images/hero/slide-3.png'
+  },
+  'swedanam': {
+    title: 'Swedanam Therapy',
+    shortDescription: 'Traditional herbal steam and sudation therapy to open microchannels, relieve deep muscle stiffness, and eliminate metabolic toxins.',
+    fullDescription: '',
+    benefits: [
+      'Relief from muscular stiffness and joint rigidity',
+      'Enhanced blood circulation and tissue oxygenation',
+      'Deep cellular detoxification through perspiration',
+      'Restoration of bodily lightness and flexibility'
     ],
     image: '/images/hero/slide-3.png'
   },
@@ -108,11 +132,13 @@ export default function ServiceDetails() {
       ? rawService.image
       : (isValidImage(fallback?.image) ? fallback.image : previewDefaultImg);
 
+    const isExcludedDesc = ['varmam', 'varmam-therapy', 'thokkanam', 'thokkanam-therapy', 'swedanam', 'swedanam-therapy'].includes(slugKey);
+
     if (rawService && rawService.title) {
       return {
         ...rawService,
         shortDescription: rawService.shortDescription || fallback?.shortDescription,
-        fullDescription: rawService.fullDescription || fallback?.fullDescription,
+        fullDescription: isExcludedDesc ? '' : (rawService.fullDescription || fallback?.fullDescription || ''),
         benefits: rawService.benefits?.length ? rawService.benefits : fallback?.benefits,
         image: baseImage
       };
@@ -120,6 +146,7 @@ export default function ServiceDetails() {
     if (fallback) {
       return {
         ...fallback,
+        fullDescription: isExcludedDesc ? '' : (fallback.fullDescription || ''),
         image: fallback.image || previewDefaultImg
       };
     }

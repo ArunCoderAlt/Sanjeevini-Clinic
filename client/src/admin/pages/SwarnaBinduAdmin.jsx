@@ -110,12 +110,12 @@ const SwarnaBinduAdmin = () => {
 
   const handleQuickMarkNext = async (item, e) => {
     e?.stopPropagation();
+    const itemId = item.id || item._id;
     try {
-      // First update current items so no other is "Next Camp"
+      // First update current items in local state so UI responds immediately
       const updatedList = schedule.map((s) => {
         const id = s.id || s._id;
-        const currentId = item.id || item._id;
-        if (id === currentId) {
+        if (id === itemId) {
           return { ...s, status: 'Next Camp' };
         } else if (s.status === 'Next Camp') {
           return { ...s, status: 'Upcoming' };
@@ -124,14 +124,23 @@ const SwarnaBinduAdmin = () => {
       });
       setSchedule(updatedList);
 
-      await updateSwarnaBinduScheduleItem(item.id || item._id, {
-        ...item,
-        status: 'Next Camp'
+      await updateSwarnaBinduScheduleItem(itemId, {
+        month: item.month,
+        date: item.date,
+        day: item.day,
+        nakshatra: item.nakshatra || 'Pushya (Poosam)',
+        timings: item.timings || '5:00 PM – 9:30 PM',
+        venue: item.venue || 'Sanjeevini Medical Centre, Karaikal',
+        status: 'Next Camp',
+        notes: item.notes || '',
+        order: item.order !== undefined ? item.order : (item.order_index || 0),
+        isActive: item.isActive !== undefined ? item.isActive : true
       });
       toast.success(`Marked ${item.date} as Next Camp!`);
+      await fetchSchedule();
     } catch (err) {
       toast.error('Failed to update status.');
-      fetchSchedule();
+      await fetchSchedule();
     }
   };
 

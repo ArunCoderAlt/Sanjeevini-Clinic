@@ -37,10 +37,17 @@ app.use(
 );
 
 // CORS middleware - supports CLIENT_URL, CLIENT_ORIGIN, and auto-permits Vercel domains
+const defaultOrigins = [
+  'https://www.sanjeevinisiddha.in',
+  'https://sanjeevinisiddha.in',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 const clientOriginEnv = process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || '';
-const explicitOrigins = clientOriginEnv
-  ? clientOriginEnv.split(',').map((o) => o.trim().replace(/\/$/, ''))
-  : ['http://localhost:5173', 'http://localhost:3000'];
+const explicitOrigins = [
+  ...defaultOrigins,
+  ...(clientOriginEnv ? clientOriginEnv.split(',').map((o) => o.trim().replace(/\/$/, '')) : []),
+];
 
 // Bulletproof CORS options that support Vercel, Render, local dev, custom domains, and previews
 const corsOptions = {

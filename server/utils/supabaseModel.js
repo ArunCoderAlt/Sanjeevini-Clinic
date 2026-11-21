@@ -296,6 +296,16 @@ const toDbRow = (data, tableName = '') => {
     }
   }
 
+  if (tableName === 'swarna_bindu') {
+    if (result['status'] === 'Next Camp') {
+      result['status'] = 'Upcoming';
+      const cleanNotes = (result['notes'] || '').replace(/\s*\[SPOTLIGHT\]\s*/g, '').trim();
+      result['notes'] = cleanNotes ? `${cleanNotes} [SPOTLIGHT]` : '[SPOTLIGHT]';
+    } else if (result['notes'] !== undefined && typeof result['notes'] === 'string') {
+      result['notes'] = result['notes'].replace(/\s*\[SPOTLIGHT\]\s*/g, '').trim();
+    }
+  }
+
   return result;
 };
 
@@ -335,6 +345,13 @@ const formatRow = (row, tableName, customMethods = {}) => {
     formatted.imageUrl = galleryImg;
     formatted.caption = row.caption || row.description || '';
     formatted.description = row.description || row.caption || '';
+  }
+
+  if (tableName === 'swarna_bindu') {
+    if (row.notes && String(row.notes).includes('[SPOTLIGHT]')) {
+      formatted.status = 'Next Camp';
+      formatted.notes = String(row.notes).replace(/\s*\[SPOTLIGHT\]\s*/g, '').trim();
+    }
   }
 
   formatted.save = async function () {

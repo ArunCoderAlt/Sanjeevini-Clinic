@@ -7,10 +7,10 @@ exports.getEvents = asyncHandler(async (req, res) => {
   if (req.query.all !== 'true') {
     filter.isActive = true;
   }
+  let events = await SwarnaBindu.find(filter).sort({ order: 1, date: 1, createdAt: 1 });
   if (req.query.status && req.query.status !== 'all') {
-    filter.status = req.query.status;
+    events = events.filter((e) => e.status === req.query.status);
   }
-  const events = await SwarnaBindu.find(filter).sort({ order: 1, date: 1, createdAt: 1 });
   return success(res, events);
 });
 
@@ -21,12 +21,38 @@ exports.getEventById = asyncHandler(async (req, res) => {
 });
 
 exports.createEvent = asyncHandler(async (req, res) => {
+  if (req.body && req.body.status === 'Next Camp') {
+    try {
+      const allEvents = await SwarnaBindu.find({});
+      for (const ev of allEvents) {
+        if (ev.status === 'Next Camp') {
+          const evId = ev.id || ev._id;
+          await SwarnaBindu.findByIdAndUpdate(evId, { ...ev, status: 'Upcoming' });
+        }
+      }
+    } catch (_) {}
+  }
   const event = await SwarnaBindu.create(req.body);
   return success(res, event, 'Swarna Bindu event created successfully', 201);
 });
 
 exports.updateEvent = asyncHandler(async (req, res) => {
-  const event = await SwarnaBindu.findByIdAndUpdate(req.params.id, req.body, {
+  const targetId = req.params.id;
+
+  // When setting an item as Next Camp, clear Spotlight from any previous Next Camp item
+  if (req.body && req.body.status === 'Next Camp') {
+    try {
+      const allEvents = await SwarnaBindu.find({});
+      for (const ev of allEvents) {
+        const evId = ev.id || ev._id;
+        if (evId !== targetId && ev.status === 'Next Camp') {
+          await SwarnaBindu.findByIdAndUpdate(evId, { ...ev, status: 'Upcoming' });
+        }
+      }
+    } catch (_) {}
+  }
+
+  const event = await SwarnaBindu.findByIdAndUpdate(targetId, req.body, {
     new: true,
     runValidators: true,
   });
