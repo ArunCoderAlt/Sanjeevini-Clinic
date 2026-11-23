@@ -120,11 +120,18 @@ export default function ServiceDetails() {
 
   const service = useMemo(() => {
     const slugKey = slug?.toLowerCase() || '';
-    const fallback = serviceCatalog[slugKey] || 
-      serviceCatalog[slugKey.replace('-therapy', '').replace('-support', '')] ||
-      serviceCatalog[`${slugKey}-therapy`] ||
-      serviceCatalog[`${slugKey}-support`] ||
-      null;
+    const rawTitle = (rawService?.title || '').toLowerCase();
+    const isSwedanam = rawTitle.includes('swedan') || slugKey.includes('swedan');
+
+    const fallback = isSwedanam
+      ? (serviceCatalog['swedanam'] || serviceCatalog['swedanam-therapy'])
+      : (
+          serviceCatalog[slugKey] || 
+          serviceCatalog[slugKey.replace('-therapy', '').replace('-support', '')] ||
+          serviceCatalog[`${slugKey}-therapy`] ||
+          serviceCatalog[`${slugKey}-support`] ||
+          null
+        );
 
     const previewDefaultImg = getDefaultServiceImage(slugKey);
 
@@ -132,7 +139,9 @@ export default function ServiceDetails() {
       ? rawService.image
       : (isValidImage(fallback?.image) ? fallback.image : previewDefaultImg);
 
-    const isExcludedDesc = ['varmam', 'varmam-therapy', 'thokkanam', 'thokkanam-therapy', 'swedanam', 'swedanam-therapy'].includes(slugKey);
+    const isExcludedDesc = isSwedanam || 
+      ['varmam', 'varmam-therapy', 'thokkanam', 'thokkanam-therapy', 'swedanam', 'swedanam-therapy'].includes(slugKey) ||
+      ['varmam', 'thokkanam', 'swedan'].some((k) => rawTitle.includes(k) || slugKey.includes(k));
 
     if (rawService && rawService.title) {
       return {

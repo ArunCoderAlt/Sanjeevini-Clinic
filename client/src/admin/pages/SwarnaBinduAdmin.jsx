@@ -39,6 +39,16 @@ const initialScheduleForm = {
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const match = String(dateStr).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (match) {
+    const [, yyyy, mm, dd] = match;
+    return `${dd.padStart(2, '0')}-${mm.padStart(2, '0')}-${yyyy}`;
+  }
+  return dateStr;
+};
+
 const SwarnaBinduAdmin = () => {
   const [schedule, setSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -211,7 +221,7 @@ const SwarnaBinduAdmin = () => {
       sortable: true,
       render: (val, row) => (
         <div>
-          <span className="font-semibold text-slate-900 block">{val}</span>
+          <span className="font-semibold text-slate-900 block">{formatDate(val)}</span>
           <span className="text-xs text-slate-500 font-medium">{row.day}</span>
         </div>
       )

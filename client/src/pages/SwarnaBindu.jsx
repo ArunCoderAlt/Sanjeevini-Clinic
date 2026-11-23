@@ -15,6 +15,16 @@ import Container from '../components/common/Container';
 import PageTransition from '../components/common/PageTransition';
 import { useSwarnaBindu } from '../hooks/useQueries';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const match = String(dateStr).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (match) {
+    const [, yyyy, mm, dd] = match;
+    return `${dd.padStart(2, '0')}-${mm.padStart(2, '0')}-${yyyy}`;
+  }
+  return dateStr;
+};
+
 const SwarnaBindu = () => {
   const { data: rawEvents, isLoading } = useSwarnaBindu();
   const schedule = useMemo(() => {
@@ -341,7 +351,7 @@ const SwarnaBindu = () => {
 
                           {/* Camp Date */}
                           <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-slate-900">
-                            {row.date}
+                            {formatDate(row.date)}
                           </td>
 
                           {/* Day */}
